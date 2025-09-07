@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}View Booking - CRM System{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('bookings.index') }}">Bookings</a></li>
+<li class="breadcrumb-item active">View Booking</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-eye text-primary"></i>
+                View Booking
+            </h2>
+            <div>
+                <a href="{{ url_for('bookings.edit', id=booking.id) }}" class="btn btn-secondary me-2">
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+                <a href="{{ url_for('bookings.index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Bookings
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Booking Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-5">Booking Code:</dt>
+                            <dd class="col-sm-7">{{ booking.booking_code }}</dd>
+
+                            <dt class="col-sm-5">Customer Name:</dt>
+                            <dd class="col-sm-7">{{ booking.customer_name }}</dd>
+
+                            <dt class="col-sm-5">Customer Mobile:</dt>
+                            <dd class="col-sm-7">{{ booking.customer_mob }}</dd>
+
+                            <dt class="col-sm-5">Start Date:</dt>
+                            <dd class="col-sm-7">{{ booking.start_date.strftime('%d/%m/%Y') if booking.start_date else '-' }}</dd>
+
+                            <dt class="col-sm-5">End Date:</dt>
+                            <dd class="col-sm-7">{{ booking.end_date.strftime('%d/%m/%Y') if booking.end_date else '-' }}</dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-5">Service Charge:</dt>
+                            <dd class="col-sm-7">₹{{ "%.2f"|format(booking.service_charge or 0) }}</dd>
+
+                            <dt class="col-sm-5">Other Expenses:</dt>
+                            <dd class="col-sm-7">₹{{ "%.2f"|format(booking.other_expanse or 0) }}</dd>
+
+                            <dt class="col-sm-5">GST Percentage:</dt>
+                            <dd class="col-sm-7">{{ booking.gst_percentage or 0 }}%</dd>
+
+                            <dt class="col-sm-5">GST Value:</dt>
+                            <dd class="col-sm-7">₹{{ "%.2f"|format(booking.gst_value or 0) }}</dd>
+
+                            <dt class="col-sm-5">Total Amount:</dt>
+                            <dd class="col-sm-7"><strong>₹{{ "%.2f"|format(booking.total_amount or 0) }}</strong></dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-5">Amount Paid:</dt>
+                            <dd class="col-sm-7">₹{{ "%.2f"|format(booking.amount_paid or 0) }}</dd>
+
+                            <dt class="col-sm-5">Pending Amount:</dt>
+                            <dd class="col-sm-7">
+                                <span class="{% if booking.pending_amount and booking.pending_amount > 0 %}text-danger{% else %}text-success{% endif %}">
+                                    ₹{{ "%.2f"|format(booking.pending_amount or 0) }}
+                                </span>
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-5">Last Payment:</dt>
+                            <dd class="col-sm-7">{{ booking.last_payment_date.strftime('%d/%m/%Y') if booking.last_payment_date else '-' }}</dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <h6>Services:</h6>
+                    <p class="text-muted">{{ booking.services or 'No services specified' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('bookings.payment', id=booking.id) }}" class="btn btn-success">
+                        <i class="bi bi-cash"></i> Add Payment
+                    </a>
+                    <a href="{{ url_for('bookings.edit', id=booking.id) }}" class="btn btn-secondary">
+                        <i class="bi bi-pencil"></i> Edit Booking
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {% if booking.expenses.count() > 0 %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Expenses ({{ booking.expenses.count() }})</h5>
+            </div>
+            <div class="card-body">
+                {% for expense in booking.expenses %}
+                <div class="border-bottom pb-2 mb-2">
+                    <small class="text-muted">{{ expense.expense_code }}</small>
+                    <p class="mb-1">{{ expense.category }} - {{ expense.sub_category or '' }}</p>
+                    <small class="text-info">₹{{ "%.2f"|format(expense.expense_amount or 0) }}</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

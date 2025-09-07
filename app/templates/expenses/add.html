@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Add Expense - CRM System{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('expenses.index') }}">Expenses</a></li>
+<li class="breadcrumb-item active">Add Expense</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-cash-coin text-primary"></i>
+                Add Expense
+            </h2>
+            <a href="{{ url_for('expenses.index') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Expenses
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Expense Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.expense_code.label(class="form-label") }}
+                            {{ form.expense_code() }}
+                            {% if form.expense_code.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.expense_code.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.date.label(class="form-label") }}
+                            {{ form.date() }}
+                            {% if form.date.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.date.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.category.label(class="form-label") }}
+                            {{ form.category() }}
+                            {% if form.category.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.category.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.sub_category.label(class="form-label") }}
+                            {{ form.sub_category() }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.expense_amount.label(class="form-label") }}
+                            {{ form.expense_amount() }}
+                            {% if form.expense_amount.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.expense_amount.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.booking_id.label(class="form-label") }}
+                            {{ form.booking_id() }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        {{ form.other_id.label(class="form-label") }}
+                        {{ form.other_id() }}
+                    </div>
+                    <div class="d-flex gap-2">
+                        {{ form.submit() }}
+                        <a href="{{ url_for('expenses.index') }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

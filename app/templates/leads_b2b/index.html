@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}B2B Leads - CRM System{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item active">B2B Leads</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-building text-primary"></i>
+                B2B Leads
+            </h2>
+            <a href="{{ url_for('leads_b2b.add') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Add New Lead
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Leads Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">All B2B Leads ({{ leads|length }})</h5>
+            </div>
+            <div class="card-body">
+                {% if leads %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Sr No</th>
+                                <th>Organization Name</th>
+                                <th>Email</th>
+                                <th>Location</th>
+                                <th>Type of Leads</th>
+                                <th>POC & Role</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lead in leads %}
+                            <tr>
+                                <td>{{ lead.sr_no or '-' }}</td>
+                                <td>{{ lead.organization_name }}</td>
+                                <td>{{ lead.organization_email or '-' }}</td>
+                                <td>{{ lead.location or '-' }}</td>
+                                <td>{{ lead.type_of_leads or '-' }}</td>
+                                <td>{{ lead.org_poc_name_and_role or '-' }}</td>
+                                <td>
+                                    <span class="badge bg-primary">{{ lead.status or 'New' }}</span>
+                                </td>
+                                <td>{{ lead.date.strftime('%d/%m/%Y') if lead.date else '-' }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('leads_b2b.view', id=lead.id) }}" class="btn btn-outline-primary btn-sm" title="View">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('leads_b2b.edit', id=lead.id) }}" class="btn btn-outline-secondary btn-sm" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{{ url_for('leads_b2b.follow_up', id=lead.id) }}" class="btn btn-outline-info btn-sm" title="Follow-up">
+                                            <i class="bi bi-clock"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-building-x fs-1 text-muted mb-3"></i>
+                    <h5 class="text-muted">No B2B Leads Found</h5>
+                    <p class="text-muted">Start by adding your first B2B lead.</p>
+                    <a href="{{ url_for('leads_b2b.add') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Add First Lead
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

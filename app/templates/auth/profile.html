@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - CRM System{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item active">Profile</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="card-title mb-0">
+                    <i class="bi bi-person-circle"></i> User Profile
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-4">
+                        <strong>Full Name:</strong>
+                    </div>
+                    <div class="col-sm-8">
+                        {{ user.full_name }}
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-sm-4">
+                        <strong>Email:</strong>
+                    </div>
+                    <div class="col-sm-8">
+                        {{ user.email }}
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-sm-4">
+                        <strong>Role:</strong>
+                    </div>
+                    <div class="col-sm-8">
+                        <span class="badge bg-primary">{{ user.role.value }}</span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-sm-4">
+                        <strong>Status:</strong>
+                    </div>
+                    <div class="col-sm-8">
+                        {% if user.is_active %}
+                            <span class="badge bg-success">Active</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inactive</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if user.last_login_at %}
+                <div class="row mb-3">
+                    <div class="col-sm-4">
+                        <strong>Last Login:</strong>
+                    </div>
+                    <div class="col-sm-8">
+                        {{ user.last_login_at.strftime('%B %d, %Y at %I:%M %p') }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="row mb-3">
+                    <div class="col-sm-4">
+                        <strong>Account Created:</strong>
+                    </div>
+                    <div class="col-sm-8">
+                        {{ user.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-sm-4">
+                        <strong>Last Updated:</strong>
+                    </div>
+                    <div class="col-sm-8">
+                        {{ user.updated_at.strftime('%B %d, %Y at %I:%M %p') }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('auth.change_password') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-key"></i> Change Password
+                    </a>
+                    <a href="{{ url_for('dashboard.index') }}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

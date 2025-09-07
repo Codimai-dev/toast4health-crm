@@ -1,0 +1,201 @@
+"""Dashboard routes with comprehensive CRM statistics."""
+
+from datetime import datetime, date, timedelta
+from flask import render_template, request
+from flask_login import login_required, current_user
+from sqlalchemy import func, and_, or_
+
+from app import db
+from app.dashboard import bp
+from app.models import (
+    B2CLead, B2BLead, FollowUp, Customer, Booking, Employee,
+    Expense, ChannelPartner, LeadStatus, LeadType
+)
+
+
+@bp.route('/')
+@login_required
+def index():
+    """Dashboard with comprehensive CRM statistics."""
+    
+    try:
+        # Date calculations
+        today = date.today()
+        
+        # Simple statistics with error handling
+        b2c_stats = {
+            'total': B2CLead.query.count(),
+            'today': B2CLead.query.filter_by(enquiry_date=today).count(),
+            'new': B2CLead.query.filter_by(status=LeadStatus.NEW).count(),
+            'follow_up': B2CLead.query.filter_by(status=LeadStatus.FOLLOW_UP).count(),
+            'prospect': B2CLead.query.filter_by(status=LeadStatus.PROSPECT).count(),
+            'converted': B2CLead.query.filter_by(status=LeadStatus.CONVERTED).count(),
+            'lost': B2CLead.query.filter_by(status=LeadStatus.LOST).count(),
+        }
+        
+        b2b_stats = {
+            'total': B2BLead.query.count(),
+            'today': B2BLead.query.filter_by(date=today).count(),
+        }
+        
+        follow_up_stats = {
+            'due_today': FollowUp.query.filter_by(follow_up_on=today).count(),
+            'due_tomorrow': FollowUp.query.filter_by(follow_up_on=today + timedelta(days=1)).count(),
+            'overdue': FollowUp.query.filter(FollowUp.follow_up_on < today).count(),
+            'total': FollowUp.query.count(),
+        }
+        
+        customer_stats = {
+            'total': Customer.query.count(),
+            'with_bookings': db.session.query(func.count(func.distinct(Customer.id))).filter(Customer.bookings.any()).scalar() or 0,
+        }
+        
+        booking_stats = {
+            'total': Booking.query.count(),
+            'next_7_days': Booking.query.filter(Booking.start_date.between(today, today + timedelta(days=7))).count(),
+            'pending_amount': db.session.query(func.sum(Booking.pending_amount)).scalar() or 0,
+            'total_amount': db.session.query(func.sum(Booking.total_amount)).scalar() or 0,
+            'paid_amount': db.session.query(func.sum(Booking.amount_paid)).scalar() or 0,
+        }
+        
+        employee_stats = {
+            'total': Employee.query.count(),
+            'with_bookings': db.session.query(func.count(func.distinct(Employee.id))).filter(Employee.bookings.any()).scalar() or 0,
+        }
+        
+        expense_stats = {
+            'total': Expense.query.count(),
+            'last_30_days': Expense.query.filter(Expense.date >= today - timedelta(days=30)).count(),
+            'amount_last_30_days': db.session.query(func.sum(Expense.expense_amount)).filter(Expense.date >= today - timedelta(days=30)).scalar() or 0,
+            'total_amount': db.session.query(func.sum(Expense.expense_amount)).scalar() or 0,
+        }
+        
+        channel_partner_stats = {
+            'total': ChannelPartner.query.count(),
+            'with_customers': db.session.query(func.count(func.distinct(ChannelPartner.id))).filter(ChannelPartner.customers.any()).scalar() or 0,
+        }
+        
+        return render_template('dashboard/index.html',
+                              title='Dashboard',
+                              b2c_stats=b2c_stats,
+                              b2b_stats=b2b_stats,
+                              follow_up_stats=follow_up_stats,
+                              customer_stats=customer_stats,
+                              booking_stats=booking_stats,
+                              employee_stats=employee_stats,
+                              expense_stats=expense_stats,
+                              channel_partner_stats=channel_partner_stats,
+                              today=today)
+
+    except Exception as e:
+        # Fallback in case of any errors
+        print(f"Dashboard error: {e}")
+        return "Dashboard with statistics - System is initializing..."
+
+
+@bp.route('/search')
+@login_required
+def search():
+    """Global search across all CRM entities."""
+    query = request.args.get('q', '').strip()
+
+    if not query:
+        return render_template('dashboard/search.html',
+                              title='Search Results',
+                              query=query,
+                              results={})
+
+    results = {}
+
+    # Search B2C Leads
+    b2c_results = B2CLead.query.filter(
+        or_(
+            B2CLead.customer_name.ilike(f'%{query}%'),
+            B2CLead.contact_no.ilike(f'%{query}%'),
+            B2CLead.email.ilike(f'%{query}%'),
+            B2CLead.enquiry_id.ilike(f'%{query}%')
+        )
+    ).limit(10).all()
+    if b2c_results:
+        results['B2C Leads'] = b2c_results
+
+    # Search B2B Leads
+    b2b_results = B2BLead.query.filter(
+        or_(
+            B2BLead.organization_name.ilike(f'%{query}%'),
+            B2BLead.organization_email.ilike(f'%{query}%'),
+            B2BLead.t4h_spoc.ilike(f'%{query}%'),
+            B2BLead.email1.ilike(f'%{query}%'),
+            B2BLead.email2.ilike(f'%{query}%'),
+            B2BLead.email3.ilike(f'%{query}%'),
+            B2BLead.email4.ilike(f'%{query}%'),
+            B2BLead.email5.ilike(f'%{query}%')
+        )
+    ).limit(10).all()
+    if b2b_results:
+        results['B2B Leads'] = b2b_results
+
+    # Search Customers
+    customer_results = Customer.query.filter(
+        or_(
+            Customer.customer_name.ilike(f'%{query}%'),
+            Customer.contact_no.ilike(f'%{query}%'),
+            Customer.email.ilike(f'%{query}%'),
+            Customer.customer_code.ilike(f'%{query}%')
+        )
+    ).limit(10).all()
+    if customer_results:
+        results['Customers'] = customer_results
+
+    # Search Bookings
+    booking_results = Booking.query.filter(
+        or_(
+            Booking.customer_name.ilike(f'%{query}%'),
+            Booking.customer_mob.ilike(f'%{query}%'),
+            Booking.booking_code.ilike(f'%{query}%'),
+            Booking.services.ilike(f'%{query}%')
+        )
+    ).limit(10).all()
+    if booking_results:
+        results['Bookings'] = booking_results
+
+    # Search Employees
+    employee_results = Employee.query.filter(
+        or_(
+            Employee.name.ilike(f'%{query}%'),
+            Employee.contact_no.ilike(f'%{query}%'),
+            Employee.email.ilike(f'%{query}%'),
+            Employee.employee_code.ilike(f'%{query}%'),
+            Employee.designation.ilike(f'%{query}%')
+        )
+    ).limit(10).all()
+    if employee_results:
+        results['Employees'] = employee_results
+
+    # Search Channel Partners
+    partner_results = ChannelPartner.query.filter(
+        or_(
+            ChannelPartner.name.ilike(f'%{query}%'),
+            ChannelPartner.contact_no.ilike(f'%{query}%'),
+            ChannelPartner.email.ilike(f'%{query}%'),
+            ChannelPartner.partner_code.ilike(f'%{query}%')
+        )
+    ).limit(10).all()
+    if partner_results:
+        results['Channel Partners'] = partner_results
+
+    # Search Expenses
+    expense_results = Expense.query.filter(
+        or_(
+            Expense.expense_code.ilike(f'%{query}%'),
+            Expense.category.ilike(f'%{query}%'),
+            Expense.sub_category.ilike(f'%{query}%')
+        )
+    ).limit(10).all()
+    if expense_results:
+        results['Expenses'] = expense_results
+
+    return render_template('dashboard/search.html',
+                          title='Search Results',
+                          query=query,
+                          results=results)

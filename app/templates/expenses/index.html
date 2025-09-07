@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Expenses - CRM System{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item active">Expenses</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-cash-coin text-primary"></i>
+                Expenses
+            </h2>
+            <a href="{{ url_for('expenses.add') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Add New Expense
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Expenses Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">All Expenses ({{ expenses|length }})</h5>
+            </div>
+            <div class="card-body">
+                {% if expenses %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Expense Code</th>
+                                <th>Date</th>
+                                <th>Category</th>
+                                <th>Sub Category</th>
+                                <th>Amount</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for expense in expenses %}
+                            <tr>
+                                <td>{{ expense.expense_code }}</td>
+                                <td>{{ expense.date.strftime('%d/%m/%Y') if expense.date else '-' }}</td>
+                                <td>{{ expense.category }}</td>
+                                <td>{{ expense.sub_category or '-' }}</td>
+                                <td>₹{{ "%.2f"|format(expense.expense_amount or 0) }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('expenses.view', id=expense.id) }}" class="btn btn-outline-primary btn-sm" title="View">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('expenses.edit', id=expense.id) }}" class="btn btn-outline-secondary btn-sm" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-cash-x fs-1 text-muted mb-3"></i>
+                    <h5 class="text-muted">No Expenses Found</h5>
+                    <p class="text-muted">Start by adding your first expense.</p>
+                    <a href="{{ url_for('expenses.add') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Add First Expense
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

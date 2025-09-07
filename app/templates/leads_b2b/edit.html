@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Edit B2B Lead - CRM System{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('leads_b2b.index') }}">B2B Leads</a></li>
+<li class="breadcrumb-item active">Edit Lead</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-pencil text-primary"></i>
+                Edit B2B Lead
+            </h2>
+            <div>
+                <a href="{{ url_for('leads_b2b.view', id=lead.id) }}" class="btn btn-info me-2">
+                    <i class="bi bi-eye"></i> View
+                </a>
+                <a href="{{ url_for('leads_b2b.index') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Leads
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Lead Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+
+                    <!-- Basic Information -->
+                    <h6 class="text-primary mb-3"><i class="bi bi-info-circle"></i> Basic Information</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.sr_no.label(class="form-label") }}
+                            {{ form.sr_no() }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.t4h_spoc.label(class="form-label") }}
+                            {{ form.t4h_spoc() }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.organization_name.label(class="form-label") }}
+                            {{ form.organization_name() }}
+                            {% if form.organization_name.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.organization_name.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.organization_email.label(class="form-label") }}
+                            {{ form.organization_email() }}
+                            {% if form.organization_email.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.organization_email.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.location.label(class="form-label") }}
+                            {{ form.location() }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.type_of_leads.label(class="form-label") }}
+                            {{ form.type_of_leads() }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.org_poc_name_and_role.label(class="form-label") }}
+                            {{ form.org_poc_name_and_role() }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.date.label(class="form-label") }}
+                            {{ form.date() }}
+                        </div>
+                    </div>
+
+                    <!-- Employee Information -->
+                    <h6 class="text-primary mb-3 mt-4"><i class="bi bi-people"></i> Employee Information</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.employee_size.label(class="form-label") }}
+                            {{ form.employee_size() }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.employee_wellness_program.label(class="form-label") }}
+                            {{ form.employee_wellness_program() }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.budget_of_wellness_program.label(class="form-label") }}
+                            {{ form.budget_of_wellness_program() }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.last_wellness_activity_done.label(class="form-label") }}
+                            {{ form.last_wellness_activity_done() }}
+                        </div>
+                    </div>
+
+                    <!-- Additional Emails -->
+                    <h6 class="text-primary mb-3 mt-4"><i class="bi bi-envelope"></i> Additional Emails</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.email1.label(class="form-label") }}
+                            {{ form.email1() }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.email2.label(class="form-label") }}
+                            {{ form.email2() }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.email3.label(class="form-label") }}
+                            {{ form.email3() }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.email4.label(class="form-label") }}
+                            {{ form.email4() }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        {{ form.email5.label(class="form-label") }}
+                        {{ form.email5() }}
+                    </div>
+
+                    <!-- Meeting Information -->
+                    <h6 class="text-primary mb-3 mt-4"><i class="bi bi-calendar-event"></i> Meeting Information</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.meeting1.label(class="form-label") }}
+                            {{ form.meeting1() }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.meeting2.label(class="form-label") }}
+                            {{ form.meeting2() }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        {{ form.meeting1_notes.label(class="form-label") }}
+                        {{ form.meeting1_notes() }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.meeting1_task_done.label(class="form-label") }}
+                        {{ form.meeting1_task_done() }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.notes.label(class="form-label") }}
+                        {{ form.notes() }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.task_done.label(class="form-label") }}
+                        {{ form.task_done() }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.status.label(class="form-label") }}
+                        {{ form.status() }}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        {{ form.submit() }}
+                        <a href="{{ url_for('leads_b2b.index') }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

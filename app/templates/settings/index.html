@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - CRM System{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item active">Settings</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-gear"></i> Application Settings
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Manage your application settings and configurations.</p>
+
+                <!-- General Settings Section -->
+                <div class="mb-4">
+                    <h6 class="text-primary mb-3">
+                        <i class="bi bi-sliders"></i> General Settings
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="appName" class="form-label">Application Name</label>
+                                <input type="text" class="form-control" id="appName" value="CRM System" readonly>
+                                <div class="form-text">Application name is configured in the system.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="version" class="form-label">Version</label>
+                                <input type="text" class="form-control" id="version" value="1.0.0" readonly>
+                                <div class="form-text">Current application version.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Information -->
+                <div class="mb-4">
+                    <h6 class="text-primary mb-3">
+                        <i class="bi bi-info-circle"></i> System Information
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Database Status</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-success text-white">
+                                        <i class="bi bi-check-circle"></i>
+                                    </span>
+                                    <input type="text" class="form-control" value="Connected" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Upload Directory</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-folder"></i>
+                                    </span>
+                                    <input type="text" class="form-control" value="app/static/uploads/" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="border border-danger rounded p-4 mb-4 bg-light">
+                    <h6 class="text-danger mb-3">
+                        <i class="bi bi-exclamation-triangle"></i> Danger Zone
+                    </h6>
+                    <p class="text-muted mb-3">
+                        These actions are irreversible and will permanently delete data from the application.
+                        Please proceed with extreme caution.
+                    </p>
+
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <strong>Warning:</strong> Deleting all data will remove all leads, customers, bookings,
+                        employees, expenses, and other records. This action cannot be undone.
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAllDataModal">
+                            <i class="bi bi-trash"></i> Delete All Application Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete All Data Confirmation Modal -->
+<div class="modal fade" id="deleteAllDataModal" tabindex="-1" aria-labelledby="deleteAllDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteAllDataModalLabel">
+                    <i class="bi bi-exclamation-triangle"></i> Confirm Data Deletion
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger" role="alert">
+                    <strong>⚠️ CRITICAL WARNING</strong>
+                </div>
+                <p>This action will permanently delete <strong>ALL</strong> data from the application, including:</p>
+                <ul class="text-danger">
+                    <li>All B2C and B2B leads</li>
+                    <li>All customers and bookings</li>
+                    <li>All employees and expenses</li>
+                    <li>All channel partners</li>
+                    <li>All follow-up records</li>
+                    <li>All audit logs</li>
+                    <li>All settings and configurations</li>
+                </ul>
+                <p class="text-danger fw-bold">
+                    This action cannot be undone. The data will be lost forever.
+                </p>
+                <div class="mb-3">
+                    <label for="confirmationText" class="form-label fw-bold">
+                        Type "DELETE ALL DATA" to confirm:
+                    </label>
+                    <input type="text" class="form-control" id="confirmationText" placeholder="DELETE ALL DATA">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn" disabled>
+                    <i class="bi bi-trash"></i> Delete All Data
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const confirmationInput = document.getElementById('confirmationText');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+    // Enable/disable confirm button based on input
+    confirmationInput.addEventListener('input', function() {
+        confirmDeleteBtn.disabled = this.value !== 'DELETE ALL DATA';
+    });
+
+    // Handle delete confirmation
+    confirmDeleteBtn.addEventListener('click', function() {
+        if (confirmationInput.value === 'DELETE ALL DATA') {
+            // Show loading state
+            confirmDeleteBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Deleting...';
+            confirmDeleteBtn.disabled = true;
+
+            // Send delete request
+            fetch('/settings/delete-all-data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    'csrf_token': '{{ csrf_token() }}'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Close modal and show success message
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteAllDataModal'));
+                    modal.hide();
+
+                    // Show success alert
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                    alertDiv.innerHTML = `
+                        <i class="bi bi-check-circle"></i> All application data has been successfully deleted.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    document.querySelector('.main-content').prepend(alertDiv);
+
+                    // Auto-dismiss after 5 seconds
+                    setTimeout(() => {
+                        alertDiv.remove();
+                    }, 5000);
+                } else {
+                    throw new Error(data.message || 'Failed to delete data');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Show error alert
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+                alertDiv.innerHTML = `
+                    <i class="bi bi-exclamation-triangle"></i> Error: ${error.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.querySelector('.main-content').prepend(alertDiv);
+            })
+            .finally(() => {
+                // Reset button state
+                confirmDeleteBtn.innerHTML = '<i class="bi bi-trash"></i> Delete All Data';
+                confirmDeleteBtn.disabled = true;
+                confirmationInput.value = '';
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

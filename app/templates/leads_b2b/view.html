@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}View B2B Lead - CRM System{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('leads_b2b.index') }}">B2B Leads</a></li>
+<li class="breadcrumb-item active">View Lead</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-eye text-primary"></i>
+                View B2B Lead
+            </h2>
+            <div>
+                <a href="{{ url_for('leads_b2b.edit', id=lead.id) }}" class="btn btn-secondary me-2">
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+                <a href="{{ url_for('leads_b2b.index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Leads
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Lead Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-5">Sr No:</dt>
+                            <dd class="col-sm-7">{{ lead.sr_no or '-' }}</dd>
+
+                            <dt class="col-sm-5">Organization:</dt>
+                            <dd class="col-sm-7">{{ lead.organization_name }}</dd>
+
+                            <dt class="col-sm-5">Email:</dt>
+                            <dd class="col-sm-7">{{ lead.organization_email or '-' }}</dd>
+
+                            <dt class="col-sm-5">Location:</dt>
+                            <dd class="col-sm-7">{{ lead.location or '-' }}</dd>
+
+                            <dt class="col-sm-5">Type of Leads:</dt>
+                            <dd class="col-sm-7">{{ lead.type_of_leads or '-' }}</dd>
+
+                            <dt class="col-sm-5">POC & Role:</dt>
+                            <dd class="col-sm-7">{{ lead.org_poc_name_and_role or '-' }}</dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-5">Employee Size:</dt>
+                            <dd class="col-sm-7">{{ lead.employee_size or '-' }}</dd>
+
+                            <dt class="col-sm-5">Wellness Program:</dt>
+                            <dd class="col-sm-7">{{ lead.employee_wellness_program or '-' }}</dd>
+
+                            <dt class="col-sm-5">Budget:</dt>
+                            <dd class="col-sm-7">{{ lead.budget_of_wellness_program or '-' }}</dd>
+
+                            <dt class="col-sm-5">Last Activity:</dt>
+                            <dd class="col-sm-7">{{ lead.last_wellness_activity_done or '-' }}</dd>
+
+                            <dt class="col-sm-5">Date:</dt>
+                            <dd class="col-sm-7">{{ lead.date.strftime('%d/%m/%Y') if lead.date else '-' }}</dd>
+
+                            <dt class="col-sm-5">Status:</dt>
+                            <dd class="col-sm-7">
+                                <span class="badge bg-primary">{{ lead.status or 'New' }}</span>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <!-- Email Fields -->
+                {% if lead.email1 or lead.email2 or lead.email3 or lead.email4 or lead.email5 %}
+                <div class="mt-3">
+                    <h6>Additional Emails:</h6>
+                    <ul class="list-unstyled">
+                        {% if lead.email1 %}<li>{{ lead.email1 }}</li>{% endif %}
+                        {% if lead.email2 %}<li>{{ lead.email2 }}</li>{% endif %}
+                        {% if lead.email3 %}<li>{{ lead.email3 }}</li>{% endif %}
+                        {% if lead.email4 %}<li>{{ lead.email4 }}</li>{% endif %}
+                        {% if lead.email5 %}<li>{{ lead.email5 }}</li>{% endif %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <!-- Meeting Information -->
+                {% if lead.meeting1 or lead.meeting2 %}
+                <div class="mt-3">
+                    <h6>Meeting Information:</h6>
+                    {% if lead.meeting1 %}
+                    <p><strong>Meeting 1:</strong> {{ lead.meeting1.strftime('%d/%m/%Y') if lead.meeting1 else '-' }}</p>
+                    {% if lead.meeting1_notes %}<p><strong>Notes:</strong> {{ lead.meeting1_notes }}</p>{% endif %}
+                    {% if lead.meeting1_task_done %}<p><strong>Task Done:</strong> {{ lead.meeting1_task_done }}</p>{% endif %}
+                    {% endif %}
+                    {% if lead.meeting2 %}
+                    <p><strong>Meeting 2:</strong> {{ lead.meeting2.strftime('%d/%m/%Y') if lead.meeting2 else '-' }}</p>
+                    {% endif %}
+                    {% if lead.notes %}<p><strong>Notes:</strong> {{ lead.notes }}</p>{% endif %}
+                    {% if lead.task_done %}<p><strong>Task Done:</strong> {{ lead.task_done }}</p>{% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('leads_b2b.follow_up', id=lead.id) }}" class="btn btn-info">
+                        <i class="bi bi-clock"></i> Add Follow-up
+                    </a>
+                    <a href="{{ url_for('leads_b2b.edit', id=lead.id) }}" class="btn btn-secondary">
+                        <i class="bi bi-pencil"></i> Edit Lead
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {% if lead.follow_ups.count() > 0 %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Follow-ups ({{ lead.follow_ups.count() }})</h5>
+            </div>
+            <div class="card-body">
+                {% for followup in lead.follow_ups %}
+                <div class="border-bottom pb-2 mb-2">
+                    <small class="text-muted">{{ followup.follow_up_on.strftime('%d/%m/%Y') }}</small>
+                    <p class="mb-1">{{ followup.notes or 'No notes' }}</p>
+                    <small class="text-info">{{ followup.outcome.value.replace('_', ' ') }}</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

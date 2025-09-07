@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - CRM System{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Dashboard</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-speedometer2 text-primary"></i>
+                Dashboard Overview
+            </h2>
+            <div class="text-muted">
+                Welcome back, <strong>{{ current_user.full_name }}</strong>
+                <br><small>Last updated: {{ today.strftime('%B %d, %Y') }}</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards Row 1 -->
+<div class="row g-3 mb-4">
+    <!-- B2C Leads Stats -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-muted">B2C Leads</h6>
+                        <h3 class="card-title mb-0">{{ b2c_stats.total }}</h3>
+                        <small class="text-success">
+                            <i class="bi bi-plus-circle"></i> {{ b2c_stats.today }} today
+                        </small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-person fs-2 text-primary opacity-75"></i>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <a href="{{ url_for('leads_b2c.index') }}" class="btn btn-sm btn-outline-primary">
+                        View All <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Follow-ups Stats -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-muted">Follow-ups</h6>
+                        <h3 class="card-title mb-0">{{ follow_up_stats.due_today }}</h3>
+                        <small class="text-warning">
+                            <i class="bi bi-exclamation-circle"></i> 
+                            {{ follow_up_stats.overdue }} overdue
+                        </small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-clock fs-2 text-warning opacity-75"></i>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <span class="badge bg-light text-dark">{{ follow_up_stats.due_tomorrow }} tomorrow</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue Stats -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-muted">Pending Revenue</h6>
+                        <h3 class="card-title mb-0">{{ booking_stats.pending_amount | currency }}</h3>
+                        <small class="text-success">
+                            <i class="bi bi-arrow-up"></i> {{ booking_stats.total_amount | currency }} total
+                        </small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-currency-rupee fs-2 text-success opacity-75"></i>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <a href="{{ url_for('bookings.index') }}" class="btn btn-sm btn-outline-success">
+                        View Bookings <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expenses Stats -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card danger">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-muted">Expenses (30d)</h6>
+                        <h3 class="card-title mb-0">{{ expense_stats.amount_last_30_days | currency }}</h3>
+                        <small class="text-muted">
+                            <i class="bi bi-receipt"></i> {{ expense_stats.last_30_days }} entries
+                        </small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-receipt fs-2 text-danger opacity-75"></i>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <a href="{{ url_for('expenses.index') }}" class="btn btn-sm btn-outline-danger">
+                        View All <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards Row 2 -->
+<div class="row g-3 mb-4">
+    <!-- B2B Leads -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card info">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-muted">B2B Leads</h6>
+                        <h3 class="card-title mb-0">{{ b2b_stats.total }}</h3>
+                        <small class="text-info">
+                            <i class="bi bi-plus-circle"></i> {{ b2b_stats.today }} today
+                        </small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-building fs-2 text-info opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customers -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-muted">Customers</h6>
+                        <h3 class="card-title mb-0">{{ customer_stats.total }}</h3>
+                        <small class="text-primary">
+                            <i class="bi bi-check-circle"></i> {{ customer_stats.with_bookings }} active
+                        </small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-people fs-2 text-primary opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bookings -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-muted">Bookings</h6>
+                        <h3 class="card-title mb-0">{{ booking_stats.total }}</h3>
+                        <small class="text-success">
+                            <i class="bi bi-calendar-event"></i> {{ booking_stats.next_7_days }} next 7 days
+                        </small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-calendar-check fs-2 text-success opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employees -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-muted">Employees</h6>
+                        <h3 class="card-title mb-0">{{ employee_stats.total }}</h3>
+                        <small class="text-warning">
+                            <i class="bi bi-briefcase"></i> {{ employee_stats.with_bookings }} assigned
+                        </small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-person-badge fs-2 text-warning opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions Row -->
+<div class="row g-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-lightning"></i> Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                        <a href="{{ url_for('leads_b2c.add') }}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-plus-circle"></i><br>Add B2C Lead
+                        </a>
+                    </div>
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                        <a href="{{ url_for('leads_b2b.add') }}" class="btn btn-outline-info w-100">
+                            <i class="bi bi-building"></i><br>Add B2B Lead
+                        </a>
+                    </div>
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                        <a href="{{ url_for('customers.add') }}" class="btn btn-outline-success w-100">
+                            <i class="bi bi-people"></i><br>Add Customer
+                        </a>
+                    </div>
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                        <a href="{{ url_for('bookings.add') }}" class="btn btn-outline-warning w-100">
+                            <i class="bi bi-calendar-plus"></i><br>New Booking
+                        </a>
+                    </div>
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                        <a href="{{ url_for('expenses.add') }}" class="btn btn-outline-danger w-100">
+                            <i class="bi bi-receipt"></i><br>Add Expense
+                        </a>
+                    </div>
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                        <a href="{{ url_for('employees.add') }}" class="btn btn-outline-secondary w-100">
+                            <i class="bi bi-person-plus"></i><br>Add Employee
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.stats-card {
+    border-left: 4px solid;
+}
+.stats-card.primary { border-left-color: #0d6efd; }
+.stats-card.success { border-left-color: #198754; }
+.stats-card.warning { border-left-color: #ffc107; }
+.stats-card.danger { border-left-color: #dc3545; }
+.stats-card.info { border-left-color: #0dcaf0; }
+</style>
+{% endblock %}

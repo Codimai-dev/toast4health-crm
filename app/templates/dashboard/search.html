@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results - CRM System{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item active">Search Results</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-search text-primary"></i>
+                Search Results
+            </h2>
+            <div class="text-muted">
+                Query: "<strong>{{ query }}</strong>"
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if results %}
+    {% for category, items in results.items() %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-list-ul"></i>
+                {{ category }} ({{ items|length }})
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="list-group list-group-flush">
+                {% for item in items %}
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            {% if category == 'B2C Leads' %}
+                                <strong>{{ item.customer_name }}</strong>
+                                <br><small class="text-muted">{{ item.enquiry_id }} • {{ item.contact_no }} • {{ item.email or 'No email' }}</small>
+                            {% elif category == 'B2B Leads' %}
+                                <strong>{{ item.organization_name }}</strong>
+                                <br><small class="text-muted">{{ item.t4h_spoc or 'No SPOC' }} • {{ item.organization_email or 'No email' }}</small>
+                            {% elif category == 'Customers' %}
+                                <strong>{{ item.customer_name }}</strong>
+                                <br><small class="text-muted">{{ item.customer_code }} • {{ item.contact_no }} • {{ item.email or 'No email' }}</small>
+                            {% elif category == 'Bookings' %}
+                                <strong>{{ item.customer_name }}</strong>
+                                <br><small class="text-muted">{{ item.booking_code }} • {{ item.services }} • {{ item.start_date.strftime('%Y-%m-%d') }}</small>
+                            {% elif category == 'Employees' %}
+                                <strong>{{ item.name }}</strong>
+                                <br><small class="text-muted">{{ item.employee_code }} • {{ item.designation or 'No designation' }} • {{ item.contact_no }}</small>
+                            {% elif category == 'Channel Partners' %}
+                                <strong>{{ item.name }}</strong>
+                                <br><small class="text-muted">{{ item.partner_code }} • {{ item.contact_no }} • {{ item.email or 'No email' }}</small>
+                            {% elif category == 'Expenses' %}
+                                <strong>{{ item.category }}</strong>
+                                <br><small class="text-muted">{{ item.expense_code }} • {{ item.sub_category or 'No subcategory' }} • {{ item.date.strftime('%Y-%m-%d') }}</small>
+                            {% endif %}
+                        </div>
+                        <div>
+                            {% if category == 'B2C Leads' %}
+                                <a href="{{ url_for('leads_b2c.view', id=item.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                            {% elif category == 'B2B Leads' %}
+                                <a href="{{ url_for('leads_b2b.view', id=item.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                            {% elif category == 'Customers' %}
+                                <a href="{{ url_for('customers.view', id=item.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                            {% elif category == 'Bookings' %}
+                                <a href="{{ url_for('bookings.view', id=item.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                            {% elif category == 'Employees' %}
+                                <a href="{{ url_for('employees.view', id=item.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                            {% elif category == 'Channel Partners' %}
+                                <a href="{{ url_for('channel_partners.view', id=item.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                            {% elif category == 'Expenses' %}
+                                <a href="{{ url_for('expenses.view', id=item.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="card">
+        <div class="card-body text-center">
+            <i class="bi bi-search fs-1 text-muted mb-3"></i>
+            <h5 class="card-title">No Results Found</h5>
+            <p class="card-text text-muted">
+                No items match your search query "{{ query }}". Try different keywords or check your spelling.
+            </p>
+            <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary">
+                <i class="bi bi-house"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+{% endif %}
+
+{% if not results %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i>
+            <strong>Search Tips:</strong> You can search by name, contact number, email, or code across all CRM entities including leads, customers, bookings, employees, and more.
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

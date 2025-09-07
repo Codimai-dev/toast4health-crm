@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Booking - CRM System{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('bookings.index') }}">Bookings</a></li>
+<li class="breadcrumb-item active">Edit Booking</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-pencil text-primary"></i>
+                Edit Booking
+            </h2>
+            <div>
+                <a href="{{ url_for('bookings.view', id=booking.id) }}" class="btn btn-info me-2">
+                    <i class="bi bi-eye"></i> View
+                </a>
+                <a href="{{ url_for('bookings.index') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Bookings
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Booking Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.booking_code.label(class="form-label") }}
+                            {{ form.booking_code() }}
+                            {% if form.booking_code.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.booking_code.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.customer_name.label(class="form-label") }}
+                            {{ form.customer_name() }}
+                            {% if form.customer_name.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.customer_name.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.customer_mob.label(class="form-label") }}
+                            {{ form.customer_mob() }}
+                            {% if form.customer_mob.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.customer_mob.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.start_date.label(class="form-label") }}
+                            {{ form.start_date() }}
+                            {% if form.start_date.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.start_date.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.end_date.label(class="form-label") }}
+                            {{ form.end_date() }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.service_charge.label(class="form-label") }}
+                            {{ form.service_charge() }}
+                            {% if form.service_charge.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.service_charge.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.other_expanse.label(class="form-label") }}
+                            {{ form.other_expanse() }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.gst_percentage.label(class="form-label") }}
+                            {{ form.gst_percentage() }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.amount_paid.label(class="form-label") }}
+                            {{ form.amount_paid() }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            &nbsp;
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        {{ form.services.label(class="form-label") }}
+                        {{ form.services() }}
+                        {% if form.services.errors %}
+                            <div class="text-danger">
+                                {% for error in form.services.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex gap-2">
+                        {{ form.submit() }}
+                        <a href="{{ url_for('bookings.index') }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

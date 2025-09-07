@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}View Channel Partner - CRM System{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('channel_partners.index') }}">Channel Partners</a></li>
+<li class="breadcrumb-item active">View Partner</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-eye text-primary"></i>
+                View Channel Partner
+            </h2>
+            <div>
+                <a href="{{ url_for('channel_partners.edit', id=partner.id) }}" class="btn btn-secondary me-2">
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+                <a href="{{ url_for('channel_partners.index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Partners
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Partner Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-5">Partner Code:</dt>
+                            <dd class="col-sm-7">{{ partner.partner_code }}</dd>
+
+                            <dt class="col-sm-5">Name:</dt>
+                            <dd class="col-sm-7">{{ partner.name }}</dd>
+
+                            <dt class="col-sm-5">Contact:</dt>
+                            <dd class="col-sm-7">{{ partner.contact_no }}</dd>
+
+                            <dt class="col-sm-5">Email:</dt>
+                            <dd class="col-sm-7">{{ partner.email or '-' }}</dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-5">Created Date:</dt>
+                            <dd class="col-sm-7">{{ partner.created_date.strftime('%d/%m/%Y') if partner.created_date else '-' }}</dd>
+                        </dl>
+                    </div>
+                </div>
+
+                {% if partner.notes %}
+                <div class="mt-3">
+                    <h6>Notes:</h6>
+                    <p class="text-muted">{{ partner.notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('channel_partners.edit', id=partner.id) }}" class="btn btn-secondary">
+                        <i class="bi bi-pencil"></i> Edit Partner
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {% if partner.customers %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Customers ({{ partner.customers|length }})</h5>
+            </div>
+            <div class="card-body">
+                {% for customer in partner.customers %}
+                <div class="border-bottom pb-2 mb-2">
+                    <small class="text-muted">{{ customer.customer_code }}</small>
+                    <p class="mb-1">{{ customer.customer_name }}</p>
+                    <small class="text-info">{{ customer.contact_no }}</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

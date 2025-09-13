@@ -17,7 +17,7 @@
                 Edit B2C Lead
             </h2>
             <div>
-                <a href="{{ url_for('leads_b2c.view', id=lead.id) }}" class="btn btn-info me-2">
+                <a href="{{ url_for('leads_b2c.view', enquiry_id=lead.enquiry_id) }}" class="btn btn-info me-2">
                     <i class="bi bi-eye"></i> View
                 </a>
                 <a href="{{ url_for('leads_b2c.index') }}" class="btn btn-secondary">

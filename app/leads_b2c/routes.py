@@ -22,6 +22,9 @@ def index():
 def add():
     """Add a new B2C lead."""
     form = B2CLeadForm()
+    # Auto-generate enquiry_id for new leads
+    if not form.enquiry_id.data:
+        form.enquiry_id.data = B2CLead.generate_enquiry_id()
     if form.validate_on_submit():
         lead = B2CLead(
             enquiry_id=form.enquiry_id.data,
@@ -44,19 +47,19 @@ def add():
     return render_template('leads_b2c/add.html', title='Add B2C Lead', form=form)
 
 
-@bp.route('/view/<int:id>')
+@bp.route('/view/<enquiry_id>')
 @login_required
-def view(id):
+def view(enquiry_id):
     """View a B2C lead."""
-    lead = B2CLead.query.get_or_404(id)
+    lead = B2CLead.query.filter_by(enquiry_id=enquiry_id).first_or_404()
     return render_template('leads_b2c/view.html', title='View B2C Lead', lead=lead)
 
 
-@bp.route('/edit/<int:id>', methods=['GET', 'POST'])
+@bp.route('/edit/<enquiry_id>', methods=['GET', 'POST'])
 @login_required
-def edit(id):
+def edit(enquiry_id):
     """Edit a B2C lead."""
-    lead = B2CLead.query.get_or_404(id)
+    lead = B2CLead.query.filter_by(enquiry_id=enquiry_id).first_or_404()
     form = B2CLeadForm(obj=lead)
     if form.validate_on_submit():
         form.populate_obj(lead)
@@ -67,11 +70,11 @@ def edit(id):
     return render_template('leads_b2c/edit.html', title='Edit B2C Lead', form=form, lead=lead)
 
 
-@bp.route('/follow_up/<int:id>', methods=['GET', 'POST'])
+@bp.route('/follow_up/<enquiry_id>', methods=['GET', 'POST'])
 @login_required
-def follow_up(id):
+def follow_up(enquiry_id):
     """Add follow-up for a B2C lead."""
-    lead = B2CLead.query.get_or_404(id)
+    lead = B2CLead.query.filter_by(enquiry_id=enquiry_id).first_or_404()
     from app.leads_b2c.forms import FollowUpForm
     form = FollowUpForm()
     if form.validate_on_submit():
@@ -88,5 +91,5 @@ def follow_up(id):
         db.session.add(followup)
         db.session.commit()
         flash('Follow-up added successfully!', 'success')
-        return redirect(url_for('leads_b2c.view', id=lead.id))
+        return redirect(url_for('leads_b2c.view', enquiry_id=lead.enquiry_id))
     return render_template('leads_b2c/follow_up.html', title='Add Follow-up', form=form, lead=lead)

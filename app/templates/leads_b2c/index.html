@@ -61,13 +61,13 @@
                                 <td>{{ lead.source.value.replace('_', ' ') if lead.source else '-' }}</td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <a href="{{ url_for('leads_b2c.view', id=lead.id) }}" class="btn btn-outline-primary btn-sm" title="View">
+                                        <a href="{{ url_for('leads_b2c.view', enquiry_id=lead.enquiry_id) }}" class="btn btn-outline-primary btn-sm" title="View">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        <a href="{{ url_for('leads_b2c.edit', id=lead.id) }}" class="btn btn-outline-secondary btn-sm" title="Edit">
+                                        <a href="{{ url_for('leads_b2c.edit', enquiry_id=lead.enquiry_id) }}" class="btn btn-outline-secondary btn-sm" title="Edit">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        <a href="{{ url_for('leads_b2c.follow_up', id=lead.id) }}" class="btn btn-outline-info btn-sm" title="Follow-up">
+                                        <a href="{{ url_for('leads_b2c.follow_up', enquiry_id=lead.enquiry_id) }}" class="btn btn-outline-info btn-sm" title="Follow-up">
                                             <i class="bi bi-clock"></i>
                                         </a>
                                     </div>

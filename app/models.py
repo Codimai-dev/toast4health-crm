@@ -135,9 +135,9 @@ class User(UserMixin, db.Model, TimestampMixin):
 
 class B2CLead(db.Model, TimestampMixin, UserTrackingMixin):
     """B2C Lead model."""
-    
+
     __tablename__ = 'b2c_lead'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     enquiry_id = db.Column(db.String(20), nullable=False, unique=True, index=True)
     customer_name = db.Column(db.String(100), nullable=False)
@@ -173,6 +173,34 @@ class B2CLead(db.Model, TimestampMixin, UserTrackingMixin):
     
     def __repr__(self):
         return f'<B2CLead {self.enquiry_id}: {self.customer_name}>'
+
+    @staticmethod
+    def generate_enquiry_id():
+        """Generate a unique enquiry ID in format B2C-YYYYMMDD-XXX."""
+        from datetime import datetime
+        date_str = datetime.now().strftime('%Y%m%d')
+
+        # Find the highest existing enquiry ID for today
+        today_prefix = f'B2C-{date_str}-'
+        existing_ids = db.session.query(B2CLead.enquiry_id).filter(
+            B2CLead.enquiry_id.like(f'{today_prefix}%')
+        ).all()
+
+        if existing_ids:
+            # Extract the sequential numbers and find the max
+            numbers = []
+            for eid in existing_ids:
+                try:
+                    num_part = eid[0].split('-')[-1]
+                    numbers.append(int(num_part))
+                except (IndexError, ValueError):
+                    continue
+
+            next_num = max(numbers) + 1 if numbers else 1
+        else:
+            next_num = 1
+
+        return f'{today_prefix}{next_num:03d}'
 
 
 # Indexes for B2CLead

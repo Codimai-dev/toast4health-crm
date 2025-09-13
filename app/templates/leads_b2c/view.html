@@ -17,7 +17,7 @@
                 View B2C Lead
             </h2>
             <div>
-                <a href="{{ url_for('leads_b2c.edit', id=lead.id) }}" class="btn btn-secondary me-2">
+                <a href="{{ url_for('leads_b2c.edit', enquiry_id=lead.enquiry_id) }}" class="btn btn-secondary me-2">
                     <i class="bi bi-pencil"></i> Edit
                 </a>
                 <a href="{{ url_for('leads_b2c.index') }}" class="btn btn-outline-secondary">
@@ -92,10 +92,10 @@
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
-                    <a href="{{ url_for('leads_b2c.follow_up', id=lead.id) }}" class="btn btn-info">
+                    <a href="{{ url_for('leads_b2c.follow_up', enquiry_id=lead.enquiry_id) }}" class="btn btn-info">
                         <i class="bi bi-clock"></i> Add Follow-up
                     </a>
-                    <a href="{{ url_for('leads_b2c.edit', id=lead.id) }}" class="btn btn-secondary">
+                    <a href="{{ url_for('leads_b2c.edit', enquiry_id=lead.enquiry_id) }}" class="btn btn-secondary">
                         <i class="bi bi-pencil"></i> Edit Lead
                     </a>
                 </div>

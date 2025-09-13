@@ -11,7 +11,7 @@ class B2CLeadForm(FlaskForm):
     """Form for adding/editing B2C leads."""
 
     enquiry_id = StringField('Enquiry ID', validators=[DataRequired()],
-                           render_kw={'class': 'form-control', 'placeholder': 'Enter enquiry ID'})
+                           render_kw={'class': 'form-control', 'readonly': True})
     customer_name = StringField('Customer Name', validators=[DataRequired()],
                               render_kw={'class': 'form-control', 'placeholder': 'Enter customer name'})
     contact_no = StringField('Contact Number', validators=[DataRequired()],

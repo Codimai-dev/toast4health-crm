@@ -64,7 +64,7 @@
                             </dd>
 
                             <dt class="col-sm-5">Source:</dt>
-                            <dd class="col-sm-7">{{ lead.source or '-' }}</dd>
+                            <dd class="col-sm-7">{{ lead.source.value.replace('_', ' ') if lead.source else '-' }}</dd>
 
                             <dt class="col-sm-5">Services:</dt>
                             <dd class="col-sm-7">{{ lead.services or '-' }}</dd>

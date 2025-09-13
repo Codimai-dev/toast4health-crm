@@ -58,7 +58,7 @@
                                         {{ lead.status.value.replace('_', ' ') }}
                                     </span>
                                 </td>
-                                <td>{{ lead.source or '-' }}</td>
+                                <td>{{ lead.source.value.replace('_', ' ') if lead.source else '-' }}</td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
                                         <a href="{{ url_for('leads_b2c.view', id=lead.id) }}" class="btn btn-outline-primary btn-sm" title="View">

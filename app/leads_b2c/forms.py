@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, DateField, SelectField, SubmitField
 from wtforms.validators import DataRequired, Email, Optional
 
-from app.models import LeadStatus, FollowUpOutcome
+from app.models import LeadStatus, FollowUpOutcome, LeadSource
 
 
 class B2CLeadForm(FlaskForm):
@@ -20,7 +20,8 @@ class B2CLeadForm(FlaskForm):
                        render_kw={'class': 'form-control', 'placeholder': 'Enter email (optional)'})
     enquiry_date = DateField('Enquiry Date', validators=[DataRequired()],
                            render_kw={'class': 'form-control'})
-    source = StringField('Source', render_kw={'class': 'form-control', 'placeholder': 'Enter source (optional)'})
+    source = SelectField('Source', choices=[('', 'Select Source')] + [(source.value, source.value.replace('_', ' ')) for source in LeadSource],
+                         render_kw={'class': 'form-select'})
     services = StringField('Services', render_kw={'class': 'form-control', 'placeholder': 'Enter services (optional)'})
     referred_by = StringField('Referred By', render_kw={'class': 'form-control', 'placeholder': 'Enter referrer (optional)'})
     status = SelectField('Status', choices=[(status.value, status.value.replace('_', ' ')) for status in LeadStatus],

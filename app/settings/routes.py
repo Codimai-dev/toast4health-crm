@@ -327,16 +327,15 @@ def delete_all_data():
         Service.query.delete()
         Setting.query.delete()
 
-        # Note: We don't delete users to keep at least the admin account
-        # If you want to delete all users too, uncomment the next line:
-        # User.query.delete()
+        # Delete all users except admin users
+        User.query.filter(User.role != UserRole.ADMIN).delete()
 
         # Commit the changes
         db.session.commit()
 
         return jsonify({
             'success': True,
-            'message': 'All application data has been successfully deleted.'
+            'message': 'All application data and non-admin user profiles have been successfully deleted.'
         })
 
     except Exception as e:

@@ -23,7 +23,7 @@ class B2CLeadForm(FlaskForm):
     source = SelectField('Source', choices=[('', 'Select Source')] + [(source.value, source.value.replace('_', ' ')) for source in LeadSource],
                          render_kw={'class': 'form-select'})
     services = StringField('Services', render_kw={'class': 'form-control', 'placeholder': 'Enter services (optional)'})
-    referred_by = StringField('Referred By', render_kw={'class': 'form-control', 'placeholder': 'Enter referrer (optional)'})
+    referred_by = SelectField('Referred By', choices=[], render_kw={'class': 'form-select'})
     status = SelectField('Status', choices=[(status.value, status.value.replace('_', ' ')) for status in LeadStatus],
                         default=LeadStatus.NEW.value, render_kw={'class': 'form-select'})
     comment = TextAreaField('Comment', render_kw={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter comment (optional)'})

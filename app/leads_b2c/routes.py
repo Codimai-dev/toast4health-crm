@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from app import db
 from app.leads_b2c import bp
 from app.leads_b2c.forms import B2CLeadForm
-from app.models import B2CLead
+from app.models import B2CLead, ChannelPartner
 
 
 @bp.route('/')
@@ -22,6 +22,7 @@ def index():
 def add():
     """Add a new B2C lead."""
     form = B2CLeadForm()
+    form.referred_by.choices = [('', 'Select Channel Partner')] + [(cp.name, cp.name) for cp in ChannelPartner.query.order_by(ChannelPartner.name).all()]
     # Auto-generate enquiry_id for new leads
     if not form.enquiry_id.data:
         form.enquiry_id.data = B2CLead.generate_enquiry_id()
@@ -32,9 +33,9 @@ def add():
             contact_no=form.contact_no.data,
             email=form.email.data,
             enquiry_date=form.enquiry_date.data,
-            source=form.source.data,
+            source=form.source.data if form.source.data else None,
             services=form.services.data,
-            referred_by=form.referred_by.data,
+            referred_by=form.referred_by.data if form.referred_by.data else None,
             status=form.status.data,
             comment=form.comment.data,
             created_by=current_user.id,
@@ -61,8 +62,11 @@ def edit(enquiry_id):
     """Edit a B2C lead."""
     lead = B2CLead.query.filter_by(enquiry_id=enquiry_id).first_or_404()
     form = B2CLeadForm(obj=lead)
+    form.referred_by.choices = [('', 'Select Channel Partner')] + [(cp.name, cp.name) for cp in ChannelPartner.query.order_by(ChannelPartner.name).all()]
     if form.validate_on_submit():
         form.populate_obj(lead)
+        lead.source = form.source.data if form.source.data else None
+        lead.referred_by = form.referred_by.data if form.referred_by.data else None
         lead.updated_by = current_user.id
         db.session.commit()
         flash('B2C lead updated successfully!', 'success')

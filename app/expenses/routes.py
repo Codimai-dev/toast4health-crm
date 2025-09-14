@@ -3,7 +3,7 @@
 from flask import render_template, flash, redirect, url_for
 from flask_login import login_required, current_user
 
-from app import db
+from app import db, require_module_access
 from app.expenses import bp
 from app.expenses.forms import ExpenseForm
 from app.models import Expense
@@ -11,6 +11,7 @@ from app.models import Expense
 
 @bp.route('/')
 @login_required
+@require_module_access('expenses')
 def index():
     """Display all expenses."""
     expenses = Expense.query.order_by(Expense.created_at.desc()).all()
@@ -19,6 +20,7 @@ def index():
 
 @bp.route('/add', methods=['GET', 'POST'])
 @login_required
+@require_module_access('expenses')
 def add():
     """Add a new expense."""
     form = ExpenseForm()
@@ -43,6 +45,7 @@ def add():
 
 @bp.route('/view/<int:id>')
 @login_required
+@require_module_access('expenses')
 def view(id):
     """View an expense."""
     expense = Expense.query.get_or_404(id)
@@ -51,6 +54,7 @@ def view(id):
 
 @bp.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
+@require_module_access('expenses')
 def edit(id):
     """Edit an expense."""
     expense = Expense.query.get_or_404(id)

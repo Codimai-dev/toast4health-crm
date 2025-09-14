@@ -9,6 +9,90 @@ from app.models import (
     Employee, Expense, ChannelPartner, Setting, AuditLog, Service
 )
 from app.settings import bp
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SelectField, BooleanField, SubmitField
+from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
+
+
+class UserForm(FlaskForm):
+    """User management form for admin."""
+
+    full_name = StringField('Full Name', validators=[DataRequired(), Length(min=2, max=100)],
+                            render_kw={'class': 'form-control', 'placeholder': 'Enter full name'})
+    email = StringField('Email', validators=[DataRequired(), Email()],
+                        render_kw={'class': 'form-control', 'placeholder': 'Enter email'})
+    password = PasswordField('Password', validators=[
+        DataRequired(),
+        Length(min=8, message='Password must be at least 8 characters long')
+    ], render_kw={'class': 'form-control', 'placeholder': 'Enter password'})
+    password2 = PasswordField('Confirm Password', validators=[
+        DataRequired(),
+        EqualTo('password', message='Passwords must match')
+    ], render_kw={'class': 'form-control', 'placeholder': 'Confirm password'})
+    role = SelectField('Role', validators=[DataRequired()],
+                       choices=[(UserRole.SALES.value, 'Sales'), (UserRole.OPS.value, 'Operations'),
+                               (UserRole.FINANCE.value, 'Finance'), (UserRole.VIEWER.value, 'Viewer')],
+                       render_kw={'class': 'form-select'})
+
+    # Module permissions checkboxes
+    dashboard_access = BooleanField('Dashboard', default=True, render_kw={'class': 'form-check-input'})
+    leads_b2c_access = BooleanField('B2C Leads', render_kw={'class': 'form-check-input'})
+    leads_b2b_access = BooleanField('B2B Leads', render_kw={'class': 'form-check-input'})
+    follow_ups_access = BooleanField('Follow-ups', render_kw={'class': 'form-check-input'})
+    customers_access = BooleanField('Customers', render_kw={'class': 'form-check-input'})
+    bookings_access = BooleanField('Bookings', render_kw={'class': 'form-check-input'})
+    employees_access = BooleanField('Employees', render_kw={'class': 'form-check-input'})
+    expenses_access = BooleanField('Expenses', render_kw={'class': 'form-check-input'})
+    channel_partners_access = BooleanField('Channel Partners', render_kw={'class': 'form-check-input'})
+    services_access = BooleanField('Services', render_kw={'class': 'form-check-input'})
+
+    is_active = BooleanField('Active', default=True, render_kw={'class': 'form-check-input'})
+    submit = SubmitField('Create User', render_kw={'class': 'btn btn-primary'})
+
+    def validate_email(self, email):
+        """Check if email is already registered."""
+        user = User.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError('This email is already registered.')
+
+
+class EditUserForm(FlaskForm):
+    """Edit user form for admin."""
+
+    full_name = StringField('Full Name', validators=[DataRequired(), Length(min=2, max=100)],
+                            render_kw={'class': 'form-control', 'placeholder': 'Enter full name'})
+    email = StringField('Email', validators=[DataRequired(), Email()],
+                        render_kw={'class': 'form-control', 'placeholder': 'Enter email'})
+    role = SelectField('Role', validators=[DataRequired()],
+                       choices=[(UserRole.SALES.value, 'Sales'), (UserRole.OPS.value, 'Operations'),
+                               (UserRole.FINANCE.value, 'Finance'), (UserRole.VIEWER.value, 'Viewer')],
+                       render_kw={'class': 'form-select'})
+
+    # Module permissions checkboxes
+    dashboard_access = BooleanField('Dashboard', default=True, render_kw={'class': 'form-check-input'})
+    leads_b2c_access = BooleanField('B2C Leads', render_kw={'class': 'form-check-input'})
+    leads_b2b_access = BooleanField('B2B Leads', render_kw={'class': 'form-check-input'})
+    follow_ups_access = BooleanField('Follow-ups', render_kw={'class': 'form-check-input'})
+    customers_access = BooleanField('Customers', render_kw={'class': 'form-check-input'})
+    bookings_access = BooleanField('Bookings', render_kw={'class': 'form-check-input'})
+    employees_access = BooleanField('Employees', render_kw={'class': 'form-check-input'})
+    expenses_access = BooleanField('Expenses', render_kw={'class': 'form-check-input'})
+    channel_partners_access = BooleanField('Channel Partners', render_kw={'class': 'form-check-input'})
+    services_access = BooleanField('Services', render_kw={'class': 'form-check-input'})
+
+    is_active = BooleanField('Active', render_kw={'class': 'form-check-input'})
+    submit = SubmitField('Update User', render_kw={'class': 'btn btn-primary'})
+
+    def __init__(self, original_email=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.original_email = original_email
+
+    def validate_email(self, email):
+        """Check if email is already registered by another user."""
+        if email.data != self.original_email:
+            user = User.query.filter_by(email=email.data).first()
+            if user:
+                raise ValidationError('This email is already registered.')
 
 
 @bp.route('/')
@@ -20,6 +104,185 @@ def index():
         return redirect(url_for('dashboard.index'))
 
     return render_template('settings/index.html')
+
+
+@bp.route('/users')
+@login_required
+def users():
+    """User management page."""
+    if not current_user.has_permission(UserRole.ADMIN):
+        flash('Access denied. Admin privileges required.', 'error')
+        return redirect(url_for('dashboard.index'))
+
+    users = User.query.order_by(User.created_at.desc()).all()
+    return render_template('settings/users.html', title='User Management', users=users)
+
+
+@bp.route('/users/create', methods=['GET', 'POST'])
+@login_required
+def create_user():
+    """Create new user."""
+    if not current_user.has_permission(UserRole.ADMIN):
+        flash('Access denied. Admin privileges required.', 'error')
+        return redirect(url_for('dashboard.index'))
+
+    form = UserForm()
+    if form.validate_on_submit():
+        # Collect selected modules
+        allowed_modules = []
+        if form.dashboard_access.data:
+            allowed_modules.append('dashboard')
+        if form.leads_b2c_access.data:
+            allowed_modules.append('leads_b2c')
+        if form.leads_b2b_access.data:
+            allowed_modules.append('leads_b2b')
+        if form.follow_ups_access.data:
+            allowed_modules.append('follow_ups')
+        if form.customers_access.data:
+            allowed_modules.append('customers')
+        if form.bookings_access.data:
+            allowed_modules.append('bookings')
+        if form.employees_access.data:
+            allowed_modules.append('employees')
+        if form.expenses_access.data:
+            allowed_modules.append('expenses')
+        if form.channel_partners_access.data:
+            allowed_modules.append('channel_partners')
+        if form.services_access.data:
+            allowed_modules.append('services')
+
+        user = User(
+            full_name=form.full_name.data,
+            email=form.email.data,
+            role=UserRole[form.role.data],
+            is_active=form.is_active.data,
+            created_by=current_user.id,
+            updated_by=current_user.id
+        )
+        user.allowed_modules = allowed_modules
+        user.set_password(form.password.data)
+
+        db.session.add(user)
+        db.session.commit()
+
+        flash(f'User {user.full_name} created successfully!', 'success')
+        return redirect(url_for('settings.users'))
+
+    return render_template('settings/create_user.html', title='Create User', form=form)
+
+
+@bp.route('/users/<int:user_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_user(user_id):
+    """Edit user."""
+    if not current_user.has_permission(UserRole.ADMIN):
+        flash('Access denied. Admin privileges required.', 'error')
+        return redirect(url_for('dashboard.index'))
+
+    user = User.query.get_or_404(user_id)
+
+    # Prevent editing other admins
+    if user.role == UserRole.ADMIN and user.id != current_user.id:
+        flash('Cannot edit other admin users.', 'error')
+        return redirect(url_for('settings.users'))
+
+    form = EditUserForm(original_email=user.email, obj=user)
+
+    if form.validate_on_submit():
+        # Collect selected modules
+        allowed_modules = []
+        if form.dashboard_access.data:
+            allowed_modules.append('dashboard')
+        if form.leads_b2c_access.data:
+            allowed_modules.append('leads_b2c')
+        if form.leads_b2b_access.data:
+            allowed_modules.append('leads_b2b')
+        if form.follow_ups_access.data:
+            allowed_modules.append('follow_ups')
+        if form.customers_access.data:
+            allowed_modules.append('customers')
+        if form.bookings_access.data:
+            allowed_modules.append('bookings')
+        if form.employees_access.data:
+            allowed_modules.append('employees')
+        if form.expenses_access.data:
+            allowed_modules.append('expenses')
+        if form.channel_partners_access.data:
+            allowed_modules.append('channel_partners')
+        if form.services_access.data:
+            allowed_modules.append('services')
+
+        form.populate_obj(user)
+        user.role = UserRole[form.role.data]
+        user.allowed_modules = allowed_modules
+        user.updated_by = current_user.id
+        db.session.commit()
+
+        flash(f'User {user.full_name} updated successfully!', 'success')
+        return redirect(url_for('settings.users'))
+
+    # Set form values for GET request
+    form.role.data = user.role.value
+    form.is_active.data = user.is_active
+
+    # Set module permissions checkboxes
+    allowed = user.allowed_modules
+    form.dashboard_access.data = 'dashboard' in allowed
+    form.leads_b2c_access.data = 'leads_b2c' in allowed
+    form.leads_b2b_access.data = 'leads_b2b' in allowed
+    form.follow_ups_access.data = 'follow_ups' in allowed
+    form.customers_access.data = 'customers' in allowed
+    form.bookings_access.data = 'bookings' in allowed
+    form.employees_access.data = 'employees' in allowed
+    form.expenses_access.data = 'expenses' in allowed
+    form.channel_partners_access.data = 'channel_partners' in allowed
+    form.services_access.data = 'services' in allowed
+
+    return render_template('settings/edit_user.html', title='Edit User', form=form, user=user)
+
+
+@bp.route('/users/<int:user_id>/toggle-status', methods=['POST'])
+@login_required
+def toggle_user_status(user_id):
+    """Toggle user active status."""
+    if not current_user.has_permission(UserRole.ADMIN):
+        flash('Access denied. Admin privileges required.', 'error')
+        return redirect(url_for('dashboard.index'))
+
+    user = User.query.get_or_404(user_id)
+
+    # Prevent deactivating other admins
+    if user.role == UserRole.ADMIN and user.id != current_user.id:
+        flash('Cannot deactivate other admin users.', 'error')
+        return redirect(url_for('settings.users'))
+
+    user.is_active = not user.is_active
+    user.updated_by = current_user.id
+    db.session.commit()
+
+    status = 'activated' if user.is_active else 'deactivated'
+    flash(f'User {user.full_name} has been {status}.', 'success')
+    return redirect(url_for('settings.users'))
+
+
+@bp.route('/users/<int:user_id>/reset-password', methods=['POST'])
+@login_required
+def reset_user_password(user_id):
+    """Reset user password to a default one."""
+    if not current_user.has_permission(UserRole.ADMIN):
+        flash('Access denied. Admin privileges required.', 'error')
+        return redirect(url_for('dashboard.index'))
+
+    user = User.query.get_or_404(user_id)
+
+    # Generate a default password
+    default_password = f"Welcome@{user_id}"
+    user.set_password(default_password)
+    user.updated_by = current_user.id
+    db.session.commit()
+
+    flash(f'Password for {user.full_name} has been reset to: {default_password}', 'success')
+    return redirect(url_for('settings.users'))
 
 
 @bp.route('/delete-all-data', methods=['POST'])

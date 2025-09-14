@@ -24,6 +24,7 @@
 
 <!-- Statistics Cards Row 1 -->
 <div class="row g-3 mb-4">
+    {% if b2c_stats %}
     <!-- B2C Leads Stats -->
     <div class="col-xl-3 col-md-6">
         <div class="card stats-card primary">
@@ -48,7 +49,9 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
+    {% if follow_up_stats %}
     <!-- Follow-ups Stats -->
     <div class="col-xl-3 col-md-6">
         <div class="card stats-card warning">
@@ -58,7 +61,7 @@
                         <h6 class="card-subtitle mb-2 text-muted">Follow-ups</h6>
                         <h3 class="card-title mb-0">{{ follow_up_stats.due_today }}</h3>
                         <small class="text-warning">
-                            <i class="bi bi-exclamation-circle"></i> 
+                            <i class="bi bi-exclamation-circle"></i>
                             {{ follow_up_stats.overdue }} overdue
                         </small>
                     </div>
@@ -72,7 +75,9 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
+    {% if booking_stats %}
     <!-- Revenue Stats -->
     <div class="col-xl-3 col-md-6">
         <div class="card stats-card success">
@@ -97,7 +102,9 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
+    {% if expense_stats %}
     <!-- Expenses Stats -->
     <div class="col-xl-3 col-md-6">
         <div class="card stats-card danger">
@@ -122,10 +129,12 @@
             </div>
         </div>
     </div>
+    {% endif %}
 </div>
 
 <!-- Statistics Cards Row 2 -->
 <div class="row g-3 mb-4">
+    {% if b2b_stats %}
     <!-- B2B Leads -->
     <div class="col-xl-3 col-md-6">
         <div class="card stats-card info">
@@ -145,7 +154,9 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
+    {% if customer_stats %}
     <!-- Customers -->
     <div class="col-xl-3 col-md-6">
         <div class="card stats-card primary">
@@ -165,7 +176,9 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
+    {% if booking_stats %}
     <!-- Bookings -->
     <div class="col-xl-3 col-md-6">
         <div class="card stats-card success">
@@ -185,7 +198,9 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
+    {% if employee_stats %}
     <!-- Employees -->
     <div class="col-xl-3 col-md-6">
         <div class="card stats-card warning">
@@ -205,6 +220,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
 </div>
 
 <!-- Quick Actions Row -->
@@ -218,36 +234,48 @@
             </div>
             <div class="card-body">
                 <div class="row g-2">
+                    {% if 'leads_b2c' in allowed_modules %}
                     <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
                         <a href="{{ url_for('leads_b2c.add') }}" class="btn btn-outline-primary w-100">
                             <i class="bi bi-plus-circle"></i><br>Add B2C Lead
                         </a>
                     </div>
+                    {% endif %}
+                    {% if 'leads_b2b' in allowed_modules %}
                     <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
                         <a href="{{ url_for('leads_b2b.add') }}" class="btn btn-outline-info w-100">
                             <i class="bi bi-building"></i><br>Add B2B Lead
                         </a>
                     </div>
+                    {% endif %}
+                    {% if 'customers' in allowed_modules %}
                     <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
                         <a href="{{ url_for('customers.add') }}" class="btn btn-outline-success w-100">
                             <i class="bi bi-people"></i><br>Add Customer
                         </a>
                     </div>
+                    {% endif %}
+                    {% if 'bookings' in allowed_modules %}
                     <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
                         <a href="{{ url_for('bookings.add') }}" class="btn btn-outline-warning w-100">
                             <i class="bi bi-calendar-plus"></i><br>New Booking
                         </a>
                     </div>
+                    {% endif %}
+                    {% if 'expenses' in allowed_modules %}
                     <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
                         <a href="{{ url_for('expenses.add') }}" class="btn btn-outline-danger w-100">
                             <i class="bi bi-receipt"></i><br>Add Expense
                         </a>
                     </div>
+                    {% endif %}
+                    {% if 'employees' in allowed_modules %}
                     <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
                         <a href="{{ url_for('employees.add') }}" class="btn btn-outline-secondary w-100">
                             <i class="bi bi-person-plus"></i><br>Add Employee
                         </a>
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

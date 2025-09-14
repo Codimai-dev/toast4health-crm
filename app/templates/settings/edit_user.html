@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Edit User - CRM System{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('settings.index') }}">Settings</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('settings.users') }}">User Management</a></li>
+<li class="breadcrumb-item active">Edit User</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-person-gear text-primary"></i>
+                Edit User: {{ user.full_name }}
+            </h2>
+            <a href="{{ url_for('settings.users') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Users
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">User Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {{ form.hidden_tag() }}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.full_name.label(class="form-label") }}
+                            {{ form.full_name() }}
+                            {% if form.full_name.errors %}
+                                {% for error in form.full_name.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.email.label(class="form-label") }}
+                            {{ form.email() }}
+                            {% if form.email.errors %}
+                                {% for error in form.email.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.role.label(class="form-label") }}
+                            {{ form.role() }}
+                            {% if form.role.errors %}
+                                {% for error in form.role.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check mt-4">
+                                {{ form.is_active() }}
+                                {{ form.is_active.label(class="form-check-label") }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Module Permissions -->
+                    <div class="mb-4">
+                        <h6 class="mb-3">Module Access Permissions</h6>
+                        <p class="text-muted small mb-3">Select which sections of the CRM this user can access:</p>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    {{ form.dashboard_access() }}
+                                    {{ form.dashboard_access.label(class="form-check-label") }}
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ form.leads_b2c_access() }}
+                                    {{ form.leads_b2c_access.label(class="form-check-label") }}
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ form.leads_b2b_access() }}
+                                    {{ form.leads_b2b_access.label(class="form-check-label") }}
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ form.follow_ups_access() }}
+                                    {{ form.follow_ups_access.label(class="form-check-label") }}
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ form.customers_access() }}
+                                    {{ form.customers_access.label(class="form-check-label") }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    {{ form.bookings_access() }}
+                                    {{ form.bookings_access.label(class="form-check-label") }}
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ form.employees_access() }}
+                                    {{ form.employees_access.label(class="form-check-label") }}
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ form.expenses_access() }}
+                                    {{ form.expenses_access.label(class="form-check-label") }}
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ form.channel_partners_access() }}
+                                    {{ form.channel_partners_access.label(class="form-check-label") }}
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ form.services_access() }}
+                                    {{ form.services_access.label(class="form-check-label") }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        {{ form.submit() }}
+                        <a href="{{ url_for('settings.users') }}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">User Details</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-5">Created:</dt>
+                    <dd class="col-sm-7">{{ user.created_at.strftime('%d/%m/%Y %H:%M') }}</dd>
+
+                    <dt class="col-sm-5">Last Login:</dt>
+                    <dd class="col-sm-7">{{ user.last_login_at.strftime('%d/%m/%Y %H:%M') if user.last_login_at else 'Never' }}</dd>
+
+                    <dt class="col-sm-5">Created By:</dt>
+                    <dd class="col-sm-7">{{ user.creator.full_name if user.creator else 'System' }}</dd>
+                </dl>
+            </div>
+        </div>
+
+        {% if user.id != current_user.id %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Danger Zone</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small">These actions cannot be undone.</p>
+                <div class="d-grid gap-2">
+                    <form method="post" action="{{ url_for('settings.reset_user_password', user_id=user.id) }}">
+                        <button type="submit" class="btn btn-outline-warning btn-sm"
+                                onclick="return confirm('Are you sure you want to reset this user\'s password?');">
+                            <i class="bi bi-key"></i> Reset Password
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -171,43 +171,61 @@
                     <div class="list-group-item bg-secondary text-white">
                         <small><strong>LEADS MANAGEMENT</strong></small>
                     </div>
+                    {% if current_user.has_module_access('leads_b2c') %}
                     <a href="{{ url_for('leads_b2c.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('leads_b2c.') }}">
                         <i class="bi bi-person"></i> B2C Leads
                     </a>
+                    {% endif %}
+                    {% if current_user.has_module_access('leads_b2b') %}
                     <a href="{{ url_for('leads_b2b.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('leads_b2b.') }}">
                         <i class="bi bi-building"></i> B2B Leads
                     </a>
+                    {% endif %}
+                    {% if current_user.has_module_access('follow_ups') %}
                     <a href="{{ url_for('follow_ups.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('follow_ups.') }}">
                         <i class="bi bi-clock"></i> Follow-ups
                     </a>
+                    {% endif %}
 
                     <!-- Customer Section -->
                     <div class="list-group-item bg-secondary text-white">
                         <small><strong>CUSTOMER MANAGEMENT</strong></small>
                     </div>
+                    {% if current_user.has_module_access('customers') %}
                     <a href="{{ url_for('customers.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('customers.') }}">
                         <i class="bi bi-people"></i> Customers
                     </a>
+                    {% endif %}
+                    {% if current_user.has_module_access('bookings') %}
                     <a href="{{ url_for('bookings.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('bookings.') }}">
                         <i class="bi bi-calendar-check"></i> Bookings
                     </a>
+                    {% endif %}
 
                     <!-- Operations Section -->
                     <div class="list-group-item bg-secondary text-white">
                         <small><strong>OPERATIONS</strong></small>
                     </div>
+                    {% if current_user.has_module_access('employees') %}
                     <a href="{{ url_for('employees.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('employees.') }}">
                         <i class="bi bi-person-badge"></i> Employees
                     </a>
+                    {% endif %}
+                    {% if current_user.has_module_access('expenses') %}
                     <a href="{{ url_for('expenses.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('expenses.') }}">
                         <i class="bi bi-receipt"></i> Expenses
                     </a>
+                    {% endif %}
+                    {% if current_user.has_module_access('channel_partners') %}
                     <a href="{{ url_for('channel_partners.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('channel_partners.') }}">
                         <i class="bi bi-diagram-3"></i> Channel Partners
                     </a>
+                    {% endif %}
+                    {% if current_user.has_module_access('services') %}
                     <a href="{{ url_for('services.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('services.') }}">
                         <i class="bi bi-tools"></i> Services
                     </a>
+                    {% endif %}
 
                     {% if current_user.role.value == 'ADMIN' %}
                     <!-- Admin Section -->
@@ -239,43 +257,61 @@
                         <div class="list-group-item bg-secondary text-white">
                             <small><strong>LEADS MANAGEMENT</strong></small>
                         </div>
+                        {% if current_user.has_module_access('leads_b2c') %}
                         <a href="{{ url_for('leads_b2c.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('leads_b2c.') }}">
                             <i class="bi bi-person"></i> B2C Leads
                         </a>
+                        {% endif %}
+                        {% if current_user.has_module_access('leads_b2b') %}
                         <a href="{{ url_for('leads_b2b.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('leads_b2b.') }}">
                             <i class="bi bi-building"></i> B2B Leads
                         </a>
+                        {% endif %}
+                        {% if current_user.has_module_access('follow_ups') %}
                         <a href="{{ url_for('follow_ups.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('follow_ups.') }}">
                             <i class="bi bi-clock"></i> Follow-ups
                         </a>
+                        {% endif %}
 
                         <!-- Customer Section -->
                         <div class="list-group-item bg-secondary text-white">
                             <small><strong>CUSTOMER MANAGEMENT</strong></small>
                         </div>
+                        {% if current_user.has_module_access('customers') %}
                         <a href="{{ url_for('customers.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('customers.') }}">
                             <i class="bi bi-people"></i> Customers
                         </a>
+                        {% endif %}
+                        {% if current_user.has_module_access('bookings') %}
                         <a href="{{ url_for('bookings.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('bookings.') }}">
                             <i class="bi bi-calendar-check"></i> Bookings
                         </a>
-
+                        {% endif %}
+   
                         <!-- Operations Section -->
                         <div class="list-group-item bg-secondary text-white">
                             <small><strong>OPERATIONS</strong></small>
                         </div>
+                        {% if current_user.has_module_access('employees') %}
                         <a href="{{ url_for('employees.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('employees.') }}">
                             <i class="bi bi-person-badge"></i> Employees
                         </a>
+                        {% endif %}
+                        {% if current_user.has_module_access('expenses') %}
                         <a href="{{ url_for('expenses.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('expenses.') }}">
                             <i class="bi bi-receipt"></i> Expenses
                         </a>
+                        {% endif %}
+                        {% if current_user.has_module_access('channel_partners') %}
                         <a href="{{ url_for('channel_partners.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('channel_partners.') }}">
                             <i class="bi bi-diagram-3"></i> Channel Partners
                         </a>
+                        {% endif %}
+                        {% if current_user.has_module_access('services') %}
                         <a href="{{ url_for('services.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('services.') }}">
                             <i class="bi bi-tools"></i> Services
                         </a>
+                        {% endif %}
 
                         {% if current_user.role.value == 'ADMIN' %}
                         <!-- Admin Section -->

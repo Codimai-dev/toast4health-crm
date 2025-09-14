@@ -3,12 +3,14 @@
 from flask import render_template
 from flask_login import login_required
 
+from app import require_module_access
 from app.follow_ups import bp
 from app.models import FollowUp
 
 
 @bp.route('/')
 @login_required
+@require_module_access('follow_ups')
 def index():
     """Display all follow-ups categorized by B2C and B2B."""
 

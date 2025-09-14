@@ -3,7 +3,7 @@
 from flask import render_template, flash, redirect, url_for
 from flask_login import login_required, current_user
 
-from app import db
+from app import db, require_module_access
 from app.leads_b2c import bp
 from app.leads_b2c.forms import B2CLeadForm
 from app.models import B2CLead, ChannelPartner, Service
@@ -11,6 +11,7 @@ from app.models import B2CLead, ChannelPartner, Service
 
 @bp.route('/')
 @login_required
+@require_module_access('leads_b2c')
 def index():
     """Display all B2C leads."""
     leads = B2CLead.query.order_by(B2CLead.created_at.desc()).all()
@@ -19,6 +20,7 @@ def index():
 
 @bp.route('/add', methods=['GET', 'POST'])
 @login_required
+@require_module_access('leads_b2c')
 def add():
     """Add a new B2C lead."""
     form = B2CLeadForm()
@@ -56,6 +58,7 @@ def add():
 
 @bp.route('/view/<enquiry_id>')
 @login_required
+@require_module_access('leads_b2c')
 def view(enquiry_id):
     """View a B2C lead."""
     lead = B2CLead.query.filter_by(enquiry_id=enquiry_id).first_or_404()
@@ -64,6 +67,7 @@ def view(enquiry_id):
 
 @bp.route('/edit/<enquiry_id>', methods=['GET', 'POST'])
 @login_required
+@require_module_access('leads_b2c')
 def edit(enquiry_id):
     """Edit a B2C lead."""
     lead = B2CLead.query.filter_by(enquiry_id=enquiry_id).first_or_404()
@@ -103,6 +107,7 @@ def edit(enquiry_id):
 
 @bp.route('/follow_up/<enquiry_id>', methods=['GET', 'POST'])
 @login_required
+@require_module_access('leads_b2c')
 def follow_up(enquiry_id):
     """Add follow-up for a B2C lead."""
     lead = B2CLead.query.filter_by(enquiry_id=enquiry_id).first_or_404()

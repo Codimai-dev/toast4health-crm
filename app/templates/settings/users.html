@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}User Management - CRM System{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('settings.index') }}">Settings</a></li>
+<li class="breadcrumb-item active">User Management</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-people text-primary"></i>
+                User Management
+            </h2>
+            <a href="{{ url_for('settings.create_user') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Create New User
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Users Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">All Users ({{ users|length }})</h5>
+            </div>
+            <div class="card-body">
+                {% if users %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Last Login</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>{{ user.full_name }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'danger' if user.role.value == 'ADMIN' else 'primary' if user.role.value == 'SALES' else 'info' if user.role.value == 'OPS' else 'warning' if user.role.value == 'FINANCE' else 'secondary' }}">
+                                        {{ user.role.value }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if user.is_active else 'danger' }}">
+                                        {{ 'Active' if user.is_active else 'Inactive' }}
+                                    </span>
+                                </td>
+                                <td>{{ user.last_login_at.strftime('%d/%m/%Y %H:%M') if user.last_login_at else '-' }}</td>
+                                <td>{{ user.created_at.strftime('%d/%m/%Y') }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('settings.edit_user', user_id=user.id) }}" class="btn btn-outline-secondary btn-sm" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        {% if user.id != current_user.id %}
+                                        <form method="post" action="{{ url_for('settings.toggle_user_status', user_id=user.id) }}" class="d-inline">
+                                            <button type="submit" class="btn btn-outline-{{ 'warning' if user.is_active else 'success' }} btn-sm"
+                                                    title="{{ 'Deactivate' if user.is_active else 'Activate' }}"
+                                                    onclick="return confirm('Are you sure you want to {{ 'deactivate' if user.is_active else 'activate' }} this user?');">
+                                                <i class="bi bi-{{ 'person-dash' if user.is_active else 'person-check' }}"></i>
+                                            </button>
+                                        </form>
+                                        <form method="post" action="{{ url_for('settings.reset_user_password', user_id=user.id) }}" class="d-inline">
+                                            <button type="submit" class="btn btn-outline-info btn-sm" title="Reset Password"
+                                                    onclick="return confirm('Are you sure you want to reset this user\'s password?')">
+                                                <i class="bi bi-key"></i>
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-people-x fs-1 text-muted mb-3"></i>
+                    <h5 class="text-muted">No Users Found</h5>
+                    <p class="text-muted">Start by creating your first user.</p>
+                    <a href="{{ url_for('settings.create_user') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Create First User
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

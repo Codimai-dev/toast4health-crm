@@ -14,6 +14,27 @@ db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
 
+# Access control decorator
+def require_module_access(module_name):
+    """Decorator to check if user has access to a specific module."""
+    def decorator(f):
+        from functools import wraps
+        from flask import flash, redirect, url_for
+        from flask_login import current_user
+
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if not current_user.is_authenticated:
+                return redirect(url_for('auth.login'))
+
+            if not current_user.has_module_access(module_name):
+                flash(f'Access denied. You do not have permission to access {module_name.replace("_", " ").title()}.', 'error')
+                return redirect(url_for('dashboard.index'))
+
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
 
 def create_app(config_name=None):
     """Create and configure the Flask application."""
@@ -95,6 +116,10 @@ def create_app(config_name=None):
     # Register template filters and globals
     from app.utils.filters import register_filters
     register_filters(app)
+
+    # Make UserRole enum available in templates
+    from app.models import UserRole
+    app.jinja_env.globals['UserRole'] = UserRole
     
     # Error handlers
     from app.errors import register_error_handlers

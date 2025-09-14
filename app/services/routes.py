@@ -3,7 +3,7 @@
 from flask import render_template, flash, redirect, url_for
 from flask_login import login_required, current_user
 
-from app import db
+from app import db, require_module_access
 from app.services import bp
 from app.services.forms import ServiceForm
 from app.models import Service
@@ -11,6 +11,7 @@ from app.models import Service
 
 @bp.route('/')
 @login_required
+@require_module_access('services')
 def index():
     """Display all services."""
     services = Service.query.order_by(Service.created_at.desc()).all()
@@ -19,6 +20,7 @@ def index():
 
 @bp.route('/add', methods=['GET', 'POST'])
 @login_required
+@require_module_access('services')
 def add():
     """Add a new service."""
     form = ServiceForm()
@@ -38,6 +40,7 @@ def add():
 
 @bp.route('/view/<int:id>')
 @login_required
+@require_module_access('services')
 def view(id):
     """View a service."""
     service = Service.query.get_or_404(id)
@@ -46,6 +49,7 @@ def view(id):
 
 @bp.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
+@require_module_access('services')
 def edit(id):
     """Edit a service."""
     service = Service.query.get_or_404(id)

@@ -3,7 +3,7 @@
 from flask import render_template, flash, redirect, url_for
 from flask_login import login_required, current_user
 
-from app import db
+from app import db, require_module_access
 from app.leads_b2b import bp
 from app.leads_b2b.forms import B2BLeadForm
 from app.models import B2BLead
@@ -11,6 +11,7 @@ from app.models import B2BLead
 
 @bp.route('/')
 @login_required
+@require_module_access('leads_b2b')
 def index():
     """Display all B2B leads."""
     leads = B2BLead.query.order_by(B2BLead.created_at.desc()).all()
@@ -19,6 +20,7 @@ def index():
 
 @bp.route('/add', methods=['GET', 'POST'])
 @login_required
+@require_module_access('leads_b2b')
 def add():
     """Add a new B2B lead."""
     form = B2BLeadForm()
@@ -60,6 +62,7 @@ def add():
 
 @bp.route('/view/<int:id>')
 @login_required
+@require_module_access('leads_b2b')
 def view(id):
     """View a B2B lead."""
     lead = B2BLead.query.get_or_404(id)
@@ -68,6 +71,7 @@ def view(id):
 
 @bp.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
+@require_module_access('leads_b2b')
 def edit(id):
     """Edit a B2B lead."""
     lead = B2BLead.query.get_or_404(id)
@@ -83,6 +87,7 @@ def edit(id):
 
 @bp.route('/follow_up/<int:id>', methods=['GET', 'POST'])
 @login_required
+@require_module_access('leads_b2b')
 def follow_up(id):
     """Add follow-up for a B2B lead."""
     lead = B2BLead.query.get_or_404(id)

@@ -60,24 +60,23 @@
                             Forgot your password?
                         </a>
                     </p>
-                    <p class="mb-0">
-                        Don't have an account? 
-                        <a href="{{ url_for('auth.register') }}" class="text-decoration-none">Sign up</a>
+                    <p class="mb-0 text-muted small">
+                        Contact your administrator to get login credentials.
                     </p>
                 </div>
             </div>
         </div>
         
-        <!-- Demo credentials info -->
-        <div class="card mt-3 border-info">
+        <!-- Admin credentials info -->
+        <div class="card mt-3 border-warning">
             <div class="card-body">
-                <h6 class="card-title text-info">
-                    <i class="bi bi-info-circle"></i> Demo Credentials
+                <h6 class="card-title text-warning">
+                    <i class="bi bi-shield-lock"></i> Admin Access Only
                 </h6>
                 <p class="card-text small mb-0">
-                    After running <code>flask seed</code>, use:<br>
-                    <strong>Email:</strong> admin@example.com<br>
-                    <strong>Password:</strong> Admin@12345
+                    This system is restricted to authorized users only.<br>
+                    Contact your system administrator for login credentials.<br>
+                    <strong>Default Admin:</strong> admin@example.com
                 </p>
             </div>
         </div>

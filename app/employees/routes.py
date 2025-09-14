@@ -5,7 +5,7 @@ from flask import render_template, flash, redirect, url_for, request, current_ap
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 
-from app import db
+from app import db, require_module_access
 from app.employees import bp
 from app.employees.forms import EmployeeForm
 from app.models import Employee
@@ -26,6 +26,7 @@ def save_uploaded_file(file_field, upload_folder, filename_prefix=""):
 
 @bp.route('/')
 @login_required
+@require_module_access('employees')
 def index():
     """Display all employees."""
     # Use raw SQL to handle empty gender values
@@ -65,6 +66,7 @@ def index():
 
 @bp.route('/add', methods=['GET', 'POST'])
 @login_required
+@require_module_access('employees')
 def add():
     """Add a new employee."""
     form = EmployeeForm()
@@ -111,6 +113,7 @@ def add():
 
 @bp.route('/view/<int:id>')
 @login_required
+@require_module_access('employees')
 def view(id):
     """View an employee."""
     # Use raw SQL to handle empty gender values
@@ -160,6 +163,7 @@ def view(id):
 
 @bp.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
+@require_module_access('employees')
 def edit(id):
     """Edit an employee."""
     # Use raw SQL to handle empty gender values

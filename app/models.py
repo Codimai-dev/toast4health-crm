@@ -97,16 +97,17 @@ class UserTrackingMixin:
         return db.relationship('User', foreign_keys=[cls.updated_by], post_update=True)
 
 
-class User(UserMixin, db.Model, TimestampMixin):
+class User(UserMixin, db.Model, TimestampMixin, UserTrackingMixin):
     """User model for authentication and authorization."""
-    
+
     __tablename__ = 'user'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(128), nullable=False)
     full_name = db.Column(db.String(100), nullable=False)
     role = db.Column(db.Enum(UserRole), nullable=False, default=UserRole.VIEWER)
+    permissions = db.Column(db.Text, nullable=True)  # JSON string of allowed modules
     is_active = db.Column(db.Boolean, nullable=False, default=True)
     last_login_at = db.Column(db.DateTime, nullable=True)
     
@@ -118,6 +119,43 @@ class User(UserMixin, db.Model, TimestampMixin):
         """Check if the provided password matches the hash."""
         return check_password_hash(self.password_hash, password)
     
+    @property
+    def allowed_modules(self):
+        """Get list of allowed modules for this user."""
+        if self.role == UserRole.ADMIN:
+            # Admins have access to everything
+            return ['dashboard', 'leads_b2c', 'leads_b2b', 'follow_ups', 'customers',
+                   'bookings', 'employees', 'expenses', 'channel_partners', 'services', 'settings']
+
+        if self.permissions:
+            try:
+                return json.loads(self.permissions)
+            except (json.JSONDecodeError, TypeError):
+                pass
+
+        # Default permissions based on role
+        defaults = {
+            UserRole.SALES: ['dashboard', 'leads_b2c', 'leads_b2b', 'follow_ups'],
+            UserRole.OPS: ['dashboard', 'customers', 'bookings', 'employees', 'expenses', 'channel_partners', 'services'],
+            UserRole.FINANCE: ['dashboard', 'bookings', 'expenses'],
+            UserRole.VIEWER: ['dashboard']  # Read-only access
+        }
+        return defaults.get(self.role, ['dashboard'])
+
+    @allowed_modules.setter
+    def allowed_modules(self, modules):
+        """Set allowed modules for this user."""
+        if isinstance(modules, list):
+            self.permissions = json.dumps(modules)
+        else:
+            self.permissions = None
+
+    def has_module_access(self, module_name: str) -> bool:
+        """Check if user has access to a specific module."""
+        if self.role == UserRole.ADMIN:
+            return True
+        return module_name in self.allowed_modules
+
     def has_permission(self, required_role: UserRole) -> bool:
         """Check if user has required permission level."""
         role_hierarchy = {

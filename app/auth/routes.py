@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 
 from app import db
 from app.auth import bp
-from app.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm, ChangePasswordForm
+from app.auth.forms import LoginForm, ResetPasswordRequestForm, ResetPasswordForm, ChangePasswordForm
 from app.models import User, UserRole
 from app.utils.security import generate_password_reset_token, verify_password_reset_token
 
@@ -45,31 +45,6 @@ def login():
         return redirect(next_page)
     
     return render_template('auth/login.html', title='Sign In', form=form)
-
-
-@bp.route('/register', methods=['GET', 'POST'])
-def register():
-    """User registration page."""
-    if current_user.is_authenticated:
-        return redirect(url_for('dashboard.index'))
-    
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        user = User(
-            full_name=form.full_name.data,
-            email=form.email.data,
-            role=UserRole[form.role.data],
-            is_active=True
-        )
-        user.set_password(form.password.data)
-        
-        db.session.add(user)
-        db.session.commit()
-        
-        flash('Registration successful! You can now log in.', 'success')
-        return redirect(url_for('auth.login'))
-    
-    return render_template('auth/register.html', title='Register', form=form)
 
 
 @bp.route('/logout')

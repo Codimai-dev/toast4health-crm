@@ -3,7 +3,7 @@
 from flask import render_template, flash, redirect, url_for
 from flask_login import login_required, current_user
 
-from app import db
+from app import db, require_module_access
 from app.bookings import bp
 from app.bookings.forms import BookingForm
 from app.models import Booking
@@ -11,6 +11,7 @@ from app.models import Booking
 
 @bp.route('/')
 @login_required
+@require_module_access('bookings')
 def index():
     """Display all bookings."""
     bookings = Booking.query.order_by(Booking.created_at.desc()).all()
@@ -19,6 +20,7 @@ def index():
 
 @bp.route('/add', methods=['GET', 'POST'])
 @login_required
+@require_module_access('bookings')
 def add():
     """Add a new booking."""
     form = BookingForm()
@@ -47,6 +49,7 @@ def add():
 
 @bp.route('/view/<int:id>')
 @login_required
+@require_module_access('bookings')
 def view(id):
     """View a booking."""
     booking = Booking.query.get_or_404(id)
@@ -55,6 +58,7 @@ def view(id):
 
 @bp.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
+@require_module_access('bookings')
 def edit(id):
     """Edit a booking."""
     booking = Booking.query.get_or_404(id)
@@ -71,6 +75,7 @@ def edit(id):
 
 @bp.route('/payment/<int:id>', methods=['GET', 'POST'])
 @login_required
+@require_module_access('bookings')
 def payment(id):
     """Add payment for a booking."""
     booking = Booking.query.get_or_404(id)

@@ -3,7 +3,7 @@
 from flask import render_template, flash, redirect, url_for
 from flask_login import login_required, current_user
 
-from app import db
+from app import db, require_module_access
 from app.customers import bp
 from app.customers.forms import CustomerForm
 from app.models import Customer
@@ -11,6 +11,7 @@ from app.models import Customer
 
 @bp.route('/')
 @login_required
+@require_module_access('customers')
 def index():
     """Display all customers."""
     customers = Customer.query.order_by(Customer.created_at.desc()).all()
@@ -19,6 +20,7 @@ def index():
 
 @bp.route('/add', methods=['GET', 'POST'])
 @login_required
+@require_module_access('customers')
 def add():
     """Add a new customer."""
     form = CustomerForm()
@@ -41,6 +43,7 @@ def add():
 
 @bp.route('/view/<int:id>')
 @login_required
+@require_module_access('customers')
 def view(id):
     """View a customer."""
     customer = Customer.query.get_or_404(id)
@@ -49,6 +52,7 @@ def view(id):
 
 @bp.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
+@require_module_access('customers')
 def edit(id):
     """Edit a customer."""
     customer = Customer.query.get_or_404(id)

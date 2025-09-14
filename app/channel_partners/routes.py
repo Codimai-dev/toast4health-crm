@@ -3,7 +3,7 @@
 from flask import render_template, flash, redirect, url_for
 from flask_login import login_required, current_user
 
-from app import db
+from app import db, require_module_access
 from app.channel_partners import bp
 from app.channel_partners.forms import ChannelPartnerForm
 from app.models import ChannelPartner
@@ -11,6 +11,7 @@ from app.models import ChannelPartner
 
 @bp.route('/')
 @login_required
+@require_module_access('channel_partners')
 def index():
     """Display all channel partners."""
     channel_partners = ChannelPartner.query.order_by(ChannelPartner.created_at.desc()).all()
@@ -19,6 +20,7 @@ def index():
 
 @bp.route('/add', methods=['GET', 'POST'])
 @login_required
+@require_module_access('channel_partners')
 def add():
     """Add a new channel partner."""
     form = ChannelPartnerForm()
@@ -42,6 +44,7 @@ def add():
 
 @bp.route('/view/<int:id>')
 @login_required
+@require_module_access('channel_partners')
 def view(id):
     """View a channel partner."""
     partner = ChannelPartner.query.get_or_404(id)
@@ -50,6 +53,7 @@ def view(id):
 
 @bp.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
+@require_module_access('channel_partners')
 def edit(id):
     """Edit a channel partner."""
     partner = ChannelPartner.query.get_or_404(id)

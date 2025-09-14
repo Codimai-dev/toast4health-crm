@@ -202,6 +202,9 @@
                     <a href="{{ url_for('channel_partners.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('channel_partners.') }}">
                         <i class="bi bi-diagram-3"></i> Channel Partners
                     </a>
+                    <a href="{{ url_for('services.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('services.') }}">
+                        <i class="bi bi-tools"></i> Services
+                    </a>
 
                     {% if current_user.role.value == 'ADMIN' %}
                     <!-- Admin Section -->
@@ -263,6 +266,9 @@
                         </a>
                         <a href="{{ url_for('channel_partners.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('channel_partners.') }}">
                             <i class="bi bi-diagram-3"></i> Channel Partners
+                        </a>
+                        <a href="{{ url_for('services.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('services.') }}">
+                            <i class="bi bi-tools"></i> Services
                         </a>
 
                         {% if current_user.role.value == 'ADMIN' %}

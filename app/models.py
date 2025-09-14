@@ -475,6 +475,19 @@ class Setting(db.Model, TimestampMixin, UserTrackingMixin):
         return f'<Setting {self.group}.{self.key}: {self.value}>'
 
 
+class Service(db.Model, TimestampMixin, UserTrackingMixin):
+    """Service model."""
+
+    __tablename__ = 'service'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, index=True)
+    description = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f'<Service {self.id}: {self.name}>'
+
+
 class AuditLog(db.Model):
     """Audit log model for tracking changes."""
     

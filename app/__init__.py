@@ -75,7 +75,10 @@ def create_app(config_name=None):
     
     from app.channel_partners import bp as channel_partners_bp
     app.register_blueprint(channel_partners_bp, url_prefix='/channel-partners')
-    
+
+    from app.services import bp as services_bp
+    app.register_blueprint(services_bp, url_prefix='/services')
+
     from app.settings import bp as settings_bp
     app.register_blueprint(settings_bp, url_prefix='/settings')
     

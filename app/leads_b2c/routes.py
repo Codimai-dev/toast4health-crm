@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from app import db
 from app.leads_b2c import bp
 from app.leads_b2c.forms import B2CLeadForm
-from app.models import B2CLead, ChannelPartner
+from app.models import B2CLead, ChannelPartner, Service
 
 
 @bp.route('/')
@@ -27,6 +27,12 @@ def add():
     if not form.enquiry_id.data:
         form.enquiry_id.data = B2CLead.generate_enquiry_id()
     if form.validate_on_submit():
+        # Convert service ID to service name
+        service_name = None
+        if form.services.data:
+            service = Service.query.get(int(form.services.data))
+            service_name = service.name if service else None
+
         lead = B2CLead(
             enquiry_id=form.enquiry_id.data,
             customer_name=form.customer_name.data,
@@ -34,7 +40,7 @@ def add():
             email=form.email.data,
             enquiry_date=form.enquiry_date.data,
             source=form.source.data if form.source.data else None,
-            services=form.services.data,
+            services=service_name,
             referred_by=form.referred_by.data if form.referred_by.data else None,
             status=form.status.data,
             comment=form.comment.data,
@@ -63,9 +69,23 @@ def edit(enquiry_id):
     lead = B2CLead.query.filter_by(enquiry_id=enquiry_id).first_or_404()
     form = B2CLeadForm(obj=lead)
     form.referred_by.choices = [('', 'Select Channel Partner')] + [(cp.name, cp.name) for cp in ChannelPartner.query.order_by(ChannelPartner.name).all()]
+
+    # Set the correct service selection based on stored service name
+    if lead.services:
+        service = Service.query.filter_by(name=lead.services).first()
+        if service:
+            form.services.data = str(service.id)
+
     if form.validate_on_submit():
+        # Convert service ID to service name
+        service_name = None
+        if form.services.data:
+            service = Service.query.get(int(form.services.data))
+            service_name = service.name if service else None
+
         form.populate_obj(lead)
         lead.source = form.source.data if form.source.data else None
+        lead.services = service_name
         lead.referred_by = form.referred_by.data if form.referred_by.data else None
         lead.updated_by = current_user.id
         db.session.commit()

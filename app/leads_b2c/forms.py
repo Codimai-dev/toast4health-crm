@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, DateField, SelectField, SubmitField
 from wtforms.validators import DataRequired, Email, Optional
 
-from app.models import LeadStatus, FollowUpOutcome, LeadSource
+from app.models import LeadStatus, FollowUpOutcome, LeadSource, Service
 
 
 class B2CLeadForm(FlaskForm):
@@ -22,12 +22,17 @@ class B2CLeadForm(FlaskForm):
                            render_kw={'class': 'form-control'})
     source = SelectField('Source', choices=[('', 'Select Source')] + [(source.value, source.value.replace('_', ' ')) for source in LeadSource],
                          render_kw={'class': 'form-select'})
-    services = StringField('Services', render_kw={'class': 'form-control', 'placeholder': 'Enter services (optional)'})
+    services = SelectField('Services', choices=[], render_kw={'class': 'form-select'})
     referred_by = SelectField('Referred By', choices=[], render_kw={'class': 'form-select'})
     status = SelectField('Status', choices=[(status.value, status.value.replace('_', ' ')) for status in LeadStatus],
                         default=LeadStatus.NEW.value, render_kw={'class': 'form-select'})
     comment = TextAreaField('Comment', render_kw={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter comment (optional)'})
     submit = SubmitField('Save Lead', render_kw={'class': 'btn btn-primary'})
+
+    def __init__(self, *args, **kwargs):
+        super(B2CLeadForm, self).__init__(*args, **kwargs)
+        # Populate services choices from database
+        self.services.choices = [('', 'Select Service')] + [(str(service.id), service.name) for service in Service.query.order_by(Service.name).all()]
 
 
 class FollowUpForm(FlaskForm):

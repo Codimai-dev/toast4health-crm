@@ -177,6 +177,9 @@
                     <a href="{{ url_for('leads_b2b.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('leads_b2b.') }}">
                         <i class="bi bi-building"></i> B2B Leads
                     </a>
+                    <a href="{{ url_for('follow_ups.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('follow_ups.') }}">
+                        <i class="bi bi-clock"></i> Follow-ups
+                    </a>
 
                     <!-- Customer Section -->
                     <div class="list-group-item bg-secondary text-white">
@@ -241,6 +244,9 @@
                         </a>
                         <a href="{{ url_for('leads_b2b.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('leads_b2b.') }}">
                             <i class="bi bi-building"></i> B2B Leads
+                        </a>
+                        <a href="{{ url_for('follow_ups.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('follow_ups.') }}">
+                            <i class="bi bi-clock"></i> Follow-ups
                         </a>
 
                         <!-- Customer Section -->

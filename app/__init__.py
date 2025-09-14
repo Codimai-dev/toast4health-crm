@@ -60,7 +60,10 @@ def create_app(config_name=None):
     
     from app.leads_b2b import bp as leads_b2b_bp
     app.register_blueprint(leads_b2b_bp, url_prefix='/leads-b2b')
-    
+
+    from app.follow_ups import bp as follow_ups_bp
+    app.register_blueprint(follow_ups_bp, url_prefix='/follow-ups')
+
     from app.customers import bp as customers_bp
     app.register_blueprint(customers_bp, url_prefix='/customers')
     

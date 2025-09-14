@@ -70,6 +70,10 @@ def edit(enquiry_id):
     form = B2CLeadForm(obj=lead)
     form.referred_by.choices = [('', 'Select Channel Partner')] + [(cp.name, cp.name) for cp in ChannelPartner.query.order_by(ChannelPartner.name).all()]
 
+    # Set the correct source and status selection
+    form.source.data = lead.source.value if lead.source else None
+    form.status.data = lead.status.value
+
     # Set the correct service selection based on stored service name
     if lead.services:
         service = Service.query.filter_by(name=lead.services).first()

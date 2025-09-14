@@ -6,7 +6,7 @@ from flask_wtf.csrf import validate_csrf, generate_csrf
 from app import db
 from app.models import (
     User, UserRole, B2CLead, B2BLead, FollowUp, Customer, Booking,
-    Employee, Expense, ChannelPartner, Setting, AuditLog
+    Employee, Expense, ChannelPartner, Setting, AuditLog, Service
 )
 from app.settings import bp
 
@@ -61,6 +61,7 @@ def delete_all_data():
         B2BLead.query.delete()
         Employee.query.delete()
         ChannelPartner.query.delete()
+        Service.query.delete()
         Setting.query.delete()
 
         # Note: We don't delete users to keep at least the admin account

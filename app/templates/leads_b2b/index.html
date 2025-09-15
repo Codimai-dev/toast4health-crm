@@ -61,13 +61,13 @@
                                 <td>{{ lead.date.strftime('%d/%m/%Y') if lead.date else '-' }}</td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <a href="{{ url_for('leads_b2b.view', id=lead.id) }}" class="btn btn-outline-primary btn-sm" title="View">
+                                        <a href="{{ url_for('leads_b2b.view', sr_no=lead.sr_no) }}" class="btn btn-outline-primary btn-sm" title="View">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        <a href="{{ url_for('leads_b2b.edit', id=lead.id) }}" class="btn btn-outline-secondary btn-sm" title="Edit">
+                                        <a href="{{ url_for('leads_b2b.edit', sr_no=lead.sr_no) }}" class="btn btn-outline-secondary btn-sm" title="Edit">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        <a href="{{ url_for('leads_b2b.follow_up', id=lead.id) }}" class="btn btn-outline-info btn-sm" title="Follow-up">
+                                        <a href="{{ url_for('leads_b2b.follow_up', sr_no=lead.sr_no) }}" class="btn btn-outline-info btn-sm" title="Follow-up">
                                             <i class="bi bi-clock"></i>
                                         </a>
                                     </div>

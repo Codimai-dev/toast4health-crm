@@ -24,9 +24,11 @@ def index():
 def add():
     """Add a new B2B lead."""
     form = B2BLeadForm()
+    generated_sr_no = B2BLead.generate_sr_no()
+    form.sr_no.data = generated_sr_no
     if form.validate_on_submit():
         lead = B2BLead(
-            sr_no=form.sr_no.data,
+            sr_no=generated_sr_no,
             t4h_spoc=form.t4h_spoc.data,
             date=form.date.data,
             organization_name=form.organization_name.data,
@@ -60,21 +62,21 @@ def add():
     return render_template('leads_b2b/add.html', title='Add B2B Lead', form=form)
 
 
-@bp.route('/view/<int:id>')
+@bp.route('/view/<sr_no>')
 @login_required
 @require_module_access('leads_b2b')
-def view(id):
+def view(sr_no):
     """View a B2B lead."""
-    lead = B2BLead.query.get_or_404(id)
+    lead = B2BLead.query.filter_by(sr_no=sr_no).first_or_404()
     return render_template('leads_b2b/view.html', title='View B2B Lead', lead=lead)
 
 
-@bp.route('/edit/<int:id>', methods=['GET', 'POST'])
+@bp.route('/edit/<sr_no>', methods=['GET', 'POST'])
 @login_required
 @require_module_access('leads_b2b')
-def edit(id):
+def edit(sr_no):
     """Edit a B2B lead."""
-    lead = B2BLead.query.get_or_404(id)
+    lead = B2BLead.query.filter_by(sr_no=sr_no).first_or_404()
     form = B2BLeadForm(obj=lead)
     if form.validate_on_submit():
         form.populate_obj(lead)
@@ -85,12 +87,12 @@ def edit(id):
     return render_template('leads_b2b/edit.html', title='Edit B2B Lead', form=form, lead=lead)
 
 
-@bp.route('/follow_up/<int:id>', methods=['GET', 'POST'])
+@bp.route('/follow_up/<sr_no>', methods=['GET', 'POST'])
 @login_required
 @require_module_access('leads_b2b')
-def follow_up(id):
+def follow_up(sr_no):
     """Add follow-up for a B2B lead."""
-    lead = B2BLead.query.get_or_404(id)
+    lead = B2BLead.query.filter_by(sr_no=sr_no).first_or_404()
     from app.leads_b2c.forms import FollowUpForm
     form = FollowUpForm()
     if form.validate_on_submit():
@@ -107,5 +109,5 @@ def follow_up(id):
         db.session.add(followup)
         db.session.commit()
         flash('Follow-up added successfully!', 'success')
-        return redirect(url_for('leads_b2b.view', id=lead.id))
+        return redirect(url_for('leads_b2b.view', sr_no=lead.sr_no))
     return render_template('leads_b2b/follow_up.html', title='Add Follow-up', form=form, lead=lead)

@@ -252,7 +252,7 @@ class B2BLead(db.Model, TimestampMixin, UserTrackingMixin):
     __tablename__ = 'b2b_lead'
     
     id = db.Column(db.Integer, primary_key=True)
-    sr_no = db.Column(db.String(20), nullable=True)
+    sr_no = db.Column(db.String(20), nullable=True, unique=True)
     t4h_spoc = db.Column(db.String(100), nullable=True)
     date = db.Column(db.Date, nullable=True, index=True)
     organization_name = db.Column(db.String(200), nullable=False, index=True)
@@ -288,6 +288,34 @@ class B2BLead(db.Model, TimestampMixin, UserTrackingMixin):
     
     def __repr__(self):
         return f'<B2BLead {self.organization_name}>'
+
+    @staticmethod
+    def generate_sr_no():
+        """Generate a unique sr_no in format B2B-YYYYMMDD-XXX."""
+        from datetime import datetime
+        date_str = datetime.now().strftime('%Y%m%d')
+
+        # Find the highest existing sr_no for today
+        today_prefix = f'B2B-{date_str}-'
+        existing_sr_nos = db.session.query(B2BLead.sr_no).filter(
+            B2BLead.sr_no.like(f'{today_prefix}%')
+        ).all()
+
+        if existing_sr_nos:
+            # Extract the sequential numbers and find the max
+            numbers = []
+            for sr_no in existing_sr_nos:
+                try:
+                    num_part = sr_no[0].split('-')[-1]
+                    numbers.append(int(num_part))
+                except (IndexError, ValueError):
+                    continue
+
+            next_num = max(numbers) + 1 if numbers else 1
+        else:
+            next_num = 1
+
+        return f'{today_prefix}{next_num:03d}'
 
 
 # Indexes for B2BLead

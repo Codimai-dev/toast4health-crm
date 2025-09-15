@@ -8,7 +8,7 @@ from wtforms.validators import DataRequired, Email, Optional
 class B2BLeadForm(FlaskForm):
     """Form for adding/editing B2B leads."""
 
-    sr_no = StringField('Sr No', render_kw={'class': 'form-control', 'placeholder': 'Enter serial number (optional)'})
+    sr_no = StringField('Sr No', render_kw={'class': 'form-control', 'readonly': True})
     t4h_spoc = StringField('T4H SPOC', render_kw={'class': 'form-control', 'placeholder': 'Enter T4H SPOC (optional)'})
     date = DateField('Date', render_kw={'class': 'form-control'})
     organization_name = StringField('Organization Name', validators=[DataRequired()],

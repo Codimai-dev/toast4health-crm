@@ -115,7 +115,7 @@
                             {% for followup in b2b_follow_ups %}
                             <tr>
                                 <td>
-                                    <a href="{{ url_for('leads_b2b.view', id=followup.b2b_lead_ref.id) }}">
+                                    <a href="{{ url_for('leads_b2b.view', sr_no=followup.b2b_lead_ref.sr_no) }}">
                                         {{ followup.b2b_lead_ref.sr_no or followup.b2b_lead_ref.id }}
                                     </a>
                                 </td>
@@ -129,7 +129,7 @@
                                 <td>{{ followup.next_follow_up_on.strftime('%d/%m/%Y') if followup.next_follow_up_on else '-' }}</td>
                                 <td>{{ followup.owner.full_name }}</td>
                                 <td>
-                                    <a href="{{ url_for('leads_b2b.view', id=followup.b2b_lead_ref.id) }}" class="btn btn-outline-primary btn-sm" title="View Lead">
+                                    <a href="{{ url_for('leads_b2b.view', sr_no=followup.b2b_lead_ref.sr_no) }}" class="btn btn-outline-primary btn-sm" title="View Lead">
                                         <i class="bi bi-eye"></i>
                                     </a>
                                 </td>

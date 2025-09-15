@@ -266,15 +266,9 @@ class B2BLead(db.Model, TimestampMixin, UserTrackingMixin):
     last_wellness_activity_done = db.Column(db.String(200), nullable=True)
     
     
-    # Meeting fields
-    meeting1 = db.Column(db.Date, nullable=True)
-    meeting1_notes = db.Column(db.Text, nullable=True)
-    meeting1_task_done = db.Column(db.Text, nullable=True)
-    meeting2 = db.Column(db.Date, nullable=True)
-    notes = db.Column(db.Text, nullable=True)
-    task_done = db.Column(db.Text, nullable=True)
-    
-    status = db.Column(db.String(50), nullable=True, index=True)
+    # Relationships
+    follow_ups = db.relationship('FollowUp', backref='b2b_lead_ref', lazy='dynamic',
+                                foreign_keys='FollowUp.b2b_lead_id')
     
     # Relationships
     follow_ups = db.relationship('FollowUp', backref='b2b_lead_ref', lazy='dynamic',
@@ -313,8 +307,8 @@ class B2BLead(db.Model, TimestampMixin, UserTrackingMixin):
 
 
 # Indexes for B2BLead
-Index('idx_b2b_lead_org_email_status', 
-      B2BLead.organization_name, B2BLead.organization_email, B2BLead.status)
+Index('idx_b2b_lead_org_email',
+      B2BLead.organization_name, B2BLead.organization_email)
 
 
 class FollowUp(db.Model, TimestampMixin):

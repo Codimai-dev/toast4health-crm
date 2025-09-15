@@ -40,13 +40,6 @@ def add():
             employee_wellness_program=form.employee_wellness_program.data,
             budget_of_wellness_program=form.budget_of_wellness_program.data,
             last_wellness_activity_done=form.last_wellness_activity_done.data,
-            meeting1=form.meeting1.data,
-            meeting1_notes=form.meeting1_notes.data,
-            meeting1_task_done=form.meeting1_task_done.data,
-            meeting2=form.meeting2.data,
-            notes=form.notes.data,
-            task_done=form.task_done.data,
-            status=form.status.data,
             created_by=current_user.id,
             updated_by=current_user.id
         )

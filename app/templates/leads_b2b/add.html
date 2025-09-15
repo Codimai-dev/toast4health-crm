@@ -124,43 +124,6 @@
             </div>
 
 
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Meetings & Notes</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ form.meeting1.label(class="form-label") }}
-                            {{ form.meeting1() }}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            {{ form.meeting2.label(class="form-label") }}
-                            {{ form.meeting2() }}
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        {{ form.meeting1_notes.label(class="form-label") }}
-                        {{ form.meeting1_notes() }}
-                    </div>
-                    <div class="mb-3">
-                        {{ form.meeting1_task_done.label(class="form-label") }}
-                        {{ form.meeting1_task_done() }}
-                    </div>
-                    <div class="mb-3">
-                        {{ form.notes.label(class="form-label") }}
-                        {{ form.notes() }}
-                    </div>
-                    <div class="mb-3">
-                        {{ form.task_done.label(class="form-label") }}
-                        {{ form.task_done() }}
-                    </div>
-                    <div class="mb-3">
-                        {{ form.status.label(class="form-label") }}
-                        {{ form.status() }}
-                    </div>
-                </div>
-            </div>
 
             <div class="d-flex gap-2 mb-4">
                 {{ form.submit() }}

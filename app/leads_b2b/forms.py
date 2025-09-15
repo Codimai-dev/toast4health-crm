@@ -22,13 +22,6 @@ class B2BLeadForm(FlaskForm):
     employee_wellness_program = StringField('Employee Wellness Program', render_kw={'class': 'form-control', 'placeholder': 'Enter wellness program (optional)'})
     budget_of_wellness_program = StringField('Budget of Wellness Program', render_kw={'class': 'form-control', 'placeholder': 'Enter budget (optional)'})
     last_wellness_activity_done = StringField('Last Wellness Activity', render_kw={'class': 'form-control', 'placeholder': 'Enter last activity (optional)'})
-    meeting1 = DateField('Meeting 1 Date', render_kw={'class': 'form-control'})
-    meeting1_notes = TextAreaField('Meeting 1 Notes', render_kw={'class': 'form-control', 'rows': 2, 'placeholder': 'Enter meeting 1 notes (optional)'})
-    meeting1_task_done = TextAreaField('Meeting 1 Task Done', render_kw={'class': 'form-control', 'rows': 2, 'placeholder': 'Enter meeting 1 tasks (optional)'})
-    meeting2 = DateField('Meeting 2 Date', render_kw={'class': 'form-control'})
-    notes = TextAreaField('Notes', render_kw={'class': 'form-control', 'rows': 2, 'placeholder': 'Enter notes (optional)'})
-    task_done = TextAreaField('Task Done', render_kw={'class': 'form-control', 'rows': 2, 'placeholder': 'Enter tasks done (optional)'})
-    status = StringField('Status', render_kw={'class': 'form-control', 'placeholder': 'Enter status (optional)'})
     submit = SubmitField('Save Lead', render_kw={'class': 'btn btn-primary'})
 
 

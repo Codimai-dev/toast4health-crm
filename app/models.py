@@ -265,12 +265,6 @@ class B2BLead(db.Model, TimestampMixin, UserTrackingMixin):
     budget_of_wellness_program = db.Column(db.String(100), nullable=True)
     last_wellness_activity_done = db.Column(db.String(200), nullable=True)
     
-    # Multiple email fields
-    email1 = db.Column(db.String(120), nullable=True)
-    email2 = db.Column(db.String(120), nullable=True)
-    email3 = db.Column(db.String(120), nullable=True)
-    email4 = db.Column(db.String(120), nullable=True)
-    email5 = db.Column(db.String(120), nullable=True)
     
     # Meeting fields
     meeting1 = db.Column(db.Date, nullable=True)

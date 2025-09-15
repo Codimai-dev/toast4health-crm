@@ -113,6 +113,9 @@
                     <a href="{{ url_for('leads_b2b.follow_up', sr_no=lead.sr_no) }}" class="btn btn-info">
                         <i class="bi bi-clock"></i> Add Follow-up
                     </a>
+                    <a href="{{ url_for('leads_b2b.meeting', sr_no=lead.sr_no) }}" class="btn btn-success">
+                        <i class="bi bi-calendar-event"></i> Add Meeting
+                    </a>
                     <a href="{{ url_for('leads_b2b.edit', sr_no=lead.sr_no) }}" class="btn btn-secondary">
                         <i class="bi bi-pencil"></i> Edit Lead
                     </a>
@@ -131,6 +134,39 @@
                     <small class="text-muted">{{ followup.follow_up_on.strftime('%d/%m/%Y') }}</small>
                     <p class="mb-1">{{ followup.notes or 'No notes' }}</p>
                     <small class="text-info">{{ followup.outcome.value.replace('_', ' ') }}</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if lead.meetings|length > 0 %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Meetings ({{ lead.meetings|length }})</h5>
+            </div>
+            <div class="card-body">
+                {% for meeting in lead.meetings %}
+                <div class="border-bottom pb-2 mb-2">
+                    <small class="text-muted">
+                        {% if meeting.meeting1_date %}Meeting 1: {{ meeting.meeting1_date.strftime('%d/%m/%Y') }}{% endif %}
+                        {% if meeting.meeting2_date %} | Meeting 2: {{ meeting.meeting2_date.strftime('%d/%m/%Y') }}{% endif %}
+                    </small>
+                    {% if meeting.meeting1_notes %}
+                    <p class="mb-1"><strong>Meeting 1 Notes:</strong> {{ meeting.meeting1_notes }}</p>
+                    {% endif %}
+                    {% if meeting.meeting1_task_done %}
+                    <p class="mb-1"><strong>Meeting 1 Tasks:</strong> {{ meeting.meeting1_task_done }}</p>
+                    {% endif %}
+                    {% if meeting.notes %}
+                    <p class="mb-1"><strong>Notes:</strong> {{ meeting.notes }}</p>
+                    {% endif %}
+                    {% if meeting.task_done %}
+                    <p class="mb-1"><strong>Tasks Done:</strong> {{ meeting.task_done }}</p>
+                    {% endif %}
+                    {% if meeting.status %}
+                    <small class="text-success">Status: {{ meeting.status }}</small>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>

@@ -30,3 +30,16 @@ class B2BLeadForm(FlaskForm):
     task_done = TextAreaField('Task Done', render_kw={'class': 'form-control', 'rows': 2, 'placeholder': 'Enter tasks done (optional)'})
     status = StringField('Status', render_kw={'class': 'form-control', 'placeholder': 'Enter status (optional)'})
     submit = SubmitField('Save Lead', render_kw={'class': 'btn btn-primary'})
+
+
+class MeetingForm(FlaskForm):
+    """Form for adding meetings to B2B leads."""
+
+    meeting1_date = DateField('Meeting 1 Date', render_kw={'class': 'form-control'})
+    meeting2_date = DateField('Meeting 2 Date', render_kw={'class': 'form-control'})
+    meeting1_notes = TextAreaField('Meeting 1 Notes', render_kw={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter meeting 1 notes (optional)'})
+    meeting1_task_done = TextAreaField('Meeting 1 Task Done', render_kw={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter meeting 1 tasks done (optional)'})
+    notes = TextAreaField('Notes', render_kw={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter general notes (optional)'})
+    task_done = TextAreaField('Task Done', render_kw={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter tasks done (optional)'})
+    status = StringField('Status', render_kw={'class': 'form-control', 'placeholder': 'Enter status (optional)'})
+    submit = SubmitField('Save Meeting', render_kw={'class': 'btn btn-primary'})

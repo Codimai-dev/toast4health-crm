@@ -349,6 +349,28 @@ class FollowUp(db.Model, TimestampMixin):
         return f'<FollowUp {lead_ref}: {self.follow_up_on}>'
 
 
+class Meeting(db.Model, TimestampMixin, UserTrackingMixin):
+    """Meeting model for B2B leads."""
+
+    __tablename__ = 'meeting'
+
+    id = db.Column(db.Integer, primary_key=True)
+    b2b_lead_id = db.Column(db.Integer, db.ForeignKey('b2b_lead.id'), nullable=False)
+    meeting1_date = db.Column(db.Date, nullable=True)
+    meeting2_date = db.Column(db.Date, nullable=True)
+    meeting1_notes = db.Column(db.Text, nullable=True)
+    meeting1_task_done = db.Column(db.Text, nullable=True)
+    notes = db.Column(db.Text, nullable=True)
+    task_done = db.Column(db.Text, nullable=True)
+    status = db.Column(db.String(50), nullable=True)
+
+    # Relationships
+    b2b_lead = db.relationship('B2BLead', backref='meetings')
+
+    def __repr__(self):
+        return f'<Meeting {self.b2b_lead_id}: {self.meeting1_date}>'
+
+
 class Customer(db.Model, TimestampMixin, UserTrackingMixin):
     """Customer model."""
     

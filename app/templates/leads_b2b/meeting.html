@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Add Meeting - CRM System{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('leads_b2b.index') }}">B2B Leads</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('leads_b2b.view', sr_no=lead.sr_no) }}">View Lead</a></li>
+<li class="breadcrumb-item active">Add Meeting</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-calendar-event text-primary"></i>
+                Add Meeting for {{ lead.organization_name }}
+            </h2>
+            <a href="{{ url_for('leads_b2b.view', sr_no=lead.sr_no) }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Lead
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Meeting Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.meeting1_date.label(class="form-label") }}
+                            {{ form.meeting1_date() }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.meeting2_date.label(class="form-label") }}
+                            {{ form.meeting2_date() }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.meeting1_notes.label(class="form-label") }}
+                        {{ form.meeting1_notes() }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.meeting1_task_done.label(class="form-label") }}
+                        {{ form.meeting1_task_done() }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.notes.label(class="form-label") }}
+                        {{ form.notes() }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.task_done.label(class="form-label") }}
+                        {{ form.task_done() }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.status.label(class="form-label") }}
+                        {{ form.status() }}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        {{ form.submit() }}
+                        <a href="{{ url_for('leads_b2b.view', sr_no=lead.sr_no) }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Lead Summary</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-5">Organization:</dt>
+                    <dd class="col-sm-7">{{ lead.organization_name }}</dd>
+
+                    <dt class="col-sm-5">Email:</dt>
+                    <dd class="col-sm-7">{{ lead.organization_email or '-' }}</dd>
+
+                    <dt class="col-sm-5">Status:</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge bg-primary">{{ lead.status or 'New' }}</span>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

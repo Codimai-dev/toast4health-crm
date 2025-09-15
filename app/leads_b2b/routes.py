@@ -5,8 +5,8 @@ from flask_login import login_required, current_user
 
 from app import db, require_module_access
 from app.leads_b2b import bp
-from app.leads_b2b.forms import B2BLeadForm
-from app.models import B2BLead
+from app.leads_b2b.forms import B2BLeadForm, MeetingForm
+from app.models import B2BLead, Meeting
 
 
 @bp.route('/')
@@ -106,3 +106,30 @@ def follow_up(sr_no):
         flash('Follow-up added successfully!', 'success')
         return redirect(url_for('leads_b2b.view', sr_no=lead.sr_no))
     return render_template('leads_b2b/follow_up.html', title='Add Follow-up', form=form, lead=lead)
+
+
+@bp.route('/meeting/<sr_no>', methods=['GET', 'POST'])
+@login_required
+@require_module_access('leads_b2b')
+def meeting(sr_no):
+    """Add meeting for a B2B lead."""
+    lead = B2BLead.query.filter_by(sr_no=sr_no).first_or_404()
+    form = MeetingForm()
+    if form.validate_on_submit():
+        meeting = Meeting(
+            b2b_lead_id=lead.id,
+            meeting1_date=form.meeting1_date.data,
+            meeting2_date=form.meeting2_date.data,
+            meeting1_notes=form.meeting1_notes.data,
+            meeting1_task_done=form.meeting1_task_done.data,
+            notes=form.notes.data,
+            task_done=form.task_done.data,
+            status=form.status.data,
+            created_by=current_user.id,
+            updated_by=current_user.id
+        )
+        db.session.add(meeting)
+        db.session.commit()
+        flash('Meeting added successfully!', 'success')
+        return redirect(url_for('leads_b2b.view', sr_no=lead.sr_no))
+    return render_template('leads_b2b/meeting.html', title='Add Meeting', form=form, lead=lead)

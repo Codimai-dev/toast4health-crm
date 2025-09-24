@@ -214,14 +214,10 @@ class B2CLead(db.Model, TimestampMixin, UserTrackingMixin):
 
     @staticmethod
     def generate_enquiry_id():
-        """Generate a unique enquiry ID in format B2C-YYYYMMDD-XXX."""
-        from datetime import datetime
-        date_str = datetime.now().strftime('%Y%m%d')
-
-        # Find the highest existing enquiry ID for today
-        today_prefix = f'B2C-{date_str}-'
+        """Generate a unique enquiry ID in format B2C-XXX."""
+        # Find the highest existing enquiry ID
         existing_ids = db.session.query(B2CLead.enquiry_id).filter(
-            B2CLead.enquiry_id.like(f'{today_prefix}%')
+            B2CLead.enquiry_id.like('B2C-%')
         ).all()
 
         if existing_ids:
@@ -238,7 +234,7 @@ class B2CLead(db.Model, TimestampMixin, UserTrackingMixin):
         else:
             next_num = 1
 
-        return f'{today_prefix}{next_num:03d}'
+        return f'B2C-{next_num:03d}'
 
 
 # Indexes for B2CLead

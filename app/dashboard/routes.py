@@ -147,11 +147,9 @@ def search():
             B2BLead.organization_name.ilike(f'%{query}%'),
             B2BLead.organization_email.ilike(f'%{query}%'),
             B2BLead.t4h_spoc.ilike(f'%{query}%'),
-            B2BLead.email1.ilike(f'%{query}%'),
-            B2BLead.email2.ilike(f'%{query}%'),
-            B2BLead.email3.ilike(f'%{query}%'),
-            B2BLead.email4.ilike(f'%{query}%'),
-            B2BLead.email5.ilike(f'%{query}%')
+            B2BLead.sr_no.ilike(f'%{query}%'),
+            B2BLead.location.ilike(f'%{query}%'),
+            B2BLead.org_poc_name_and_role.ilike(f'%{query}%')
         )
     ).limit(10).all()
     if b2b_results:

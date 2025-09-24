@@ -62,11 +62,11 @@
                         </div>
                         <div>
                             {% if category == 'B2C Leads' %}
-                                <a href="{{ url_for('leads_b2c.view', id=item.id) }}" class="btn btn-sm btn-outline-primary">
+                                <a href="{{ url_for('leads_b2c.view', enquiry_id=item.enquiry_id) }}" class="btn btn-sm btn-outline-primary">
                                     <i class="bi bi-eye"></i> View
                                 </a>
                             {% elif category == 'B2B Leads' %}
-                                <a href="{{ url_for('leads_b2b.view', id=item.id) }}" class="btn btn-sm btn-outline-primary">
+                                <a href="{{ url_for('leads_b2b.view', sr_no=item.sr_no) }}" class="btn btn-sm btn-outline-primary">
                                     <i class="bi bi-eye"></i> View
                                 </a>
                             {% elif category == 'Customers' %}

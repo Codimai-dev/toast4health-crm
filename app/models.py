@@ -176,8 +176,7 @@ class B2CLead(db.Model, TimestampMixin, UserTrackingMixin):
 
     __tablename__ = 'b2c_lead'
 
-    id = db.Column(db.Integer, primary_key=True)
-    enquiry_id = db.Column(db.String(20), nullable=False, unique=True, index=True)
+    enquiry_id = db.Column(db.String(20), primary_key=True, nullable=False, unique=True, index=True)
     customer_name = db.Column(db.String(100), nullable=False)
     contact_no = db.Column(db.String(20), nullable=False, index=True)
     email = db.Column(db.String(120), nullable=True, index=True)
@@ -305,12 +304,12 @@ Index('idx_b2b_lead_org_email',
 
 class FollowUp(db.Model, TimestampMixin):
     """Follow-up model for both B2C and B2B leads."""
-    
+
     __tablename__ = 'follow_up'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     lead_type = db.Column(db.Enum(LeadType), nullable=False)
-    b2c_lead_id = db.Column(db.Integer, db.ForeignKey('b2c_lead.id'), nullable=True)
+    b2c_lead_id = db.Column(db.String(20), db.ForeignKey('b2c_lead.enquiry_id'), nullable=True)
     b2b_lead_id = db.Column(db.Integer, db.ForeignKey('b2b_lead.id'), nullable=True)
     follow_up_on = db.Column(db.Date, nullable=False, index=True)
     notes = db.Column(db.Text, nullable=True)

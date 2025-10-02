@@ -117,7 +117,7 @@ def follow_up(enquiry_id):
         from app.models import FollowUp, FollowUpOutcome
         followup = FollowUp(
             lead_type='B2C',
-            b2c_lead_id=lead.id,
+            b2c_lead_id=lead.enquiry_id,
             follow_up_on=form.follow_up_on.data,
             notes=form.notes.data,
             outcome=form.outcome.data,

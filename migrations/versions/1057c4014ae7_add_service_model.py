@@ -33,7 +33,6 @@ def upgrade():
     with op.batch_alter_table('service', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_service_name'), ['name'], unique=False)
 
-    op.drop_table('_alembic_tmp_b2c_lead')
     # ### end Alembic commands ###
 
 

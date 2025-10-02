@@ -106,6 +106,102 @@ def index():
     return render_template('settings/index.html')
 
 
+@bp.route('/dropdowns')
+@login_required
+def dropdowns():
+    """Manage dropdown settings."""
+    if not current_user.has_permission(UserRole.ADMIN):
+        flash('Access denied. Admin privileges required.', 'error')
+        return redirect(url_for('dashboard.index'))
+
+    groups = ['Source', 'LeadStatus', 'Services', 'ExpenseCategory', 'EmployeeType']
+    settings_by_group = {}
+    for group in groups:
+        settings_by_group[group] = Setting.query.filter_by(group=group).order_by(Setting.sort_order).all()
+
+    return render_template('settings/dropdowns.html', title='Dropdown Settings', settings_by_group=settings_by_group)
+
+
+@bp.route('/dropdowns/add', methods=['POST'])
+@login_required
+def add_setting():
+    """Add new setting item."""
+    if not current_user.has_permission(UserRole.ADMIN):
+        return jsonify({'success': False, 'message': 'Access denied'}), 403
+
+    data = request.get_json()
+    group = data.get('group')
+    key = data.get('key')
+    value = data.get('value')
+
+    if not all([group, key, value]):
+        return jsonify({'success': False, 'message': 'All fields required'}), 400
+
+    # Check if key already exists in group
+    existing = Setting.query.filter_by(group=group, key=key).first()
+    if existing:
+        return jsonify({'success': False, 'message': 'Key already exists'}), 400
+
+    # Get max sort_order
+    max_order = db.session.query(db.func.max(Setting.sort_order)).filter_by(group=group).scalar() or 0
+
+    setting = Setting(
+        group=group,
+        key=key,
+        value=value,
+        sort_order=max_order + 1,
+        is_active=True,
+        created_by=current_user.id,
+        updated_by=current_user.id
+    )
+    db.session.add(setting)
+    db.session.commit()
+
+    return jsonify({'success': True, 'message': 'Setting added successfully'})
+
+
+@bp.route('/dropdowns/<int:setting_id>/edit', methods=['POST'])
+@login_required
+def edit_setting(setting_id):
+    """Edit setting item."""
+    if not current_user.has_permission(UserRole.ADMIN):
+        return jsonify({'success': False, 'message': 'Access denied'}), 403
+
+    setting = Setting.query.get_or_404(setting_id)
+    data = request.get_json()
+    value = data.get('value')
+
+    if not value:
+        return jsonify({'success': False, 'message': 'Value required'}), 400
+
+    setting.value = value
+    setting.updated_by = current_user.id
+    db.session.commit()
+
+    return jsonify({'success': True, 'message': 'Setting updated successfully'})
+
+
+@bp.route('/dropdowns/<int:setting_id>/delete', methods=['POST'])
+@login_required
+def delete_setting(setting_id):
+    """Delete setting item."""
+    if not current_user.has_permission(UserRole.ADMIN):
+        return jsonify({'success': False, 'message': 'Access denied'}), 403
+
+    setting = Setting.query.get_or_404(setting_id)
+
+    # Check if setting is in use
+    if setting.group == 'LeadStatus':
+        count = B2CLead.query.filter_by(status=setting.key).count()
+        if count > 0:
+            return jsonify({'success': False, 'message': f'Cannot delete: {count} leads use this status'}), 400
+
+    db.session.delete(setting)
+    db.session.commit()
+
+    return jsonify({'success': True, 'message': 'Setting deleted successfully'})
+
+
 @bp.route('/users')
 @login_required
 def users():

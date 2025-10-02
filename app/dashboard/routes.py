@@ -40,11 +40,11 @@ def index():
             b2c_stats = {
                 'total': B2CLead.query.count(),
                 'today': B2CLead.query.filter_by(enquiry_date=today).count(),
-                'new': B2CLead.query.filter_by(status=LeadStatus.NEW).count(),
-                'follow_up': B2CLead.query.filter_by(status=LeadStatus.FOLLOW_UP).count(),
-                'prospect': B2CLead.query.filter_by(status=LeadStatus.PROSPECT).count(),
-                'converted': B2CLead.query.filter_by(status=LeadStatus.CONVERTED).count(),
-                'lost': B2CLead.query.filter_by(status=LeadStatus.LOST).count(),
+                'new': B2CLead.query.filter_by(status='NEW').count(),
+                'follow_up': B2CLead.query.filter_by(status='FOLLOW_UP').count(),
+                'prospect': B2CLead.query.filter_by(status='PROSPECT').count(),
+                'converted': B2CLead.query.filter_by(status='CONVERTED').count(),
+                'lost': B2CLead.query.filter_by(status='LOST').count(),
             }
 
         if 'leads_b2b' in allowed_modules:

@@ -83,9 +83,8 @@ def edit(enquiry_id):
     # Set the correct source and status selection only for GET requests
     from flask import request
     if request.method == 'GET':
-        if lead.source:
-            form.source.data = lead.source.value
-        form.status.data = lead.status.value
+        form.source.data = lead.source
+        form.status.data = lead.status
 
     if form.validate_on_submit():
         # Convert service ID to service name

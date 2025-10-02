@@ -275,14 +275,10 @@ class B2BLead(db.Model, TimestampMixin, UserTrackingMixin):
 
     @staticmethod
     def generate_sr_no():
-        """Generate a unique sr_no in format B2B-YYYYMMDD-XXX."""
-        from datetime import datetime
-        date_str = datetime.now().strftime('%Y%m%d')
-
-        # Find the highest existing sr_no for today
-        today_prefix = f'B2B-{date_str}-'
+        """Generate a unique sr_no in format B2B-XXX."""
+        # Find the highest existing sr_no
         existing_sr_nos = db.session.query(B2BLead.sr_no).filter(
-            B2BLead.sr_no.like(f'{today_prefix}%')
+            B2BLead.sr_no.like('B2B-%')
         ).all()
 
         if existing_sr_nos:
@@ -299,7 +295,7 @@ class B2BLead(db.Model, TimestampMixin, UserTrackingMixin):
         else:
             next_num = 1
 
-        return f'{today_prefix}{next_num:03d}'
+        return f'B2B-{next_num:03d}'
 
 
 # Indexes for B2BLead

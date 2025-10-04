@@ -1,6 +1,7 @@
 """B2C Leads forms."""
 
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileRequired
 from wtforms import StringField, TextAreaField, DateField, SelectField, SubmitField
 from wtforms.validators import DataRequired, Email, Optional
 
@@ -47,3 +48,11 @@ class FollowUpForm(FlaskForm):
     next_follow_up_on = DateField('Next Follow-up Date', validators=[Optional()],
                                 render_kw={'class': 'form-control'})
     submit = SubmitField('Add Follow-up', render_kw={'class': 'btn btn-primary'})
+
+
+class CSVImportForm(FlaskForm):
+    """Form for importing B2C leads from CSV."""
+
+    csv_file = FileField('CSV File', validators=[FileRequired()],
+                        render_kw={'class': 'form-control', 'accept': '.csv'})
+    submit = SubmitField('Import Leads', render_kw={'class': 'btn btn-success'})

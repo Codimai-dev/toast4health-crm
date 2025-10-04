@@ -111,6 +111,9 @@
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
+                    <a href="{{ url_for('bookings.invoice', id=booking.id) }}" class="btn btn-primary" target="_blank">
+                        <i class="bi bi-file-earmark-pdf"></i> Download Invoice
+                    </a>
                     <a href="{{ url_for('bookings.payment', id=booking.id) }}" class="btn btn-success">
                         <i class="bi bi-cash"></i> Add Payment
                     </a>

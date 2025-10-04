@@ -1,7 +1,13 @@
 """Bookings routes."""
 
-from flask import render_template, flash, redirect, url_for
+import os
+from flask import render_template, flash, redirect, url_for, Response, current_app
 from flask_login import login_required, current_user
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib import colors
+from io import BytesIO
 
 from app import db, require_module_access
 from app.bookings import bp
@@ -90,3 +96,105 @@ def payment(id):
         flash('Payment added successfully!', 'success')
         return redirect(url_for('bookings.view', id=booking.id))
     return render_template('bookings/payment.html', title='Add Payment', form=form, booking=booking)
+
+
+@bp.route('/invoice/<int:id>')
+@login_required
+@require_module_access('bookings')
+def invoice(id):
+    """Generate PDF invoice for a booking."""
+    booking = Booking.query.get_or_404(id)
+
+    # Create PDF buffer
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    styles = getSampleStyleSheet()
+
+    # Custom styles
+    title_style = ParagraphStyle(
+        'Title',
+        parent=styles['Heading1'],
+        fontSize=24,
+        spaceAfter=30,
+        alignment=1  # Center
+    )
+
+    normal_style = styles['Normal']
+    heading_style = styles['Heading2']
+
+    # Build PDF content
+    content = []
+
+    # Header
+    content.append(Paragraph("Your Company Name", title_style))
+    content.append(Paragraph("123 Business Street, City, State 12345", normal_style))
+    content.append(Paragraph("Phone: (123) 456-7890 | Email: info@company.com", normal_style))
+    content.append(Spacer(1, 20))
+    content.append(Paragraph("INVOICE", title_style))
+
+    # Invoice details
+    invoice_data = [
+        ['Invoice Number:', booking.booking_code, 'Invoice Date:', booking.created_at.strftime('%d/%m/%Y') if booking.created_at else ''],
+        ['Bill To:', booking.customer_name, 'Service Period:', f"{booking.start_date.strftime('%d/%m/%Y') if booking.start_date else ''} - {booking.end_date.strftime('%d/%m/%Y') if booking.end_date else ''}"],
+        ['', booking.customer_mob, '', '']
+    ]
+
+    if booking.customer and booking.customer.email:
+        invoice_data.append(['', booking.customer.email, '', ''])
+
+    invoice_table = Table(invoice_data, colWidths=[100, 150, 100, 150])
+    invoice_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+    ]))
+    content.append(invoice_table)
+    content.append(Spacer(1, 20))
+
+    # Services table
+    content.append(Paragraph("Services", heading_style))
+    services_data = [
+        ['Description', 'Quantity', 'Unit Price', 'Amount'],
+        [booking.services or '', '1', f"₹{booking.service_charge or 0:.2f}", f"₹{booking.service_charge or 0:.2f}"]
+    ]
+
+    if booking.other_expanse:
+        services_data.append(['Other Expenses', '1', f"₹{booking.other_expanse:.2f}", f"₹{booking.other_expanse:.2f}"])
+
+    services_table = Table(services_data, colWidths=[200, 80, 100, 100])
+    services_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ('BACKGROUND', (0, 0), (0, 0), colors.lightgrey),
+        ('ALIGN', (1, 0), (-1, -1), 'RIGHT'),
+    ]))
+    content.append(services_table)
+    content.append(Spacer(1, 20))
+
+    # Totals
+    subtotal = (booking.service_charge or 0) + (booking.other_expanse or 0)
+    content.append(Paragraph(f"Subtotal: ₹{subtotal:.2f}", normal_style))
+
+    if booking.gst_percentage:
+        content.append(Paragraph(f"GST ({booking.gst_percentage}%): ₹{booking.gst_value or 0:.2f}", normal_style))
+
+    content.append(Paragraph(f"<b>Total Amount: ₹{booking.total_amount or 0:.2f}</b>", normal_style))
+    content.append(Paragraph(f"Amount Paid: ₹{booking.amount_paid or 0:.2f}", normal_style))
+    content.append(Paragraph(f"Balance Due: ₹{booking.pending_amount or 0:.2f}", normal_style))
+
+    # Footer
+    content.append(Spacer(1, 30))
+    content.append(Paragraph("Thank you for your business!", normal_style))
+    content.append(Paragraph("Payment terms: Due upon receipt", normal_style))
+    content.append(Paragraph("For any queries, please contact us at info@company.com", normal_style))
+
+    # Generate PDF
+    doc.build(content)
+    buffer.seek(0)
+
+    # Return PDF response
+    response = Response(buffer.getvalue(), mimetype='application/pdf')
+    response.headers['Content-Disposition'] = f'attachment; filename=invoice_{booking.booking_code}.pdf'
+    return response

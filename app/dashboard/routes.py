@@ -1,7 +1,7 @@
 """Dashboard routes with comprehensive CRM statistics."""
 
 from datetime import datetime, date, timedelta
-from flask import render_template, request
+from flask import render_template, request, jsonify
 from flask_login import login_required, current_user
 from sqlalchemy import func, and_, or_
 
@@ -219,3 +219,128 @@ def search():
                           title='Search Results',
                           query=query,
                           results=results)
+
+
+@bp.route('/api/chart-data')
+@login_required
+def chart_data():
+    """API endpoint for dashboard chart data."""
+    try:
+        # Get date range from request (default to last 30 days)
+        days = int(request.args.get('days', 30))
+        end_date = date.today()
+        start_date = end_date - timedelta(days=days)
+
+        allowed_modules = current_user.allowed_modules
+        chart_data = {}
+
+        # Lead conversion funnel data
+        if 'leads_b2c' in allowed_modules:
+            funnel_data = {
+                'labels': ['New', 'Follow Up', 'Prospect', 'Converted', 'Lost'],
+                'datasets': [{
+                    'label': 'B2C Leads',
+                    'data': [
+                        B2CLead.query.filter_by(status='new').count(),
+                        B2CLead.query.filter_by(status='follow_up').count(),
+                        B2CLead.query.filter_by(status='prospect').count(),
+                        B2CLead.query.filter_by(status='converted').count(),
+                        B2CLead.query.filter_by(status='lost').count(),
+                    ],
+                    'backgroundColor': [
+                        'rgba(13, 110, 253, 0.8)',   # Blue
+                        'rgba(255, 193, 7, 0.8)',    # Yellow
+                        'rgba(13, 202, 240, 0.8)',   # Cyan
+                        'rgba(25, 135, 84, 0.8)',    # Green
+                        'rgba(108, 117, 125, 0.8)',  # Gray
+                    ],
+                    'borderColor': [
+                        'rgba(13, 110, 253, 1)',
+                        'rgba(255, 193, 7, 1)',
+                        'rgba(13, 202, 240, 1)',
+                        'rgba(25, 135, 84, 1)',
+                        'rgba(108, 117, 125, 1)',
+                    ],
+                    'borderWidth': 1
+                }]
+            }
+            chart_data['lead_funnel'] = funnel_data
+
+        # Revenue trend data (last 30 days)
+        if 'bookings' in allowed_modules:
+            revenue_data = {
+                'labels': [],
+                'datasets': [{
+                    'label': 'Revenue',
+                    'data': [],
+                    'borderColor': 'rgba(25, 135, 84, 1)',
+                    'backgroundColor': 'rgba(25, 135, 84, 0.1)',
+                    'fill': True,
+                    'tension': 0.4
+                }]
+            }
+
+            for i in range(days):
+                current_date = start_date + timedelta(days=i)
+                # Convert to datetime for proper comparison
+                current_datetime = datetime.combine(current_date, datetime.min.time())
+                next_datetime = datetime.combine(current_date + timedelta(days=1), datetime.min.time())
+
+                daily_revenue = db.session.query(func.sum(Booking.total_amount)).filter(
+                    Booking.created_at >= current_datetime,
+                    Booking.created_at < next_datetime
+                ).scalar() or 0
+
+                revenue_data['labels'].append(current_date.strftime('%d/%m'))
+                revenue_data['datasets'][0]['data'].append(float(daily_revenue))
+
+            chart_data['revenue_trend'] = revenue_data
+
+        # Performance metrics
+        performance_data = {
+            'labels': ['Leads', 'Customers', 'Bookings', 'Revenue'],
+            'datasets': [{
+                'label': 'Current Month',
+                'data': [],
+                'backgroundColor': 'rgba(13, 110, 253, 0.8)',
+                'borderColor': 'rgba(13, 110, 253, 1)',
+                'borderWidth': 1
+            }]
+        }
+
+        # Calculate metrics for current month
+        month_start = date.today().replace(day=1)
+
+        if 'leads_b2c' in allowed_modules:
+            monthly_leads = B2CLead.query.filter(B2CLead.created_at >= month_start).count()
+        else:
+            monthly_leads = 0
+
+        if 'customers' in allowed_modules:
+            monthly_customers = Customer.query.filter(Customer.created_at >= month_start).count()
+        else:
+            monthly_customers = 0
+
+        if 'bookings' in allowed_modules:
+            monthly_bookings = Booking.query.filter(Booking.created_at >= month_start).count()
+            monthly_revenue = db.session.query(func.sum(Booking.total_amount)).filter(
+                Booking.created_at >= month_start
+            ).scalar() or 0
+        else:
+            monthly_bookings = 0
+            monthly_revenue = 0
+
+        performance_data['datasets'][0]['data'] = [
+            monthly_leads,
+            monthly_customers,
+            monthly_bookings,
+            float(monthly_revenue)
+        ]
+
+        chart_data['performance'] = performance_data
+
+        return jsonify(chart_data)
+
+    except Exception as e:
+        print(f"Chart data error: {e}")
+        return jsonify({'error': 'Failed to load chart data'}), 500

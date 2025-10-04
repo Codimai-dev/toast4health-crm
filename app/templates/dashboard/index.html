@@ -223,6 +223,55 @@
     {% endif %}
 </div>
 
+<!-- Charts Row -->
+<div class="row g-3 mb-4">
+    {% if 'leads_b2c' in allowed_modules %}
+    <!-- Lead Conversion Funnel -->
+    <div class="col-xl-4 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-funnel"></i> Lead Conversion Funnel
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="leadFunnelChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if 'bookings' in allowed_modules %}
+    <!-- Revenue Trend -->
+    <div class="col-xl-4 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-graph-up"></i> Revenue Trend (30 Days)
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="revenueChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Performance Metrics -->
+    <div class="col-xl-4 col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-bar-chart"></i> Monthly Performance
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="performanceChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Quick Actions Row -->
 <div class="row g-3">
     <div class="col-12">
@@ -292,4 +341,90 @@
 .stats-card.danger { border-left-color: #dc3545; }
 .stats-card.info { border-left-color: #0dcaf0; }
 </style>
+
+<script>
+// Load chart data and initialize charts
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/dashboard/api/chart-data')
+        .then(response => response.json())
+        .then(data => {
+            // Lead Conversion Funnel Chart
+            if (data.lead_funnel && document.getElementById('leadFunnelChart')) {
+                new Chart(document.getElementById('leadFunnelChart'), {
+                    type: 'bar',
+                    data: data.lead_funnel,
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Revenue Trend Chart
+            if (data.revenue_trend && document.getElementById('revenueChart')) {
+                new Chart(document.getElementById('revenueChart'), {
+                    type: 'line',
+                    data: data.revenue_trend,
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '₹' + value.toLocaleString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Performance Metrics Chart
+            if (data.performance && document.getElementById('performanceChart')) {
+                new Chart(document.getElementById('performanceChart'), {
+                    type: 'bar',
+                    data: data.performance,
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error loading chart data:', error);
+        });
+});
+</script>
 {% endblock %}

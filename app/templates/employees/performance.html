@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Performance Monitoring - CRM System{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('employees.index') }}">Employees</a></li>
+<li class="breadcrumb-item active">Performance</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-graph-up text-secondary"></i>
+                Performance Monitoring
+            </h2>
+            <a href="{{ url_for('employees.index') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Employees
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Performance Overview -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Monthly Performance Metrics</h5>
+            </div>
+            <div class="card-body">
+                {% if performance_data %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Leads Assigned</th>
+                                <th>Leads Converted</th>
+                                <th>Conversion Rate</th>
+                                <th>Bookings Completed</th>
+                                <th>Revenue Generated</th>
+                                <th>Tasks Completed</th>
+                                <th>Follow-ups Done</th>
+                                <th>Attendance %</th>
+                                <th>Performance Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for data in performance_data %}
+                            {% set metrics = data.metrics %}
+                            <tr>
+                                <td>
+                                    <strong>{{ data.employee.name }}</strong><br>
+                                    <small class="text-muted">{{ data.employee.employee_code }}</small>
+                                </td>
+                                <td>{{ metrics.leads_assigned }}</td>
+                                <td>{{ metrics.leads_converted }}</td>
+                                <td>
+                                    {% if metrics.conversion_rate %}
+                                        {{ "%.1f"|format(metrics.conversion_rate) }}%
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>{{ metrics.bookings_completed }}</td>
+                                <td>{{ metrics.revenue_generated | currency }}</td>
+                                <td>{{ metrics.tasks_completed }}</td>
+                                <td>{{ metrics.follow_ups_done }}</td>
+                                <td>
+                                    {% if metrics.attendance_percentage %}
+                                        {{ "%.1f"|format(metrics.attendance_percentage) }}%
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% set rating = (metrics.conversion_rate or 0) * 0.3 + (metrics.attendance_percentage or 0) * 0.3 + (metrics.tasks_completed * 2) %}
+                                    {% if rating >= 80 %}
+                                        <span class="badge bg-success">Excellent</span>
+                                    {% elif rating >= 60 %}
+                                        <span class="badge bg-primary">Good</span>
+                                    {% elif rating >= 40 %}
+                                        <span class="badge bg-warning">Average</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Needs Improvement</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Performance Summary -->
+                <div class="mt-4">
+                    <h6>Performance Summary</h6>
+                    <div class="row g-3">
+                        {% set total_leads = performance_data | sum(attribute='metrics.leads_assigned') %}
+                        {% set total_conversions = performance_data | sum(attribute='metrics.leads_converted') %}
+                        {% set total_revenue = performance_data | sum(attribute='metrics.revenue_generated') %}
+                        {% set total_tasks = performance_data | sum(attribute='metrics.tasks_completed') %}
+
+                        <div class="col-md-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h4 class="text-primary">{{ total_leads }}</h4>
+                                    <small>Total Leads Assigned</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h4 class="text-success">{{ total_conversions }}</h4>
+                                    <small>Total Conversions</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h4 class="text-info">{{ total_revenue | currency }}</h4>
+                                    <small>Total Revenue</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h4 class="text-warning">{{ total_tasks }}</h4>
+                                    <small>Tasks Completed</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-graph-up fs-1 text-muted mb-3"></i>
+                    <h5 class="text-muted">No Performance Data</h5>
+                    <p class="text-muted">Performance metrics will be calculated as employees complete tasks and activities.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Apply for Leave - CRM System{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('employees.index') }}">Employees</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('employees.leave') }}">Leave</a></li>
+<li class="breadcrumb-item active">Apply</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-calendar-plus text-success"></i>
+                Apply for Leave
+            </h2>
+            <a href="{{ url_for('employees.leave') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Leave Management
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Leave Application Form</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="employee_id" class="form-label">Employee</label>
+                            <select class="form-select" id="employee_id" name="employee_id" required>
+                                <option value="">Select Employee</option>
+                                {% for employee in employees %}
+                                <option value="{{ employee.id }}">{{ employee.name }} ({{ employee.employee_code }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="leave_type" class="form-label">Leave Type</label>
+                            <select class="form-select" id="leave_type" name="leave_type" required>
+                                <option value="">Select Leave Type</option>
+                                <option value="CASUAL">Casual Leave</option>
+                                <option value="SICK">Sick Leave</option>
+                                <option value="EARNED">Earned Leave</option>
+                                <option value="MATERNITY">Maternity Leave</option>
+                                <option value="PATERNITY">Paternity Leave</option>
+                                <option value="OTHER">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="start_date" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="end_date" class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date" required>
+                        </div>
+                        <div class="col-12">
+                            <label for="reason" class="form-label">Reason</label>
+                            <textarea class="form-control" id="reason" name="reason" rows="3" placeholder="Please provide a reason for your leave request"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-send"></i> Submit Leave Application
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Leave Information</h5>
+            </div>
+            <div class="card-body">
+                <h6>Leave Types:</h6>
+                <ul class="list-unstyled small">
+                    <li><strong>Casual Leave:</strong> Short-term personal matters</li>
+                    <li><strong>Sick Leave:</strong> Medical emergencies</li>
+                    <li><strong>Earned Leave:</strong> Vacation time</li>
+                    <li><strong>Maternity/Paternity:</strong> Family care</li>
+                </ul>
+                <hr>
+                <p class="small text-muted">
+                    <i class="bi bi-info-circle"></i>
+                    Your leave request will be reviewed by management and you will be notified of the approval status.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-calculate days when dates change
+document.getElementById('start_date').addEventListener('change', calculateDays);
+document.getElementById('end_date').addEventListener('change', calculateDays);
+
+function calculateDays() {
+    const start = new Date(document.getElementById('start_date').value);
+    const end = new Date(document.getElementById('end_date').value);
+
+    if (start && end && end >= start) {
+        const diffTime = Math.abs(end - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        console.log(`Leave duration: ${diffDays} days`);
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Task Management - CRM System{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('employees.index') }}">Employees</a></li>
+<li class="breadcrumb-item active">Tasks</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-list-check text-success"></i>
+                Task Management
+            </h2>
+            <div>
+                <a href="{{ url_for('employees.assign_task') }}" class="btn btn-success me-2">
+                    <i class="bi bi-plus-circle"></i> Assign Task
+                </a>
+                <a href="{{ url_for('employees.index') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Employees
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tasks Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">All Tasks</h5>
+            </div>
+            <div class="card-body">
+                {% if tasks %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Task</th>
+                                <th>Assigned To</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Due Date</th>
+                                <th>Assigned By</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in tasks %}
+                            <tr>
+                                <td>
+                                    <strong>{{ task.title }}</strong>
+                                    {% if task.description %}
+                                    <br><small class="text-muted">{{ task.description[:50] }}{% if task.description|length > 50 %}...{% endif %}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <strong>{{ task.employee.name }}</strong><br>
+                                    <small class="text-muted">{{ task.employee.employee_code }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'danger' if task.priority.value == 'URGENT' else 'warning' if task.priority.value == 'HIGH' else 'info' if task.priority.value == 'MEDIUM' else 'secondary' }}">
+                                        {{ task.priority.value }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if task.status.value == 'COMPLETED' else 'primary' if task.status.value == 'IN_PROGRESS' else 'secondary' if task.status.value == 'TODO' else 'warning' }}">
+                                        {{ task.status.value.replace('_', ' ') }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if task.due_date %}
+                                        {{ task.due_date.strftime('%d/%m/%Y') }}
+                                        {% if task.due_date < date.today() and task.status.value != 'COMPLETED' %}
+                                            <br><small class="text-danger">Overdue</small>
+                                        {% endif %}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>{{ task.assigner.full_name }}</td>
+                                <td>{{ task.created_at.strftime('%d/%m/%Y') }}</td>
+                                <td>
+                                    {% if task.status.value != 'COMPLETED' %}
+                                    <form method="POST" action="{{ url_for('employees.update_task', task_id=task.id) }}" class="d-inline">
+                                        <input type="hidden" name="status" value="COMPLETED">
+                                        <button type="submit" class="btn btn-success btn-sm me-1" onclick="return confirm('Mark this task as completed?')">
+                                            <i class="bi bi-check-circle"></i> Complete
+                                        </button>
+                                    </form>
+                                    {% if task.status.value == 'TODO' %}
+                                    <form method="POST" action="{{ url_for('employees.update_task', task_id=task.id) }}" class="d-inline">
+                                        <input type="hidden" name="status" value="IN_PROGRESS">
+                                        <button type="submit" class="btn btn-primary btn-sm">
+                                            <i class="bi bi-play-circle"></i> Start
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                    {% else %}
+                                        <small class="text-success">
+                                            Completed {{ task.completed_at.strftime('%d/%m/%Y') if task.completed_at else '' }}
+                                        </small>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-list-check fs-1 text-muted mb-3"></i>
+                    <h5 class="text-muted">No Tasks Found</h5>
+                    <p class="text-muted">Start by assigning your first task.</p>
+                    <a href="{{ url_for('employees.assign_task') }}" class="btn btn-success">
+                        <i class="bi bi-plus-circle"></i> Assign First Task
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

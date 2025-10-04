@@ -23,7 +23,11 @@ def make_shell_context():
         'Expense': Expense,
         'ChannelPartner': ChannelPartner,
         'Setting': Setting,
-        'AuditLog': AuditLog
+        'AuditLog': AuditLog,
+        'Attendance': Attendance,
+        'Leave': Leave,
+        'Task': Task,
+        'PerformanceMetric': PerformanceMetric
     }
 
 

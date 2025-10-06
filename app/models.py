@@ -744,11 +744,30 @@ class Service(db.Model, TimestampMixin, UserTrackingMixin):
         return f'<Service {self.id}: {self.name}>'
 
 
+class Payment(db.Model, TimestampMixin, UserTrackingMixin):
+    """Payment model for tracking individual payments on bookings."""
+
+    __tablename__ = 'payment'
+
+    id = db.Column(db.Integer, primary_key=True)
+    booking_id = db.Column(db.Integer, db.ForeignKey('booking.id'), nullable=False, index=True)
+    payment_amount = db.Column(db.Numeric(10, 2), nullable=False)
+    payment_date = db.Column(db.Date, nullable=False, index=True)
+    payment_method = db.Column(db.String(50), nullable=True)
+    notes = db.Column(db.Text, nullable=True)
+
+    # Relationships
+    booking = db.relationship('Booking', backref='payments')
+
+    def __repr__(self):
+        return f'<Payment {self.id}: ₹{self.payment_amount} on {self.payment_date}>'
+
+
 class AuditLog(db.Model):
     """Audit log model for tracking changes."""
-    
+
     __tablename__ = 'audit_log'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     entity = db.Column(db.String(50), nullable=False)
     entity_id = db.Column(db.Integer, nullable=False)
@@ -756,10 +775,10 @@ class AuditLog(db.Model):
     changed_fields = db.Column(db.Text, nullable=True)  # JSON string
     actor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
-    
+
     # Relationships
     actor = db.relationship('User', backref='audit_logs')
-    
+
     @property
     def changes(self):
         """Parse changed_fields JSON."""
@@ -769,7 +788,7 @@ class AuditLog(db.Model):
             except (json.JSONDecodeError, TypeError):
                 return {}
         return {}
-    
+
     @changes.setter
     def changes(self, value):
         """Set changed_fields as JSON."""
@@ -777,6 +796,6 @@ class AuditLog(db.Model):
             self.changed_fields = json.dumps(value, default=str)
         else:
             self.changed_fields = None
-    
+
     def __repr__(self):
         return f'<AuditLog {self.entity}:{self.entity_id} {self.action}>'

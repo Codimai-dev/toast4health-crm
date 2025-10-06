@@ -12,7 +12,7 @@ from io import BytesIO
 from app import db, require_module_access
 from app.bookings import bp
 from app.bookings.forms import BookingForm
-from app.models import Booking
+from app.models import Booking, Payment
 
 
 @bp.route('/')
@@ -83,7 +83,8 @@ def add():
 def view(booking_code):
     """View a booking."""
     booking = Booking.query.filter_by(booking_code=booking_code).first_or_404()
-    return render_template('bookings/view.html', title='View Booking', booking=booking)
+    payments = Payment.query.filter_by(booking_id=booking.id).order_by(Payment.payment_date.desc()).all()
+    return render_template('bookings/view.html', title='View Booking', booking=booking, payments=payments)
 
 
 @bp.route('/edit/<booking_code>', methods=['GET', 'POST'])
@@ -145,6 +146,19 @@ def payment(booking_code):
     from app.bookings.forms import PaymentForm
     form = PaymentForm()
     if form.validate_on_submit():
+        # Create payment record
+        payment = Payment(
+            booking_id=booking.id,
+            payment_amount=form.payment_amount.data,
+            payment_date=form.payment_date.data,
+            payment_method=form.payment_method.data,
+            notes=form.notes.data,
+            created_by=current_user.id,
+            updated_by=current_user.id
+        )
+        db.session.add(payment)
+
+        # Update booking totals
         booking.amount_paid = (booking.amount_paid or 0) + form.payment_amount.data
         booking.last_payment_date = form.payment_date.data
         booking.calculate_totals()

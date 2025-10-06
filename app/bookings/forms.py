@@ -41,5 +41,16 @@ class PaymentForm(FlaskForm):
     payment_amount = DecimalField('Payment Amount', validators=[DataRequired()],
                                 render_kw={'class': 'form-control', 'placeholder': '0.00', 'step': '0.01'})
     payment_date = DateField('Payment Date', validators=[DataRequired()],
-                           render_kw={'class': 'form-control'})
+                            render_kw={'class': 'form-control'})
+    payment_method = SelectField('Payment Method', choices=[
+        ('Cash', 'Cash'),
+        ('Online Transfer', 'Online Transfer'),
+        ('Cheque', 'Cheque'),
+        ('Card', 'Card'),
+        ('UPI', 'UPI'),
+        ('Other', 'Other')
+    ], validators=[Optional()], default='Cash',
+                            render_kw={'class': 'form-control'})
+    notes = TextAreaField('Notes', validators=[Optional()],
+                         render_kw={'class': 'form-control', 'rows': 3, 'placeholder': 'Optional notes about the payment'})
     submit = SubmitField('Add Payment', render_kw={'class': 'btn btn-primary'})

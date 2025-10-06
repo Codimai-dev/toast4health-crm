@@ -1,7 +1,7 @@
 """B2C Leads routes."""
 
 import csv
-from datetime import datetime
+from datetime import datetime, date
 from io import StringIO
 from flask import render_template, flash, redirect, url_for, request, Response
 from flask_login import login_required, current_user
@@ -9,7 +9,7 @@ from flask_login import login_required, current_user
 from app import db, require_module_access
 from app.leads_b2c import bp
 from app.leads_b2c.forms import B2CLeadForm, CSVImportForm
-from app.models import B2CLead, ChannelPartner, Service
+from app.models import B2CLead, ChannelPartner, Service, FollowUp, FollowUpOutcome, LeadType
 
 
 @bp.route('/')
@@ -223,6 +223,20 @@ def add():
         )
         db.session.add(lead)
         db.session.commit()
+
+        # Create automatic follow-up for the new B2C lead
+        followup = FollowUp(
+            lead_type=LeadType.B2C,
+            b2c_lead_id=lead.enquiry_id,
+            follow_up_on=date.today(),
+            outcome=FollowUpOutcome.SCHEDULED,
+            notes='Automatic follow-up created for new B2C lead',
+            next_follow_up_on=None,
+            owner_id=current_user.id
+        )
+        db.session.add(followup)
+        db.session.commit()
+
         flash('B2C lead added successfully!', 'success')
         return redirect(url_for('leads_b2c.index'))
     return render_template('leads_b2c/add.html', title='Add B2C Lead', form=form)

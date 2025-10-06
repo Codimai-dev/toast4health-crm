@@ -17,7 +17,7 @@
                 Edit Channel Partner
             </h2>
             <div>
-                <a href="{{ url_for('channel_partners.view', id=partner.id) }}" class="btn btn-info me-2">
+                <a href="{{ url_for('channel_partners.view', partner_code=partner.partner_code) }}" class="btn btn-info me-2">
                     <i class="bi bi-eye"></i> View
                 </a>
                 <a href="{{ url_for('channel_partners.index') }}" class="btn btn-secondary">

@@ -43,21 +43,21 @@ def add():
     return render_template('channel_partners/add.html', title='Add Channel Partner', form=form)
 
 
-@bp.route('/view/<int:id>')
+@bp.route('/view/<partner_code>')
 @login_required
 @require_module_access('channel_partners')
-def view(id):
+def view(partner_code):
     """View a channel partner."""
-    partner = ChannelPartner.query.get_or_404(id)
+    partner = ChannelPartner.query.filter_by(partner_code=partner_code).first_or_404()
     return render_template('channel_partners/view.html', title='View Channel Partner', partner=partner)
 
 
-@bp.route('/edit/<int:id>', methods=['GET', 'POST'])
+@bp.route('/edit/<partner_code>', methods=['GET', 'POST'])
 @login_required
 @require_module_access('channel_partners')
-def edit(id):
+def edit(partner_code):
     """Edit a channel partner."""
-    partner = ChannelPartner.query.get_or_404(id)
+    partner = ChannelPartner.query.filter_by(partner_code=partner_code).first_or_404()
     form = ChannelPartnerForm(obj=partner)
     if form.validate_on_submit():
         form.populate_obj(partner)

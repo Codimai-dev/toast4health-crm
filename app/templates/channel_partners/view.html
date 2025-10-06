@@ -17,7 +17,7 @@
                 View Channel Partner
             </h2>
             <div>
-                <a href="{{ url_for('channel_partners.edit', id=partner.id) }}" class="btn btn-secondary me-2">
+                <a href="{{ url_for('channel_partners.edit', partner_code=partner.partner_code) }}" class="btn btn-secondary me-2">
                     <i class="bi bi-pencil"></i> Edit
                 </a>
                 <a href="{{ url_for('channel_partners.index') }}" class="btn btn-outline-secondary">
@@ -76,7 +76,7 @@
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
-                    <a href="{{ url_for('channel_partners.edit', id=partner.id) }}" class="btn btn-secondary">
+                    <a href="{{ url_for('channel_partners.edit', partner_code=partner.partner_code) }}" class="btn btn-secondary">
                         <i class="bi bi-pencil"></i> Edit Partner
                     </a>
                 </div>

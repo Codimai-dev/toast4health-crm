@@ -53,10 +53,10 @@
                                 <td>{{ partner.created_date.strftime('%d/%m/%Y') if partner.created_date else '-' }}</td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <a href="{{ url_for('channel_partners.view', id=partner.id) }}" class="btn btn-outline-primary btn-sm" title="View">
+                                        <a href="{{ url_for('channel_partners.view', partner_code=partner.partner_code) }}" class="btn btn-outline-primary btn-sm" title="View">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        <a href="{{ url_for('channel_partners.edit', id=partner.id) }}" class="btn btn-outline-secondary btn-sm" title="Edit">
+                                        <a href="{{ url_for('channel_partners.edit', partner_code=partner.partner_code) }}" class="btn btn-outline-secondary btn-sm" title="Edit">
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                     </div>

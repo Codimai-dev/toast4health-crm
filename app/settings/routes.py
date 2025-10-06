@@ -109,17 +109,76 @@ def index():
 @bp.route('/dropdowns')
 @login_required
 def dropdowns():
-    """Manage dropdown settings."""
+    """Dropdown settings overview page."""
     if not current_user.has_permission(UserRole.ADMIN):
         flash('Access denied. Admin privileges required.', 'error')
         return redirect(url_for('dashboard.index'))
 
-    groups = ['Source', 'LeadStatus', 'Services', 'ExpenseCategory', 'EmployeeType']
+    return render_template('settings/dropdowns.html', title='Dropdown Settings')
+
+
+@bp.route('/dropdowns/leads')
+@login_required
+def leads_dropdowns():
+    """Manage lead-related dropdown settings."""
+    if not current_user.has_permission(UserRole.ADMIN):
+        flash('Access denied. Admin privileges required.', 'error')
+        return redirect(url_for('dashboard.index'))
+
+    groups = ['Source', 'LeadStatus']
     settings_by_group = {}
     for group in groups:
         settings_by_group[group] = Setting.query.filter_by(group=group).order_by(Setting.sort_order).all()
 
-    return render_template('settings/dropdowns.html', title='Dropdown Settings', settings_by_group=settings_by_group)
+    return render_template('settings/leads_dropdowns.html', title='Lead Settings', settings_by_group=settings_by_group)
+
+
+@bp.route('/dropdowns/services')
+@login_required
+def services_dropdowns():
+    """Manage service-related dropdown settings."""
+    if not current_user.has_permission(UserRole.ADMIN):
+        flash('Access denied. Admin privileges required.', 'error')
+        return redirect(url_for('dashboard.index'))
+
+    groups = ['Services']
+    settings_by_group = {}
+    for group in groups:
+        settings_by_group[group] = Setting.query.filter_by(group=group).order_by(Setting.sort_order).all()
+
+    return render_template('settings/services_dropdowns.html', title='Service Settings', settings_by_group=settings_by_group)
+
+
+@bp.route('/dropdowns/finance')
+@login_required
+def finance_dropdowns():
+    """Manage finance-related dropdown settings."""
+    if not current_user.has_permission(UserRole.ADMIN):
+        flash('Access denied. Admin privileges required.', 'error')
+        return redirect(url_for('dashboard.index'))
+
+    groups = ['ExpenseCategory']
+    settings_by_group = {}
+    for group in groups:
+        settings_by_group[group] = Setting.query.filter_by(group=group).order_by(Setting.sort_order).all()
+
+    return render_template('settings/finance_dropdowns.html', title='Finance Settings', settings_by_group=settings_by_group)
+
+
+@bp.route('/dropdowns/hr')
+@login_required
+def hr_dropdowns():
+    """Manage HR-related dropdown settings."""
+    if not current_user.has_permission(UserRole.ADMIN):
+        flash('Access denied. Admin privileges required.', 'error')
+        return redirect(url_for('dashboard.index'))
+
+    groups = ['EmployeeType']
+    settings_by_group = {}
+    for group in groups:
+        settings_by_group[group] = Setting.query.filter_by(group=group).order_by(Setting.sort_order).all()
+
+    return render_template('settings/hr_dropdowns.html', title='HR Settings', settings_by_group=settings_by_group)
 
 
 @bp.route('/dropdowns/add', methods=['POST'])

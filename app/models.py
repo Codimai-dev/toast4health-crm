@@ -723,6 +723,30 @@ class ChannelPartner(db.Model, TimestampMixin, UserTrackingMixin):
     def __repr__(self):
         return f'<ChannelPartner {self.partner_code}: {self.name}>'
 
+    @staticmethod
+    def generate_partner_code():
+        """Generate a unique partner code in format CP-XXX."""
+        # Find the highest existing partner code
+        existing_codes = db.session.query(ChannelPartner.partner_code).filter(
+            ChannelPartner.partner_code.like('CP-%')
+        ).all()
+
+        if existing_codes:
+            # Extract the sequential numbers and find the max
+            numbers = []
+            for code in existing_codes:
+                try:
+                    num_part = code[0].split('-')[-1]
+                    numbers.append(int(num_part))
+                except (IndexError, ValueError):
+                    continue
+
+            next_num = max(numbers) + 1 if numbers else 1
+        else:
+            next_num = 1
+
+        return f'CP-{next_num:03d}'
+
 
 # Indexes for ChannelPartner
 Index('idx_channel_partner_name_contact_email', 

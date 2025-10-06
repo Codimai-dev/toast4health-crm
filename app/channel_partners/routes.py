@@ -24,6 +24,7 @@ def index():
 def add():
     """Add a new channel partner."""
     form = ChannelPartnerForm()
+    form.partner_code.data = ChannelPartner.generate_partner_code()
     if form.validate_on_submit():
         channel_partner = ChannelPartner(
             partner_code=form.partner_code.data,

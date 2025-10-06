@@ -11,7 +11,7 @@ class ChannelPartnerForm(FlaskForm):
     """Form for adding/editing channel partners."""
 
     partner_code = StringField('Partner Code', validators=[DataRequired(), Length(max=20)],
-                              render_kw={'class': 'form-control', 'placeholder': 'Enter partner code'})
+                              render_kw={'class': 'form-control', 'readonly': True})
     name = StringField('Partner Name', validators=[DataRequired(), Length(max=100)],
                       render_kw={'class': 'form-control', 'placeholder': 'Enter partner name'})
     contact_no = StringField('Contact Number', validators=[DataRequired(), Length(max=20)],

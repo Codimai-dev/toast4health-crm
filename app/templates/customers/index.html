@@ -40,6 +40,7 @@
                                 <th>Contact</th>
                                 <th>Email</th>
                                 <th>Services</th>
+                                <th>Type</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -52,13 +53,26 @@
                                 <td>{{ customer.email or '-' }}</td>
                                 <td>{{ customer.services or '-' }}</td>
                                 <td>
+                                    {% if customer.is_converted_lead %}
+                                        <span class="badge bg-success">Converted Lead</span>
+                                    {% else %}
+                                        <span class="badge bg-primary">Customer</span>
+                                    {% endif %}
+                                </td>
+                                <td>
                                     <div class="btn-group btn-group-sm">
-                                        <a href="{{ url_for('customers.view', id=customer.id) }}" class="btn btn-outline-primary btn-sm" title="View">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                        <a href="{{ url_for('customers.edit', id=customer.id) }}" class="btn btn-outline-secondary btn-sm" title="Edit">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
+                                        {% if customer.is_converted_lead %}
+                                            <a href="{{ url_for('leads_b2c.view', enquiry_id=customer.lead_id) }}" class="btn btn-outline-primary btn-sm" title="View Lead">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        {% else %}
+                                            <a href="{{ url_for('customers.view', id=customer.id) }}" class="btn btn-outline-primary btn-sm" title="View">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{{ url_for('customers.edit', id=customer.id) }}" class="btn btn-outline-secondary btn-sm" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        {% endif %}
                                     </div>
                                 </td>
                             </tr>

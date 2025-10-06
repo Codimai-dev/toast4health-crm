@@ -54,3 +54,19 @@ class PaymentForm(FlaskForm):
     notes = TextAreaField('Notes', validators=[Optional()],
                          render_kw={'class': 'form-control', 'rows': 3, 'placeholder': 'Optional notes about the payment'})
     submit = SubmitField('Add Payment', render_kw={'class': 'btn btn-primary'})
+
+
+class PaymentAddForm(PaymentForm):
+    """Form for adding new payments with booking selection."""
+
+    booking_id = SelectField('Booking', choices=[], validators=[DataRequired()],
+                            render_kw={'class': 'form-control'})
+    submit = SubmitField('Add Payment', render_kw={'class': 'btn btn-primary'})
+
+
+class PaymentEditForm(PaymentForm):
+    """Form for editing payments with booking selection."""
+
+    booking_id = SelectField('Booking', choices=[], validators=[DataRequired()],
+                            render_kw={'class': 'form-control'})
+    submit = SubmitField('Update Payment', render_kw={'class': 'btn btn-primary'})

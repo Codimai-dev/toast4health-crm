@@ -11,7 +11,7 @@ from io import BytesIO
 
 from app import db, require_module_access
 from app.bookings import bp
-from app.bookings.forms import BookingForm
+from app.bookings.forms import BookingForm, PaymentForm, PaymentAddForm, PaymentEditForm
 from app.models import Booking, Payment
 
 
@@ -167,6 +167,114 @@ def payment(booking_code):
         flash('Payment added successfully!', 'success')
         return redirect(url_for('bookings.view', booking_code=booking.booking_code))
     return render_template('bookings/payment.html', title='Add Payment', form=form, booking=booking)
+
+
+@bp.route('/payments')
+@login_required
+@require_module_access('bookings')
+def payments():
+    """Display all payments."""
+    payments = Payment.query.join(Booking).order_by(Payment.payment_date.desc()).all()
+    return render_template('bookings/payments/index.html', title='Payments', payments=payments)
+
+
+@bp.route('/payments/add', methods=['GET', 'POST'])
+@login_required
+@require_module_access('bookings')
+def add_payment():
+    """Add a new payment."""
+    # Get all bookings for the dropdown
+    bookings = Booking.query.order_by(Booking.booking_code).all()
+    booking_choices = [(str(b.id), f"{b.booking_code} - {b.customer_name}") for b in bookings]
+
+    form = PaymentAddForm()
+    form.booking_id.choices = booking_choices
+
+    if form.validate_on_submit():
+        booking = Booking.query.get(int(form.booking_id.data))
+        if not booking:
+            flash('Invalid booking selected.', 'error')
+            return render_template('bookings/payments/add.html', title='Add Payment', form=form)
+
+        # Create payment record
+        payment = Payment(
+            booking_id=booking.id,
+            payment_amount=form.payment_amount.data,
+            payment_date=form.payment_date.data,
+            payment_method=form.payment_method.data,
+            notes=form.notes.data,
+            created_by=current_user.id,
+            updated_by=current_user.id
+        )
+        db.session.add(payment)
+
+        # Update booking totals
+        booking.amount_paid = (booking.amount_paid or 0) + form.payment_amount.data
+        booking.last_payment_date = form.payment_date.data
+        booking.calculate_totals()
+        booking.updated_by = current_user.id
+        db.session.commit()
+        flash('Payment added successfully!', 'success')
+        return redirect(url_for('bookings.payments'))
+
+    return render_template('bookings/payments/add.html', title='Add Payment', form=form)
+
+
+@bp.route('/payments/edit/<int:payment_id>', methods=['GET', 'POST'])
+@login_required
+@require_module_access('bookings')
+def edit_payment(payment_id):
+    """Edit an existing payment."""
+    payment = Payment.query.get_or_404(payment_id)
+
+    # Get all bookings for the dropdown
+    bookings = Booking.query.order_by(Booking.booking_code).all()
+    booking_choices = [(str(b.id), f"{b.booking_code} - {b.customer_name}") for b in bookings]
+
+    form = PaymentEditForm(obj=payment)
+    form.booking_id.choices = booking_choices
+
+    if form.validate_on_submit():
+        old_amount = payment.payment_amount
+        old_booking_id = payment.booking_id
+
+        booking = Booking.query.get(int(form.booking_id.data))
+        if not booking:
+            flash('Invalid booking selected.', 'error')
+            return render_template('bookings/payments/edit.html', title='Edit Payment', form=form, payment=payment)
+
+        # Update payment record
+        payment.booking_id = booking.id
+        payment.payment_amount = form.payment_amount.data
+        payment.payment_date = form.payment_date.data
+        payment.payment_method = form.payment_method.data
+        payment.notes = form.notes.data
+        payment.updated_by = current_user.id
+
+        # Update booking totals
+        if old_booking_id == booking.id:
+            # Same booking, just adjust the amount
+            amount_diff = payment.payment_amount - old_amount
+            booking.amount_paid = (booking.amount_paid or 0) + amount_diff
+        else:
+            # Different booking - revert from old booking and add to new booking
+            old_booking = Booking.query.get(old_booking_id)
+            if old_booking:
+                old_booking.amount_paid = (old_booking.amount_paid or 0) - old_amount
+                old_booking.calculate_totals()
+                old_booking.updated_by = current_user.id
+
+            booking.amount_paid = (booking.amount_paid or 0) + payment.payment_amount
+
+        booking.last_payment_date = form.payment_date.data
+        booking.calculate_totals()
+        booking.updated_by = current_user.id
+
+        db.session.commit()
+        flash('Payment updated successfully!', 'success')
+        return redirect(url_for('bookings.payments'))
+
+    return render_template('bookings/payments/edit.html', title='Edit Payment', form=form, payment=payment)
 
 
 @bp.route('/invoice/<booking_code>')

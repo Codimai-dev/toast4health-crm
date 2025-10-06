@@ -201,8 +201,11 @@
                     </a>
                     {% endif %}
                     {% if current_user.has_module_access('bookings') %}
-                    <a href="{{ url_for('bookings.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('bookings.') }}">
+                    <a href="{{ url_for('bookings.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('bookings.') and not request.endpoint.startswith('bookings.payments') }}">
                         <i class="bi bi-calendar-check"></i> Bookings
+                    </a>
+                    <a href="{{ url_for('bookings.payments') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('bookings.payments') }}">
+                        <i class="bi bi-cash"></i> Payments
                     </a>
                     {% endif %}
 
@@ -287,8 +290,11 @@
                         </a>
                         {% endif %}
                         {% if current_user.has_module_access('bookings') %}
-                        <a href="{{ url_for('bookings.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('bookings.') }}">
+                        <a href="{{ url_for('bookings.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('bookings.') and not request.endpoint.startswith('bookings.payments') }}">
                             <i class="bi bi-calendar-check"></i> Bookings
+                        </a>
+                        <a href="{{ url_for('bookings.payments') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('bookings.payments') }}">
+                            <i class="bi bi-cash"></i> Payments
                         </a>
                         {% endif %}
    

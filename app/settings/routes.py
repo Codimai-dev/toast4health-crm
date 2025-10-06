@@ -181,6 +181,43 @@ def hr_dropdowns():
     return render_template('settings/hr_dropdowns.html', title='HR Settings', settings_by_group=settings_by_group)
 
 
+@bp.route('/dropdowns/expenses')
+@login_required
+def expense_dropdowns():
+    """Manage expense category and sub-category settings."""
+    if not current_user.has_permission(UserRole.ADMIN):
+        flash('Access denied. Admin privileges required.', 'error')
+        return redirect(url_for('dashboard.index'))
+
+    # Get main categories
+    main_categories = Setting.query.filter_by(group='ExpenseMainCategory').order_by(Setting.sort_order).all()
+
+    # Get sub-categories grouped by main category
+    sub_categories = Setting.query.filter_by(group='ExpenseSubCategory').order_by(Setting.sort_order).all()
+    sub_categories_by_main = {}
+
+    # Get main category keys for matching
+    main_category_keys = [cat.key for cat in main_categories]
+
+    for sub_cat in sub_categories:
+        # Find which main category this sub-category belongs to
+        main_key = None
+        for cat_key in main_category_keys:
+            if sub_cat.key.startswith(cat_key + '_'):
+                main_key = cat_key
+                break
+
+        if main_key:
+            if main_key not in sub_categories_by_main:
+                sub_categories_by_main[main_key] = []
+            sub_categories_by_main[main_key].append(sub_cat)
+
+    return render_template('settings/expense_dropdowns.html',
+                         title='Expense Settings',
+                         main_categories=main_categories,
+                         sub_categories_by_main=sub_categories_by_main)
+
+
 @bp.route('/dropdowns/add', methods=['POST'])
 @login_required
 def add_setting():
@@ -259,6 +296,22 @@ def delete_setting(setting_id):
     db.session.commit()
 
     return jsonify({'success': True, 'message': 'Setting deleted successfully'})
+
+
+@bp.route('/dropdowns/expense-subcategories/<category_key>')
+@login_required
+def get_expense_subcategories(category_key):
+    """Get sub-categories for a specific expense main category."""
+    if not current_user.has_permission(UserRole.ADMIN):
+        return jsonify({'error': 'Access denied'}), 403
+
+    from app.models import Setting
+    sub_categories = Setting.query.filter(
+        Setting.group == 'ExpenseSubCategory',
+        Setting.key.like(f'{category_key}_%')
+    ).order_by(Setting.sort_order).all()
+
+    return jsonify([{'key': s.key, 'value': s.value} for s in sub_categories])
 
 
 @bp.route('/users')

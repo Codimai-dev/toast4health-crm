@@ -109,3 +109,44 @@
     </div>
 </div>
 {% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const categorySelect = document.getElementById('category');
+    const subCategorySelect = document.getElementById('sub_category');
+
+    function loadSubCategories() {
+        const selectedCategory = categorySelect.value;
+
+        // Clear current options except the first "Select Sub Category"
+        subCategorySelect.innerHTML = '<option value="">Select Sub Category</option>';
+
+        if (selectedCategory) {
+            // Load sub-categories via AJAX
+            fetch(`/settings/dropdowns/expense-subcategories/${selectedCategory}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(subCat => {
+                        const option = document.createElement('option');
+                        option.value = subCat.key;
+                        option.textContent = subCat.value;
+                        subCategorySelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading sub-categories:', error);
+                });
+        }
+    }
+
+    // Listen for category changes
+    categorySelect.addEventListener('change', loadSubCategories);
+
+    // Load sub-categories for the initially selected category
+    if (categorySelect.value) {
+        loadSubCategories();
+    }
+});
+</script>
+{% endblock %}

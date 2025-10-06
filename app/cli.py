@@ -49,7 +49,21 @@ def seed():
         ('Services', 'fitness_training', 'Fitness Training', 6),
         ('Services', 'nutrition_counseling', 'Nutrition Counseling', 7),
         
-        # Expense Categories
+        # Expense Main Categories
+        ('ExpenseMainCategory', 'company_expense', 'Company Expense', 1),
+        ('ExpenseMainCategory', 'booking', 'Booking', 2),
+
+        # Expense Sub Categories
+        ('ExpenseSubCategory', 'company_expense_rent', 'Rent', 1),
+        ('ExpenseSubCategory', 'company_expense_house_keeping', 'House Keeping', 2),
+        ('ExpenseSubCategory', 'company_expense_salary', 'Salary', 3),
+        ('ExpenseSubCategory', 'company_expense_employee_cost', 'Employee Cost', 4),
+        ('ExpenseSubCategory', 'booking_travelling', 'Travelling', 5),
+        ('ExpenseSubCategory', 'booking_food', 'Food', 6),
+        ('ExpenseSubCategory', 'booking_channel_partner', 'Channel Partner', 7),
+        ('ExpenseSubCategory', 'booking_employee_cost', 'Employee Cost', 8),
+
+        # Expense Categories (legacy)
         ('ExpenseCategory', 'travel', 'Travel', 1),
         ('ExpenseCategory', 'accommodation', 'Accommodation', 2),
         ('ExpenseCategory', 'meals', 'Meals', 3),

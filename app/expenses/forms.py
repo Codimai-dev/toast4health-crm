@@ -10,8 +10,8 @@ from app.models import Booking
 class ExpenseForm(FlaskForm):
     """Form for adding/editing expenses."""
 
-    expense_code = StringField('Expense Code', validators=[DataRequired()],
-                              render_kw={'class': 'form-control', 'placeholder': 'Enter expense code'})
+    expense_code = StringField('Expense Code', validators=[],
+                              render_kw={'class': 'form-control', 'disabled': True})
     date = DateField('Date', validators=[DataRequired()],
                     render_kw={'class': 'form-control', 'type': 'date'})
     category = StringField('Category', validators=[DataRequired()],

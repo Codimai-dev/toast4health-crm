@@ -26,7 +26,7 @@ def add():
     form = ExpenseForm()
     if form.validate_on_submit():
         expense = Expense(
-            expense_code=form.expense_code.data,
+            expense_code=Expense.generate_expense_code(),
             date=form.date.data,
             category=form.category.data,
             sub_category=form.sub_category.data,
@@ -40,6 +40,8 @@ def add():
         db.session.commit()
         flash('Expense added successfully!', 'success')
         return redirect(url_for('expenses.index'))
+    # Pre-populate expense code for display
+    form.expense_code.data = Expense.generate_expense_code()
     return render_template('expenses/add.html', title='Add Expense', form=form)
 
 

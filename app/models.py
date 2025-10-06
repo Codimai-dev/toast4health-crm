@@ -678,6 +678,30 @@ class Expense(db.Model, TimestampMixin, UserTrackingMixin):
     def __repr__(self):
         return f'<Expense {self.expense_code}: {self.category}>'
 
+    @staticmethod
+    def generate_expense_code():
+        """Generate a unique expense code in format EXP-XXX."""
+        # Find the highest existing expense code
+        existing_codes = db.session.query(Expense.expense_code).filter(
+            Expense.expense_code.like('EXP-%')
+        ).all()
+
+        if existing_codes:
+            # Extract the sequential numbers and find the max
+            numbers = []
+            for code in existing_codes:
+                try:
+                    num_part = code[0].split('-')[-1]
+                    numbers.append(int(num_part))
+                except (IndexError, ValueError):
+                    continue
+
+            next_num = max(numbers) + 1 if numbers else 1
+        else:
+            next_num = 1
+
+        return f'EXP-{next_num:03d}'
+
 
 # Indexes for Expense
 Index('idx_expense_date_category_booking', Expense.date, Expense.category, Expense.booking_id)

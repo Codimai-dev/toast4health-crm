@@ -542,6 +542,30 @@ class Employee(db.Model, TimestampMixin, UserTrackingMixin):
     def __repr__(self):
         return f'<Employee {self.employee_code}: {self.name}>'
 
+    @staticmethod
+    def generate_employee_code():
+        """Generate a unique employee code in format EMP-XXX."""
+        # Find the highest existing employee code
+        existing_codes = db.session.query(Employee.employee_code).filter(
+            Employee.employee_code.like('EMP-%')
+        ).all()
+
+        if existing_codes:
+            # Extract the sequential numbers and find the max
+            numbers = []
+            for code in existing_codes:
+                try:
+                    num_part = code[0].split('-')[-1]
+                    numbers.append(int(num_part))
+                except (IndexError, ValueError):
+                    continue
+
+            next_num = max(numbers) + 1 if numbers else 1
+        else:
+            next_num = 1
+
+        return f'EMP-{next_num:03d}'
+
 
 # Indexes for Employee
 Index('idx_employee_name_email_contact_designation',

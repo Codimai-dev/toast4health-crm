@@ -74,6 +74,7 @@ def index():
 def add():
     """Add a new employee."""
     form = EmployeeForm()
+    form.employee_code.data = Employee.generate_employee_code()
     if form.validate_on_submit():
         # Handle file uploads
         pdf_path = save_uploaded_file(form.pdf_file, 'uploads/pdfs', f"emp_{form.employee_code.data}")

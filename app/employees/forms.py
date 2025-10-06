@@ -12,7 +12,7 @@ class EmployeeForm(FlaskForm):
     """Form for adding/editing employees."""
 
     employee_code = StringField('Employee Code', validators=[DataRequired(), Length(max=20)],
-                               render_kw={'class': 'form-control', 'placeholder': 'Enter employee code'})
+                               render_kw={'class': 'form-control', 'readonly': True})
     name = StringField('Full Name', validators=[DataRequired(), Length(max=100)],
                       render_kw={'class': 'form-control', 'placeholder': 'Enter full name'})
     contact_no = StringField('Contact Number', validators=[DataRequired(), Length(max=20)],

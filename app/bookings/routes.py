@@ -72,6 +72,22 @@ def add():
         booking.calculate_totals()
         db.session.add(booking)
         db.session.commit()
+
+        # Create payment record if amount_paid > 0
+        if form.amount_paid.data and form.amount_paid.data > 0:
+            from datetime import date
+            payment = Payment(
+                booking_id=booking.id,
+                payment_amount=form.amount_paid.data,
+                payment_date=date.today(),
+                payment_method=None,  # Blank payment method
+                notes='Initial payment made during booking creation',
+                created_by=current_user.id,
+                updated_by=current_user.id
+            )
+            db.session.add(payment)
+            db.session.commit()
+
         flash('Booking added successfully!', 'success')
         return redirect(url_for('bookings.index'))
     return render_template('bookings/add.html', title='Add Booking', form=form, booking_code=booking_code)

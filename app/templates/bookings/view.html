@@ -17,7 +17,7 @@
                 View Booking
             </h2>
             <div>
-                <a href="{{ url_for('bookings.edit', id=booking.id) }}" class="btn btn-secondary me-2">
+                <a href="{{ url_for('bookings.edit', booking_code=booking.booking_code) }}" class="btn btn-secondary me-2">
                     <i class="bi bi-pencil"></i> Edit
                 </a>
                 <a href="{{ url_for('bookings.index') }}" class="btn btn-outline-secondary">
@@ -47,11 +47,19 @@
                             <dt class="col-sm-5">Customer Mobile:</dt>
                             <dd class="col-sm-7">{{ booking.customer_mob }}</dd>
 
+                            <dt class="col-sm-5">Type of Charge:</dt>
+                            <dd class="col-sm-7">{{ booking.charge_type or 'Fixed charge' }}</dd>
+
                             <dt class="col-sm-5">Start Date:</dt>
                             <dd class="col-sm-7">{{ booking.start_date.strftime('%d/%m/%Y') if booking.start_date else '-' }}</dd>
 
                             <dt class="col-sm-5">End Date:</dt>
                             <dd class="col-sm-7">{{ booking.end_date.strftime('%d/%m/%Y') if booking.end_date else '-' }}</dd>
+
+                            {% if booking.shift_hours %}
+                            <dt class="col-sm-5">Shift (hours):</dt>
+                            <dd class="col-sm-7">{{ booking.shift_hours }}</dd>
+                            {% endif %}
                         </dl>
                     </div>
                     <div class="col-md-6">
@@ -111,13 +119,13 @@
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
-                    <a href="{{ url_for('bookings.invoice', id=booking.id) }}" class="btn btn-primary" target="_blank">
+                    <a href="{{ url_for('bookings.invoice', booking_code=booking.booking_code) }}" class="btn btn-primary" target="_blank">
                         <i class="bi bi-file-earmark-pdf"></i> Download Invoice
                     </a>
-                    <a href="{{ url_for('bookings.payment', id=booking.id) }}" class="btn btn-success">
+                    <a href="{{ url_for('bookings.payment', booking_code=booking.booking_code) }}" class="btn btn-success">
                         <i class="bi bi-cash"></i> Add Payment
                     </a>
-                    <a href="{{ url_for('bookings.edit', id=booking.id) }}" class="btn btn-secondary">
+                    <a href="{{ url_for('bookings.edit', booking_code=booking.booking_code) }}" class="btn btn-secondary">
                         <i class="bi bi-pencil"></i> Edit Booking
                     </a>
                 </div>

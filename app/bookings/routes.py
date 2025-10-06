@@ -30,14 +30,38 @@ def index():
 def add():
     """Add a new booking."""
     form = BookingForm()
+    # Auto-generate booking code
+    booking_code = Booking.generate_booking_code()
     if form.validate_on_submit():
+        # Custom validation for recurring charge
+        if form.charge_type.data == 'Recurring charge':
+            if not form.start_date.data:
+                form.start_date.errors.append('Start Date is required for recurring charge.')
+                return render_template('bookings/add.html', title='Add Booking', form=form)
+            if not form.end_date.data:
+                form.end_date.errors.append('End Date is required for recurring charge.')
+                return render_template('bookings/add.html', title='Add Booking', form=form)
+            if not form.shift.data:
+                form.shift.errors.append('Shift is required for recurring charge.')
+                return render_template('bookings/add.html', title='Add Booking', form=form)
+
+        from datetime import datetime
+        start_date = None
+        end_date = None
+        if form.start_date.data:
+            start_date = datetime.strptime(form.start_date.data, '%Y-%m-%d').date()
+        if form.end_date.data:
+            end_date = datetime.strptime(form.end_date.data, '%Y-%m-%d').date()
+
         booking = Booking(
             booking_code=form.booking_code.data,
             customer_name=form.customer_name.data,
             customer_mob=form.customer_mob.data,
+            charge_type=form.charge_type.data,
             services=form.services.data,
-            start_date=form.start_date.data,
-            end_date=form.end_date.data,
+            start_date=start_date,
+            end_date=end_date,
+            shift_hours=form.shift.data,
             service_charge=form.service_charge.data,
             other_expanse=form.other_expanse.data or 0,
             gst_percentage=form.gst_percentage.data or 0,
@@ -50,27 +74,60 @@ def add():
         db.session.commit()
         flash('Booking added successfully!', 'success')
         return redirect(url_for('bookings.index'))
-    return render_template('bookings/add.html', title='Add Booking', form=form)
+    return render_template('bookings/add.html', title='Add Booking', form=form, booking_code=booking_code)
 
 
-@bp.route('/view/<int:id>')
+@bp.route('/view/<booking_code>')
 @login_required
 @require_module_access('bookings')
-def view(id):
+def view(booking_code):
     """View a booking."""
-    booking = Booking.query.get_or_404(id)
+    booking = Booking.query.filter_by(booking_code=booking_code).first_or_404()
     return render_template('bookings/view.html', title='View Booking', booking=booking)
 
 
-@bp.route('/edit/<int:id>', methods=['GET', 'POST'])
+@bp.route('/edit/<booking_code>', methods=['GET', 'POST'])
 @login_required
 @require_module_access('bookings')
-def edit(id):
+def edit(booking_code):
     """Edit a booking."""
-    booking = Booking.query.get_or_404(id)
+    booking = Booking.query.filter_by(booking_code=booking_code).first_or_404()
     form = BookingForm(obj=booking)
+    # Set date fields as strings for the form
+    if booking.start_date:
+        form.start_date.data = booking.start_date.strftime('%Y-%m-%d')
+    if booking.end_date:
+        form.end_date.data = booking.end_date.strftime('%Y-%m-%d')
+    # Set shift field
+    if booking.shift_hours:
+        form.shift.data = booking.shift_hours
+
     if form.validate_on_submit():
+        # Custom validation for recurring charge
+        if form.charge_type.data == 'Recurring charge':
+            if not form.start_date.data:
+                form.start_date.errors.append('Start Date is required for recurring charge.')
+                return render_template('bookings/edit.html', title='Edit Booking', form=form, booking=booking)
+            if not form.end_date.data:
+                form.end_date.errors.append('End Date is required for recurring charge.')
+                return render_template('bookings/edit.html', title='Edit Booking', form=form, booking=booking)
+            if not form.shift.data:
+                form.shift.errors.append('Shift is required for recurring charge.')
+                return render_template('bookings/edit.html', title='Edit Booking', form=form, booking=booking)
+
+        from datetime import datetime
+        start_date = None
+        end_date = None
+        if form.start_date.data:
+            start_date = datetime.strptime(form.start_date.data, '%Y-%m-%d').date()
+        if form.end_date.data:
+            end_date = datetime.strptime(form.end_date.data, '%Y-%m-%d').date()
+
         form.populate_obj(booking)
+        booking.start_date = start_date
+        booking.end_date = end_date
+        booking.charge_type = form.charge_type.data
+        booking.shift_hours = form.shift.data
         booking.updated_by = current_user.id
         booking.calculate_totals()
         db.session.commit()
@@ -79,12 +136,12 @@ def edit(id):
     return render_template('bookings/edit.html', title='Edit Booking', form=form, booking=booking)
 
 
-@bp.route('/payment/<int:id>', methods=['GET', 'POST'])
+@bp.route('/payment/<booking_code>', methods=['GET', 'POST'])
 @login_required
 @require_module_access('bookings')
-def payment(id):
+def payment(booking_code):
     """Add payment for a booking."""
-    booking = Booking.query.get_or_404(id)
+    booking = Booking.query.filter_by(booking_code=booking_code).first_or_404()
     from app.bookings.forms import PaymentForm
     form = PaymentForm()
     if form.validate_on_submit():
@@ -94,16 +151,16 @@ def payment(id):
         booking.updated_by = current_user.id
         db.session.commit()
         flash('Payment added successfully!', 'success')
-        return redirect(url_for('bookings.view', id=booking.id))
+        return redirect(url_for('bookings.view', booking_code=booking.booking_code))
     return render_template('bookings/payment.html', title='Add Payment', form=form, booking=booking)
 
 
-@bp.route('/invoice/<int:id>')
+@bp.route('/invoice/<booking_code>')
 @login_required
 @require_module_access('bookings')
-def invoice(id):
+def invoice(booking_code):
     """Generate PDF invoice for a booking."""
-    booking = Booking.query.get_or_404(id)
+    booking = Booking.query.filter_by(booking_code=booking_code).first_or_404()
 
     # Create PDF buffer
     buffer = BytesIO()

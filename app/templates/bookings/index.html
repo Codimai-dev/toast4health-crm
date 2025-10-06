@@ -61,13 +61,13 @@
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <a href="{{ url_for('bookings.view', id=booking.id) }}" class="btn btn-outline-primary btn-sm" title="View">
+                                        <a href="{{ url_for('bookings.view', booking_code=booking.booking_code) }}" class="btn btn-outline-primary btn-sm" title="View">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        <a href="{{ url_for('bookings.edit', id=booking.id) }}" class="btn btn-outline-secondary btn-sm" title="Edit">
+                                        <a href="{{ url_for('bookings.edit', booking_code=booking.booking_code) }}" class="btn btn-outline-secondary btn-sm" title="Edit">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        <a href="{{ url_for('bookings.payment', id=booking.id) }}" class="btn btn-outline-info btn-sm" title="Payment">
+                                        <a href="{{ url_for('bookings.payment', booking_code=booking.booking_code) }}" class="btn btn-outline-info btn-sm" title="Payment">
                                             <i class="bi bi-cash"></i>
                                         </a>
                                     </div>

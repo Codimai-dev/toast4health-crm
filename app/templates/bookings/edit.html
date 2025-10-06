@@ -17,7 +17,7 @@
                 Edit Booking
             </h2>
             <div>
-                <a href="{{ url_for('bookings.view', id=booking.id) }}" class="btn btn-info me-2">
+                <a href="{{ url_for('bookings.view', booking_code=booking.booking_code) }}" class="btn btn-info me-2">
                     <i class="bi bi-eye"></i> View
                 </a>
                 <a href="{{ url_for('bookings.index') }}" class="btn btn-secondary">
@@ -40,7 +40,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             {{ form.booking_code.label(class="form-label") }}
-                            {{ form.booking_code() }}
+                            {{ form.booking_code(readonly=True) }}
                             {% if form.booking_code.errors %}
                                 <div class="text-danger">
                                     {% for error in form.booking_code.errors %}
@@ -74,6 +74,19 @@
                             {% endif %}
                         </div>
                         <div class="col-md-6 mb-3">
+                            {{ form.charge_type.label(class="form-label") }}
+                            {{ form.charge_type() }}
+                            {% if form.charge_type.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.charge_type.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row recurring-fields" style="display: none;">
+                        <div class="col-md-4 mb-3">
                             {{ form.start_date.label(class="form-label") }}
                             {{ form.start_date() }}
                             {% if form.start_date.errors %}
@@ -84,12 +97,30 @@
                                 </div>
                             {% endif %}
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             {{ form.end_date.label(class="form-label") }}
                             {{ form.end_date() }}
+                            {% if form.end_date.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.end_date.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.shift.label(class="form-label") }}
+                            {{ form.shift() }}
+                            {% if form.shift.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.shift.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6 mb-3">
                             {{ form.service_charge.label(class="form-label") }}
                             {{ form.service_charge() }}
@@ -101,24 +132,19 @@
                                 </div>
                             {% endif %}
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6 mb-3">
                             {{ form.other_expanse.label(class="form-label") }}
                             {{ form.other_expanse() }}
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6 mb-3">
                             {{ form.gst_percentage.label(class="form-label") }}
                             {{ form.gst_percentage() }}
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6 mb-3">
                             {{ form.amount_paid.label(class="form-label") }}
                             {{ form.amount_paid() }}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            &nbsp;
                         </div>
                     </div>
                     <div class="mb-3">
@@ -141,4 +167,22 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+   const chargeTypeSelect = document.querySelector('#charge_type');
+   const recurringFields = document.querySelector('.recurring-fields');
+
+   function toggleRecurringFields() {
+       if (chargeTypeSelect.value === 'Recurring charge') {
+           recurringFields.style.display = 'block';
+       } else {
+           recurringFields.style.display = 'none';
+       }
+   }
+
+   chargeTypeSelect.addEventListener('change', toggleRecurringFields);
+   toggleRecurringFields(); // Initial check
+});
+</script>
 {% endblock %}

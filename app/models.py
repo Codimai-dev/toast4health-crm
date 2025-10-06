@@ -424,17 +424,19 @@ Index('idx_customer_name_contact_email', Customer.customer_name, Customer.contac
 
 class Booking(db.Model, TimestampMixin, UserTrackingMixin):
     """Booking model with financial calculations."""
-    
+
     __tablename__ = 'booking'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     booking_code = db.Column(db.String(20), nullable=False, unique=True, index=True)
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=True)
     customer_mob = db.Column(db.String(20), nullable=False)
     customer_name = db.Column(db.String(100), nullable=False, index=True)
     services = db.Column(db.String(200), nullable=False)
-    start_date = db.Column(db.Date, nullable=False, index=True)
+    charge_type = db.Column(db.String(20), nullable=False, default='Fixed charge')
+    start_date = db.Column(db.Date, nullable=True, index=True)
     end_date = db.Column(db.Date, nullable=True)
+    shift_hours = db.Column(db.Integer, nullable=True)
     service_charge = db.Column(db.Numeric(10, 2), nullable=False, default=0)
     other_expanse = db.Column(db.Numeric(10, 2), nullable=False, default=0)
     gst_percentage = db.Column(db.Integer, nullable=False, default=0)
@@ -463,13 +465,45 @@ class Booking(db.Model, TimestampMixin, UserTrackingMixin):
     
     def calculate_totals(self):
         """Calculate GST value and pending amount."""
-        base_amount = (self.service_charge or 0) + (self.other_expanse or 0)
+        base_service_charge = self.service_charge or 0
+
+        if self.charge_type == 'Recurring charge' and self.start_date and self.end_date and self.shift_hours:
+            days = (self.end_date - self.start_date).days + 1
+            shifts_per_day = 24 / self.shift_hours
+            total_shifts = Decimal(days * shifts_per_day)
+            base_service_charge *= total_shifts
+
+        base_amount = base_service_charge + (self.other_expanse or 0)
         self.gst_value = base_amount * (self.gst_percentage or 0) / 100
         self.total_amount = base_amount + self.gst_value
         self.pending_amount = self.total_amount - (self.amount_paid or 0)
     
     def __repr__(self):
         return f'<Booking {self.booking_code}: {self.customer_name}>'
+
+    @staticmethod
+    def generate_booking_code():
+        """Generate a unique booking code in format BOOK-XXX."""
+        # Find the highest existing booking code
+        existing_codes = db.session.query(Booking.booking_code).filter(
+            Booking.booking_code.like('BOOK-%')
+        ).all()
+
+        if existing_codes:
+            # Extract the sequential numbers and find the max
+            numbers = []
+            for code in existing_codes:
+                try:
+                    num_part = code[0].split('-')[-1]
+                    numbers.append(int(num_part))
+                except (IndexError, ValueError):
+                    continue
+
+            next_num = max(numbers) + 1 if numbers else 1
+        else:
+            next_num = 1
+
+        return f'BOOK-{next_num:03d}'
 
 
 # Indexes for Booking

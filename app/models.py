@@ -417,6 +417,30 @@ class Customer(db.Model, TimestampMixin, UserTrackingMixin):
     def __repr__(self):
         return f'<Customer {self.customer_code}: {self.customer_name}>'
 
+    @staticmethod
+    def generate_customer_code():
+        """Generate a unique customer code in format CUST-XXX."""
+        # Find the highest existing customer code
+        existing_codes = db.session.query(Customer.customer_code).filter(
+            Customer.customer_code.like('CUST-%')
+        ).all()
+
+        if existing_codes:
+            # Extract the sequential numbers and find the max
+            numbers = []
+            for code in existing_codes:
+                try:
+                    num_part = code[0].split('-')[-1]
+                    numbers.append(int(num_part))
+                except (IndexError, ValueError):
+                    continue
+
+            next_num = max(numbers) + 1 if numbers else 1
+        else:
+            next_num = 1
+
+        return f'CUST-{next_num:03d}'
+
 
 # Indexes for Customer
 Index('idx_customer_name_contact_email', Customer.customer_name, Customer.contact_no, Customer.email)

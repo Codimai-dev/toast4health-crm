@@ -11,7 +11,7 @@ class CustomerForm(FlaskForm):
     """Form for adding/editing customers."""
 
     customer_code = StringField('Customer Code', validators=[DataRequired()],
-                               render_kw={'class': 'form-control', 'placeholder': 'Enter customer code'})
+                               render_kw={'class': 'form-control', 'readonly': True})
     customer_name = StringField('Customer Name', validators=[DataRequired()],
                                render_kw={'class': 'form-control', 'placeholder': 'Enter customer name'})
     contact_no = StringField('Contact Number', validators=[DataRequired()],

@@ -60,6 +60,7 @@ def index():
 def add():
     """Add a new customer."""
     form = CustomerForm()
+    form.customer_code.data = Customer.generate_customer_code()
     if form.validate_on_submit():
         customer = Customer(
             customer_code=form.customer_code.data,

@@ -75,7 +75,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             {{ form.sub_category.label(class="form-label") }}
-                            {{ form.sub_category() }}
+                            {{ form.sub_category(data_existing_sub_category=form.sub_category.data) }}
                         </div>
                     </div>
                     <div class="row">
@@ -90,7 +90,7 @@
                                 </div>
                             {% endif %}
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6 mb-3" id="booking-field">
                             {{ form.booking_id.label(class="form-label") }}
                             {{ form.booking_id() }}
                         </div>
@@ -115,6 +115,18 @@
 document.addEventListener('DOMContentLoaded', function() {
     const categorySelect = document.getElementById('category');
     const subCategorySelect = document.getElementById('sub_category');
+    const bookingField = document.getElementById('booking-field');
+
+    function toggleBookingField() {
+        const selectedSubCategory = subCategorySelect.value;
+        if (selectedSubCategory === 'company_expense_salary') {
+            bookingField.style.display = 'none';
+            // Clear the value
+            document.getElementById('booking_id').value = '';
+        } else {
+            bookingField.style.display = 'block';
+        }
+    }
 
     function loadSubCategories() {
         const selectedCategory = categorySelect.value;
@@ -133,20 +145,41 @@ document.addEventListener('DOMContentLoaded', function() {
                         option.textContent = subCat.value;
                         subCategorySelect.appendChild(option);
                     });
+                    // Set the existing value if available
+                    const existingValue = subCategorySelect.dataset.existingSubCategory;
+                    if (existingValue) {
+                        subCategorySelect.value = existingValue;
+                    }
+                    // After loading, toggle booking field
+                    toggleBookingField();
                 })
                 .catch(error => {
                     console.error('Error loading sub-categories:', error);
                 });
+        } else {
+            // If no category, set existing value if available
+            const existingValue = subCategorySelect.dataset.existingSubCategory;
+            if (existingValue) {
+                subCategorySelect.value = existingValue;
+            }
+            // If no category, hide booking field or show? Probably show
+            toggleBookingField();
         }
     }
 
     // Listen for category changes
     categorySelect.addEventListener('change', loadSubCategories);
 
+    // Listen for sub-category changes
+    subCategorySelect.addEventListener('change', toggleBookingField);
+
     // Load sub-categories for the initially selected category
     if (categorySelect.value) {
         loadSubCategories();
     }
+
+    // Initial toggle
+    toggleBookingField();
 });
 </script>
 {% endblock %}

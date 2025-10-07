@@ -61,6 +61,14 @@ def edit(id):
     """Edit an expense."""
     expense = Expense.query.get_or_404(id)
     form = ExpenseForm(obj=expense)
+    # Load sub-category choices for the existing category
+    if expense.category:
+        from app.models import Setting
+        sub_categories = Setting.query.filter(
+            Setting.group == 'ExpenseSubCategory',
+            Setting.key.like(f'{expense.category}_%')
+        ).order_by(Setting.sort_order).all()
+        form.sub_category.choices = [('', 'Select Sub Category')] + [(s.key, s.value) for s in sub_categories]
     if form.validate_on_submit():
         form.populate_obj(expense)
         expense.updated_by = current_user.id

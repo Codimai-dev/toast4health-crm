@@ -33,8 +33,9 @@ class ExpenseForm(FlaskForm):
         main_categories = Setting.get_options('ExpenseMainCategory')
         self.category.choices = [('', 'Select Category')] + [(setting.key, setting.value) for setting in main_categories]
 
-        # Sub-category choices will be loaded dynamically via AJAX
-        self.sub_category.choices = [('', 'Select Sub Category')]
+        # Load all sub-category choices for validation
+        sub_categories = Setting.get_options('ExpenseSubCategory')
+        self.sub_category.choices = [('', 'Select Sub Category')] + [(setting.key, setting.value) for setting in sub_categories]
 
         # Populate booking choices
         from app.models import Booking

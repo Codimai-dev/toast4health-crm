@@ -32,7 +32,7 @@ def add():
             sub_category=form.sub_category.data,
             expense_amount=form.expense_amount.data,
             booking_id=int(form.booking_id.data) if form.booking_id.data else None,
-            other_id=form.other_id.data,
+            employee_id=int(form.employee_id.data) if form.employee_id.data else None,
             created_by=current_user.id,
             updated_by=current_user.id
         )

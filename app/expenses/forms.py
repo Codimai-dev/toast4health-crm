@@ -22,8 +22,8 @@ class ExpenseForm(FlaskForm):
                                  places=2, render_kw={'class': 'form-control', 'placeholder': 'Enter amount', 'step': '0.01'})
     booking_id = SelectField('Related Booking', choices=[('', 'Select Booking')], validators=[Optional()],
                             render_kw={'class': 'form-select'})
-    other_id = StringField('Other ID', validators=[Optional()],
-                          render_kw={'class': 'form-control', 'placeholder': 'Enter other ID'})
+    employee_id = SelectField('Employee ID', choices=[('', 'Select Employee')], validators=[Optional()],
+                             render_kw={'class': 'form-select'})
     submit = SubmitField('Save Expense', render_kw={'class': 'btn btn-primary'})
 
     def __init__(self, *args, **kwargs):
@@ -40,3 +40,8 @@ class ExpenseForm(FlaskForm):
         from app.models import Booking
         bookings = Booking.query.all()
         self.booking_id.choices = [('', 'Select Booking')] + [(str(b.id), f"{b.booking_code} - {b.customer_name}") for b in bookings]
+
+        # Populate employee choices
+        from app.models import Employee
+        employees = Employee.query.all()
+        self.employee_id.choices = [('', 'Select Employee')] + [(str(e.id), f"{e.employee_code} - {e.name}") for e in employees]

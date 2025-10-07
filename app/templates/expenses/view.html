@@ -61,9 +61,9 @@
                             <dd class="col-sm-7">{{ expense.booking.booking_code }} - {{ expense.booking.customer_name }}</dd>
                             {% endif %}
 
-                            {% if expense.other_id %}
-                            <dt class="col-sm-5">Other ID:</dt>
-                            <dd class="col-sm-7">{{ expense.other_id }}</dd>
+                            {% if expense.employee %}
+                            <dt class="col-sm-5">Employee:</dt>
+                            <dd class="col-sm-7">{{ expense.employee.employee_code }} - {{ expense.employee.name }}</dd>
                             {% endif %}
                         </dl>
                     </div>

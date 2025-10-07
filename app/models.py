@@ -566,17 +566,20 @@ Index('idx_employee_name_email_contact_designation',
 
 class Expense(db.Model, TimestampMixin, UserTrackingMixin):
     """Expense model."""
-    
+
     __tablename__ = 'expense'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     expense_code = db.Column(db.String(20), nullable=False, unique=True, index=True)
     date = db.Column(db.Date, nullable=False, index=True)
     booking_id = db.Column(db.Integer, db.ForeignKey('booking.id'), nullable=True, index=True)
-    other_id = db.Column(db.String(50), nullable=True)
+    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'), nullable=True)
     category = db.Column(db.String(100), nullable=False, index=True)
     sub_category = db.Column(db.String(100), nullable=True)
     expense_amount = db.Column(db.Numeric(10, 2), nullable=False)
+
+    # Relationships
+    employee = db.relationship('Employee', backref='expenses')
     
     def __repr__(self):
         return f'<Expense {self.expense_code}: {self.category}>'

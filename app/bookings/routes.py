@@ -1,6 +1,7 @@
 """Bookings routes."""
 
 import os
+import json
 from flask import render_template, flash, redirect, url_for, Response, current_app
 from flask_login import login_required, current_user
 from reportlab.lib.pagesizes import letter
@@ -32,7 +33,47 @@ def add():
     form = BookingForm()
     # Auto-generate booking code
     booking_code = Booking.generate_booking_code()
+
+    # Populate customer choices
+    from app.models import Customer, B2CLead
+    customers = Customer.query.order_by(Customer.customer_name).all()
+    converted_b2c = B2CLead.query.filter_by(status='converted').order_by(B2CLead.customer_name).all()
+
+    customer_choices = []
+    customer_data = {}
+    for cust in customers:
+        key = f'customer:{cust.id}'
+        customer_choices.append((key, f'{cust.customer_name} ({cust.customer_code})'))
+        customer_data[key] = cust.contact_no
+    for b2c in converted_b2c:
+        key = f'b2c:{b2c.enquiry_id}'
+        customer_choices.append((key, f'{b2c.customer_name} ({b2c.enquiry_id})'))
+        customer_data[key] = b2c.contact_no
+
+    form.customer_name.choices = [('', 'Select Customer')] + customer_choices
+
+    customer_data_json = json.dumps(customer_data)
+
     if form.validate_on_submit():
+        # Parse selected customer
+        selected_customer = form.customer_name.data
+        customer_type, customer_id = selected_customer.split(':', 1)
+        customer_name = None
+        customer_mob = None
+        customer_id_fk = None
+
+        if customer_type == 'customer':
+            customer = Customer.query.get(int(customer_id))
+            if customer:
+                customer_name = customer.customer_name
+                customer_mob = customer.contact_no
+                customer_id_fk = customer.id
+        elif customer_type == 'b2c':
+            b2c_lead = B2CLead.query.filter_by(enquiry_id=customer_id).first()
+            if b2c_lead:
+                customer_name = b2c_lead.customer_name
+                customer_mob = b2c_lead.contact_no
+
         # Custom validation for recurring charge
         if form.charge_type.data == 'Recurring charge':
             if not form.start_date.data:
@@ -55,8 +96,9 @@ def add():
 
         booking = Booking(
             booking_code=form.booking_code.data,
-            customer_name=form.customer_name.data,
-            customer_mob=form.customer_mob.data,
+            customer_id=customer_id_fk,
+            customer_name=customer_name,
+            customer_mob=customer_mob,
             charge_type=form.charge_type.data,
             services=form.services.data,
             start_date=start_date,
@@ -90,7 +132,7 @@ def add():
 
         flash('Booking added successfully!', 'success')
         return redirect(url_for('bookings.index'))
-    return render_template('bookings/add.html', title='Add Booking', form=form, booking_code=booking_code)
+    return render_template('bookings/add.html', title='Add Booking', form=form, booking_code=booking_code, customer_data_json=customer_data_json)
 
 
 @bp.route('/view/<booking_code>')
@@ -110,6 +152,38 @@ def edit(booking_code):
     """Edit a booking."""
     booking = Booking.query.filter_by(booking_code=booking_code).first_or_404()
     form = BookingForm(obj=booking)
+
+    # Populate customer choices
+    from app.models import Customer, B2CLead
+    customers = Customer.query.order_by(Customer.customer_name).all()
+    converted_b2c = B2CLead.query.filter_by(status='converted').order_by(B2CLead.customer_name).all()
+
+    customer_choices = []
+    customer_data = {}
+    for cust in customers:
+        key = f'customer:{cust.id}'
+        customer_choices.append((key, f'{cust.customer_name} ({cust.customer_code})'))
+        customer_data[key] = cust.contact_no
+    for b2c in converted_b2c:
+        key = f'b2c:{b2c.enquiry_id}'
+        customer_choices.append((key, f'{b2c.customer_name} ({b2c.enquiry_id})'))
+        customer_data[key] = b2c.contact_no
+
+    form.customer_name.choices = [('', 'Select Customer')] + customer_choices
+
+    customer_data_json = json.dumps(customer_data)
+
+    # Set initial customer selection
+    if booking.customer_id:
+        form.customer_name.data = f'customer:{booking.customer_id}'
+        form.customer_mob.data = customer_data.get(f'customer:{booking.customer_id}', booking.customer_mob)
+    else:
+        # Try to find matching B2C lead
+        b2c_match = B2CLead.query.filter_by(customer_name=booking.customer_name, contact_no=booking.customer_mob, status='converted').first()
+        if b2c_match:
+            form.customer_name.data = f'b2c:{b2c_match.enquiry_id}'
+            form.customer_mob.data = customer_data.get(f'b2c:{b2c_match.enquiry_id}', booking.customer_mob)
+
     # Set date fields as strings for the form
     if booking.start_date:
         form.start_date.data = booking.start_date.strftime('%Y-%m-%d')
@@ -120,6 +194,25 @@ def edit(booking_code):
         form.shift.data = booking.shift_hours
 
     if form.validate_on_submit():
+        # Parse selected customer
+        selected_customer = form.customer_name.data
+        customer_type, customer_id = selected_customer.split(':', 1)
+        customer_name = None
+        customer_mob = None
+        customer_id_fk = None
+
+        if customer_type == 'customer':
+            customer = Customer.query.get(int(customer_id))
+            if customer:
+                customer_name = customer.customer_name
+                customer_mob = customer.contact_no
+                customer_id_fk = customer.id
+        elif customer_type == 'b2c':
+            b2c_lead = B2CLead.query.filter_by(enquiry_id=customer_id).first()
+            if b2c_lead:
+                customer_name = b2c_lead.customer_name
+                customer_mob = b2c_lead.contact_no
+
         # Custom validation for recurring charge
         if form.charge_type.data == 'Recurring charge':
             if not form.start_date.data:
@@ -141,6 +234,9 @@ def edit(booking_code):
             end_date = datetime.strptime(form.end_date.data, '%Y-%m-%d').date()
 
         form.populate_obj(booking)
+        booking.customer_id = customer_id_fk
+        booking.customer_name = customer_name
+        booking.customer_mob = customer_mob
         booking.start_date = start_date
         booking.end_date = end_date
         booking.charge_type = form.charge_type.data
@@ -150,7 +246,7 @@ def edit(booking_code):
         db.session.commit()
         flash('Booking updated successfully!', 'success')
         return redirect(url_for('bookings.index'))
-    return render_template('bookings/edit.html', title='Edit Booking', form=form, booking=booking)
+    return render_template('bookings/edit.html', title='Edit Booking', form=form, booking=booking, customer_data_json=customer_data_json)
 
 
 @bp.route('/payment/<booking_code>', methods=['GET', 'POST'])

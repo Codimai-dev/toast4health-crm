@@ -170,19 +170,31 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-   const chargeTypeSelect = document.querySelector('#charge_type');
-   const recurringFields = document.querySelector('.recurring-fields');
+    const chargeTypeSelect = document.querySelector('#charge_type');
+    const recurringFields = document.querySelector('.recurring-fields');
 
-   function toggleRecurringFields() {
-       if (chargeTypeSelect.value === 'Recurring charge') {
-           recurringFields.style.display = 'block';
-       } else {
-           recurringFields.style.display = 'none';
-       }
-   }
+    function toggleRecurringFields() {
+        if (chargeTypeSelect.value === 'Recurring charge') {
+            recurringFields.style.display = 'block';
+        } else {
+            recurringFields.style.display = 'none';
+        }
+    }
 
-   chargeTypeSelect.addEventListener('change', toggleRecurringFields);
-   toggleRecurringFields(); // Initial check
+    chargeTypeSelect.addEventListener('change', toggleRecurringFields);
+    toggleRecurringFields(); // Initial check
+
+    // Auto-fill customer mobile
+    const customerSelect = document.querySelector('#customer_name');
+    const customerMob = document.querySelector('#customer_mob');
+    const customerData = JSON.parse('{{ customer_data_json | safe }}');
+
+    customerSelect.addEventListener('change', function() {
+        const mob = customerData[this.value];
+        if (mob) {
+            customerMob.value = mob;
+        }
+    });
 });
 </script>
 {% endblock %}

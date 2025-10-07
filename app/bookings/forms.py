@@ -12,8 +12,8 @@ class BookingForm(FlaskForm):
 
     booking_code = StringField('Booking Code', validators=[DataRequired()],
                               render_kw={'class': 'form-control', 'placeholder': 'Enter booking code', 'readonly': True})
-    customer_name = StringField('Customer Name', validators=[DataRequired()],
-                               render_kw={'class': 'form-control', 'placeholder': 'Enter customer name'})
+    customer_name = SelectField('Customer Name', choices=[], validators=[DataRequired()],
+                               render_kw={'class': 'form-control'})
     customer_mob = StringField('Customer Mobile', validators=[DataRequired()],
                               render_kw={'class': 'form-control', 'placeholder': 'Enter customer mobile'})
     charge_type = SelectField('Type of Charge', choices=[('Fixed charge', 'Fixed charge'), ('Recurring charge', 'Recurring charge')],

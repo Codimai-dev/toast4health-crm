@@ -19,8 +19,8 @@ class BookingForm(FlaskForm):
     charge_type = SelectField('Type of Charge', choices=[('Fixed charge', 'Fixed charge'), ('Recurring charge', 'Recurring charge')],
                              validators=[DataRequired()], default='Fixed charge',
                              render_kw={'class': 'form-control', 'autocomplete': 'off'})
-    services = TextAreaField('Services', validators=[DataRequired()],
-                           render_kw={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter services', 'autocomplete': 'off'})
+    services = SelectField('Services', choices=[], validators=[DataRequired()],
+                          render_kw={'class': 'form-control', 'autocomplete': 'off'})
     start_date = StringField('Start Date', validators=[Optional()], render_kw={'class': 'form-control', 'type': 'date', 'autocomplete': 'off'})
     end_date = StringField('End Date', validators=[Optional()], render_kw={'class': 'form-control', 'type': 'date', 'autocomplete': 'off'})
     shift = IntegerField('Shift (hours)', validators=[Optional()], render_kw={'class': 'form-control', 'placeholder': 'Enter shift in hours', 'autocomplete': 'off'})

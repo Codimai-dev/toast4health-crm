@@ -35,7 +35,7 @@ def add():
     booking_code = Booking.generate_booking_code()
 
     # Populate customer choices
-    from app.models import Customer, B2CLead
+    from app.models import Customer, B2CLead, Service
     customers = Customer.query.order_by(Customer.customer_name).all()
     converted_b2c = B2CLead.query.filter_by(status='converted').order_by(B2CLead.customer_name).all()
 
@@ -51,6 +51,11 @@ def add():
         customer_data[key] = b2c.contact_no
 
     form.customer_name.choices = [('', 'Select Customer')] + customer_choices
+    
+    # Populate service choices
+    services = Service.query.order_by(Service.name).all()
+    service_choices = [('', 'Select Service')] + [(s.name, s.name) for s in services]
+    form.services.choices = service_choices
 
     customer_data_json = json.dumps(customer_data)
 
@@ -154,7 +159,7 @@ def edit(booking_code):
     form = BookingForm(obj=booking)
 
     # Populate customer choices
-    from app.models import Customer, B2CLead
+    from app.models import Customer, B2CLead, Service
     customers = Customer.query.order_by(Customer.customer_name).all()
     converted_b2c = B2CLead.query.filter_by(status='converted').order_by(B2CLead.customer_name).all()
 
@@ -170,6 +175,11 @@ def edit(booking_code):
         customer_data[key] = b2c.contact_no
 
     form.customer_name.choices = [('', 'Select Customer')] + customer_choices
+    
+    # Populate service choices
+    services = Service.query.order_by(Service.name).all()
+    service_choices = [('', 'Select Service')] + [(s.name, s.name) for s in services]
+    form.services.choices = service_choices
 
     customer_data_json = json.dumps(customer_data)
 

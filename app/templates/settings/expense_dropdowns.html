@@ -53,7 +53,7 @@
                                     <td>{{ category.key }}</td>
                                     <td>
                                         <span class="category-value">{{ category.value }}</span>
-                                        <input type="text" class="form-control form-control-sm d-none edit-input" value="{{ category.value }}">
+                                        <input type="text" class="form-control form-control-sm d-none edit-input" value="{{ category.value }}" autocomplete="off">
                                     </td>
                                     <td>
                                         <span class="badge bg-secondary">{{ sub_categories_by_main.get(category.key, [])|length }}</span>
@@ -102,7 +102,7 @@
                                     <td>{{ sub_cat.key }}</td>
                                     <td>
                                         <span class="setting-value">{{ sub_cat.value }}</span>
-                                        <input type="text" class="form-control form-control-sm d-none edit-input" value="{{ sub_cat.value }}">
+                                        <input type="text" class="form-control form-control-sm d-none edit-input" value="{{ sub_cat.value }}" autocomplete="off">
                                     </td>
                                     <td>
                                         <button class="btn btn-sm btn-outline-primary edit-btn" data-id="{{ sub_cat.id }}">
@@ -136,12 +136,12 @@
                 <form id="addMainCategoryForm">
                     <div class="mb-3">
                         <label class="form-label">Key</label>
-                        <input type="text" class="form-control" id="newMainKey" required>
+                        <input type="text" class="form-control" id="newMainKey" required autocomplete="off">
                         <small class="form-text text-muted">Use lowercase with underscores (e.g., company_expense)</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Value</label>
-                        <input type="text" class="form-control" id="newMainValue" required>
+                        <input type="text" class="form-control" id="newMainValue" required autocomplete="off">
                         <small class="form-text text-muted">Display name (e.g., Company Expense)</small>
                     </div>
                 </form>
@@ -166,16 +166,16 @@
                 <form id="addSubCategoryForm">
                     <div class="mb-3">
                         <label class="form-label">Category</label>
-                        <input type="text" class="form-control" id="subCategoryParent" readonly>
+                        <input type="text" class="form-control" id="subCategoryParent" readonly autocomplete="off">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Key</label>
-                        <input type="text" class="form-control" id="newSubKey" required>
+                        <input type="text" class="form-control" id="newSubKey" required autocomplete="off">
                         <small class="form-text text-muted">Will be prefixed with category (e.g., company_expense_rent)</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Value</label>
-                        <input type="text" class="form-control" id="newSubValue" required>
+                        <input type="text" class="form-control" id="newSubValue" required autocomplete="off">
                         <small class="form-text text-muted">Display name (e.g., Rent)</small>
                     </div>
                 </form>

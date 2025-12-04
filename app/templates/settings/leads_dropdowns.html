@@ -40,7 +40,7 @@
                                     <td>{{ setting.key }}</td>
                                     <td>
                                         <span class="setting-value">{{ setting.value }}</span>
-                                        <input type="text" class="form-control form-control-sm d-none edit-input" value="{{ setting.value }}">
+                                        <input type="text" class="form-control form-control-sm d-none edit-input" value="{{ setting.value }}" autocomplete="off">
                                     </td>
                                     <td>
                                         <button class="btn btn-sm btn-outline-primary edit-btn" data-id="{{ setting.id }}">
@@ -78,11 +78,11 @@
                 <form id="addSettingForm">
                     <div class="mb-3">
                         <label class="form-label">Key</label>
-                        <input type="text" class="form-control" id="newKey" required>
+                        <input type="text" class="form-control" id="newKey" required autocomplete="off">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Value</label>
-                        <input type="text" class="form-control" id="newValue" required>
+                        <input type="text" class="form-control" id="newValue" required autocomplete="off">
                     </div>
                 </form>
             </div>

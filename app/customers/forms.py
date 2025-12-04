@@ -11,12 +11,12 @@ class CustomerForm(FlaskForm):
     """Form for adding/editing customers."""
 
     customer_code = StringField('Customer Code', validators=[DataRequired()],
-                               render_kw={'class': 'form-control', 'readonly': True})
+                               render_kw={'class': 'form-control', 'readonly': True, 'autocomplete': 'off'})
     customer_name = StringField('Customer Name', validators=[DataRequired()],
-                               render_kw={'class': 'form-control', 'placeholder': 'Enter customer name'})
+                               render_kw={'class': 'form-control', 'placeholder': 'Enter customer name', 'autocomplete': 'off'})
     contact_no = StringField('Contact Number', validators=[DataRequired()],
-                           render_kw={'class': 'form-control', 'placeholder': 'Enter contact number'})
+                           render_kw={'class': 'form-control', 'placeholder': 'Enter contact number', 'autocomplete': 'off'})
     email = StringField('Email', validators=[Optional(), Email()],
-                       render_kw={'class': 'form-control', 'placeholder': 'Enter email (optional)'})
-    services = TextAreaField('Services', render_kw={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter services (optional)'})
+                       render_kw={'class': 'form-control', 'placeholder': 'Enter email (optional)', 'autocomplete': 'off'})
+    services = TextAreaField('Services', render_kw={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter services (optional)', 'autocomplete': 'off'})
     submit = SubmitField('Save Customer', render_kw={'class': 'btn btn-primary'})

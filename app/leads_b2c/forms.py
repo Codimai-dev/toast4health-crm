@@ -12,20 +12,20 @@ class B2CLeadForm(FlaskForm):
     """Form for adding/editing B2C leads."""
 
     enquiry_id = StringField('Enquiry ID', validators=[DataRequired()],
-                           render_kw={'class': 'form-control', 'readonly': True})
+                           render_kw={'class': 'form-control', 'readonly': True, 'autocomplete': 'off'})
     customer_name = StringField('Customer Name', validators=[DataRequired()],
-                              render_kw={'class': 'form-control', 'placeholder': 'Enter customer name'})
+                              render_kw={'class': 'form-control', 'placeholder': 'Enter customer name', 'autocomplete': 'off'})
     contact_no = StringField('Contact Number', validators=[DataRequired()],
-                           render_kw={'class': 'form-control', 'placeholder': 'Enter contact number'})
+                           render_kw={'class': 'form-control', 'placeholder': 'Enter contact number', 'autocomplete': 'off'})
     email = StringField('Email', validators=[Optional(), Email()],
-                       render_kw={'class': 'form-control', 'placeholder': 'Enter email (optional)'})
+                       render_kw={'class': 'form-control', 'placeholder': 'Enter email (optional)', 'autocomplete': 'off'})
     enquiry_date = DateField('Enquiry Date', validators=[DataRequired()],
-                           render_kw={'class': 'form-control'})
-    source = SelectField('Source', choices=[], render_kw={'class': 'form-select'})
-    services = SelectField('Services', choices=[], render_kw={'class': 'form-select'})
-    referred_by = SelectField('Referred By', choices=[], render_kw={'class': 'form-select'})
-    status = SelectField('Status', choices=[], default='NEW', render_kw={'class': 'form-select'})
-    comment = TextAreaField('Comment', render_kw={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter comment (optional)'})
+                           render_kw={'class': 'form-control', 'autocomplete': 'off'})
+    source = SelectField('Source', choices=[], render_kw={'class': 'form-select', 'autocomplete': 'off'})
+    services = SelectField('Services', choices=[], render_kw={'class': 'form-select', 'autocomplete': 'off'})
+    referred_by = SelectField('Referred By', choices=[], render_kw={'class': 'form-select', 'autocomplete': 'off'})
+    status = SelectField('Status', choices=[], default='NEW', render_kw={'class': 'form-select', 'autocomplete': 'off'})
+    comment = TextAreaField('Comment', render_kw={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter comment (optional)', 'autocomplete': 'off'})
     submit = SubmitField('Save Lead', render_kw={'class': 'btn btn-primary'})
 
     def __init__(self, *args, **kwargs):
@@ -41,12 +41,12 @@ class FollowUpForm(FlaskForm):
     """Form for adding follow-ups."""
 
     follow_up_on = DateField('Follow-up Date', validators=[DataRequired()],
-                           render_kw={'class': 'form-control'})
-    notes = TextAreaField('Notes', render_kw={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter follow-up notes'})
+                           render_kw={'class': 'form-control', 'autocomplete': 'off'})
+    notes = TextAreaField('Notes', render_kw={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter follow-up notes', 'autocomplete': 'off'})
     outcome = SelectField('Outcome', choices=[(outcome.value, outcome.value.replace('_', ' ')) for outcome in FollowUpOutcome],
-                        validators=[DataRequired()], render_kw={'class': 'form-select'})
+                        validators=[DataRequired()], render_kw={'class': 'form-select', 'autocomplete': 'off'})
     next_follow_up_on = DateField('Next Follow-up Date', validators=[Optional()],
-                                render_kw={'class': 'form-control'})
+                                render_kw={'class': 'form-control', 'autocomplete': 'off'})
     submit = SubmitField('Add Follow-up', render_kw={'class': 'btn btn-primary'})
 
 
@@ -54,5 +54,5 @@ class CSVImportForm(FlaskForm):
     """Form for importing B2C leads from CSV."""
 
     csv_file = FileField('CSV File', validators=[FileRequired()],
-                        render_kw={'class': 'form-control', 'accept': '.csv'})
+                        render_kw={'class': 'form-control', 'accept': '.csv', 'autocomplete': 'off'})
     submit = SubmitField('Import Leads', render_kw={'class': 'btn btn-success'})

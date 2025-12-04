@@ -124,7 +124,115 @@ def create_app(config_name=None):
     # Error handlers
     from app.errors import register_error_handlers
     register_error_handlers(app)
-    
+
+    # Auto-create database and seed if it doesn't exist
+    with app.app_context():
+        db_uri = app.config['SQLALCHEMY_DATABASE_URI']
+        if db_uri.startswith('sqlite:///'):
+            db_file = db_uri[10:]  # Remove 'sqlite:///'
+            db_path = os.path.join(app.instance_path, db_file) if not os.path.isabs(db_file) else db_file
+            if not os.path.exists(db_path):
+                from flask_migrate import upgrade
+                upgrade()
+                # Seed initial data inline
+                from app.models import User, UserRole, Setting
+                # Create admin user
+                admin = User.query.filter_by(email='admin@example.com').first()
+                if not admin:
+                    admin = User(
+                        email='admin@example.com',
+                        full_name='System Administrator',
+                        role=UserRole.ADMIN,
+                        is_active=True
+                    )
+                    admin.set_password('Admin@12345')
+                    db.session.add(admin)
+                    print('Created admin user: admin@example.com / Admin@12345')
+                else:
+                    print('Admin user already exists')
+
+                # Seed Settings
+                settings_data = [
+                    # Sources
+                    ('Source', 'website', 'Website', 1),
+                    ('Source', 'referral', 'Referral', 2),
+                    ('Source', 'social_media', 'Social Media', 3),
+                    ('Source', 'direct_call', 'Direct Call', 4),
+                    ('Source', 'walk_in', 'Walk-in', 5),
+                    ('Source', 'advertisement', 'Advertisement', 6),
+                    ('Source', 'other', 'Other', 7),
+
+                    # Services
+                    ('Services', 'consultation', 'Consultation', 1),
+                    ('Services', 'treatment', 'Treatment', 2),
+                    ('Services', 'therapy', 'Therapy', 3),
+                    ('Services', 'wellness_program', 'Wellness Program', 4),
+                    ('Services', 'health_checkup', 'Health Checkup', 5),
+                    ('Services', 'fitness_training', 'Fitness Training', 6),
+                    ('Services', 'nutrition_counseling', 'Nutrition Counseling', 7),
+
+                    # Expense Main Categories
+                    ('ExpenseMainCategory', 'company_expense', 'Company Expense', 1),
+                    ('ExpenseMainCategory', 'booking', 'Booking', 2),
+
+                    # Expense Sub Categories
+                    ('ExpenseSubCategory', 'company_expense_rent', 'Rent', 1),
+                    ('ExpenseSubCategory', 'company_expense_house_keeping', 'House Keeping', 2),
+                    ('ExpenseSubCategory', 'company_expense_salary', 'Salary', 3),
+                    ('ExpenseSubCategory', 'company_expense_employee_cost', 'Employee Cost', 4),
+                    ('ExpenseSubCategory', 'booking_travelling', 'Travelling', 5),
+                    ('ExpenseSubCategory', 'booking_food', 'Food', 6),
+                    ('ExpenseSubCategory', 'booking_channel_partner', 'Channel Partner', 7),
+                    ('ExpenseSubCategory', 'booking_employee_cost', 'Employee Cost', 8),
+
+                    # Expense Categories (legacy)
+                    ('ExpenseCategory', 'travel', 'Travel', 1),
+                    ('ExpenseCategory', 'accommodation', 'Accommodation', 2),
+                    ('ExpenseCategory', 'meals', 'Meals', 3),
+                    ('ExpenseCategory', 'supplies', 'Supplies', 4),
+                    ('ExpenseCategory', 'equipment', 'Equipment', 5),
+                    ('ExpenseCategory', 'marketing', 'Marketing', 6),
+                    ('ExpenseCategory', 'office', 'Office Expenses', 7),
+                    ('ExpenseCategory', 'utilities', 'Utilities', 8),
+                    ('ExpenseCategory', 'insurance', 'Insurance', 9),
+                    ('ExpenseCategory', 'other', 'Other', 10),
+
+                    # Employee Types
+                    ('EmployeeType', 'full_time', 'Full Time', 1),
+                    ('EmployeeType', 'part_time', 'Part Time', 2),
+                    ('EmployeeType', 'contract', 'Contract', 3),
+                    ('EmployeeType', 'consultant', 'Consultant', 4),
+                    ('EmployeeType', 'intern', 'Intern', 5),
+
+                    # Lead Status (for consistency)
+                    ('LeadStatus', 'new', 'New', 1),
+                    ('LeadStatus', 'follow_up', 'Follow Up', 2),
+                    ('LeadStatus', 'prospect', 'Prospect', 3),
+                    ('LeadStatus', 'converted', 'Converted', 4),
+                    ('LeadStatus', 'lost', 'Lost', 5),
+                ]
+
+                for group, key, value, sort_order in settings_data:
+                    existing_setting = Setting.query.filter_by(group=group, key=key).first()
+                    if not existing_setting:
+                        setting = Setting(
+                            group=group,
+                            key=key,
+                            value=value,
+                            sort_order=sort_order,
+                            is_active=True,
+                            created_by=admin.id if admin else None,
+                            updated_by=admin.id if admin else None
+                        )
+                        db.session.add(setting)
+
+                try:
+                    db.session.commit()
+                    print('Database seeded successfully!')
+                except Exception as e:
+                    db.session.rollback()
+                    print(f'Error seeding database: {e}')
+
     # Main route - redirect to dashboard
     @app.route('/')
     def index():

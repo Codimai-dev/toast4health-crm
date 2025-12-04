@@ -18,7 +18,7 @@ class ChannelPartnerForm(FlaskForm):
                             render_kw={'class': 'form-control', 'placeholder': 'Enter contact number'})
     email = StringField('Email', validators=[Optional(), Email(), Length(max=120)],
                        render_kw={'class': 'form-control', 'placeholder': 'Enter email (optional)'})
-    created_date = DateField('Created Date', validators=[DataRequired()],
+    created_date = DateField('Created Date (Optional)', validators=[Optional()],
                             render_kw={'class': 'form-control', 'type': 'date'})
     notes = TextAreaField('Notes', validators=[Optional()],
                          render_kw={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter notes (optional)'})

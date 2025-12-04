@@ -623,7 +623,7 @@ class ChannelPartner(db.Model, TimestampMixin, UserTrackingMixin):
     name = db.Column(db.String(100), nullable=False, index=True)
     contact_no = db.Column(db.String(20), nullable=False, index=True)
     email = db.Column(db.String(120), nullable=True, index=True)
-    created_date = db.Column(db.Date, nullable=False)
+    created_date = db.Column(db.Date, nullable=True)
     notes = db.Column(db.Text, nullable=True)
     
     def __repr__(self):

@@ -291,7 +291,7 @@ def chart_data():
                     Booking.created_at < next_datetime
                 ).scalar() or 0
 
-                revenue_data['labels'].append(current_date.strftime('%d/%m'))
+                revenue_data['labels'].append(current_date.strftime('%d-%m'))
                 revenue_data['datasets'][0]['data'].append(float(daily_revenue))
 
             chart_data['revenue_trend'] = revenue_data

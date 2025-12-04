@@ -63,7 +63,7 @@
                             <dd class="col-sm-7">{{ employee.gender if employee.gender else '-' }}</dd>
 
                             <dt class="col-sm-5">Date of Birth:</dt>
-                            <dd class="col-sm-7">{{ employee.dob.strftime('%d/%m/%Y') if employee.dob else '-' }}</dd>
+                            <dd class="col-sm-7">{{ employee.dob.strftime('%d-%m-%Y') if employee.dob else '-' }}</dd>
 
                             <dt class="col-sm-5">Degree:</dt>
                             <dd class="col-sm-7">{{ employee.degree or '-' }}</dd>

@@ -46,7 +46,7 @@
                         <tbody>
                             {% for payment in payments %}
                             <tr>
-                                <td>{{ payment.payment_date.strftime('%d/%m/%Y') if payment.payment_date else '-' }}</td>
+                                <td>{{ payment.payment_date.strftime('%d-%m-%Y') if payment.payment_date else '-' }}</td>
                                 <td>
                                     <a href="{{ url_for('bookings.view', booking_code=payment.booking.booking_code) }}" class="text-decoration-none">
                                         {{ payment.booking.booking_code }}

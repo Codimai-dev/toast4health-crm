@@ -47,7 +47,7 @@
                             {% for expense in expenses %}
                             <tr>
                                 <td>{{ expense.expense_code }}</td>
-                                <td>{{ expense.date.strftime('%d/%m/%Y') if expense.date else '-' }}</td>
+                                <td>{{ expense.date.strftime('%d-%m-%Y') if expense.date else '-' }}</td>
                                 <td>{{ expense.category }}</td>
                                 <td>{{ expense.sub_category or '-' }}</td>
                                 <td>₹{{ "%.2f"|format(expense.expense_amount or 0) }}</td>

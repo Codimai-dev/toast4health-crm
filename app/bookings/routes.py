@@ -425,8 +425,8 @@ def invoice(booking_code):
 
     # Invoice details
     invoice_data = [
-        ['Invoice Number:', booking.booking_code, 'Invoice Date:', booking.created_at.strftime('%d/%m/%Y') if booking.created_at else ''],
-        ['Bill To:', booking.customer_name, 'Service Period:', f"{booking.start_date.strftime('%d/%m/%Y') if booking.start_date else ''} - {booking.end_date.strftime('%d/%m/%Y') if booking.end_date else ''}"],
+        ['Invoice Number:', booking.booking_code, 'Invoice Date:', booking.created_at.strftime('%d-%m-%Y') if booking.created_at else ''],
+        ['Bill To:', booking.customer_name, 'Service Period:', f"{booking.start_date.strftime('%d-%m-%Y') if booking.start_date else ''} - {booking.end_date.strftime('%d-%m-%Y') if booking.end_date else ''}"],
         ['', booking.customer_mob, '', '']
     ]
 

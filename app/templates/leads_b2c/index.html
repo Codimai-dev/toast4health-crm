@@ -60,7 +60,7 @@
                                 <td>{{ lead.customer_name }}</td>
                                 <td>{{ lead.contact_no }}</td>
                                 <td>{{ lead.email or '-' }}</td>
-                                <td>{{ lead.enquiry_date.strftime('%d/%m/%Y') if lead.enquiry_date else '-' }}</td>
+                                <td>{{ lead.enquiry_date.strftime('%d-%m-%Y') if lead.enquiry_date else '-' }}</td>
                                 <td>
                                     <span class="badge bg-{{ 'primary' if lead.status == 'new' else 'warning' if lead.status == 'follow_up' else 'info' if lead.status == 'prospect' else 'success' if lead.status == 'converted' else 'secondary' if lead.status == 'lost' else 'danger' }}">
                                         {{ lead.status.replace('_', ' ') }}

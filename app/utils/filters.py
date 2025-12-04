@@ -15,7 +15,7 @@ def format_currency(value):
         return "₹0.00"
 
 
-def format_date(value, format='%d %b %Y'):
+def format_date(value, format='%d-%m-%Y'):
     """Format a date value."""
     if value is None:
         return ""
@@ -31,7 +31,7 @@ def format_date(value, format='%d %b %Y'):
     return str(value)
 
 
-def format_datetime(value, format='%d %b %Y %I:%M %p'):
+def format_datetime(value, format='%d-%m-%Y %I:%M %p'):
     """Format a datetime value."""
     if value is None:
         return ""

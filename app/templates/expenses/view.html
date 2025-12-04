@@ -42,7 +42,7 @@
                             <dd class="col-sm-7">{{ expense.expense_code }}</dd>
 
                             <dt class="col-sm-5">Date:</dt>
-                            <dd class="col-sm-7">{{ expense.date.strftime('%d/%m/%Y') if expense.date else '-' }}</dd>
+                            <dd class="col-sm-7">{{ expense.date.strftime('%d-%m-%Y') if expense.date else '-' }}</dd>
 
                             <dt class="col-sm-5">Category:</dt>
                             <dd class="col-sm-7">{{ expense.category }}</dd>

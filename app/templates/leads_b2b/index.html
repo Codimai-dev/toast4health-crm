@@ -58,7 +58,7 @@
                                 <td>
                                     <span class="badge bg-primary">{{ lead.status or 'New' }}</span>
                                 </td>
-                                <td>{{ lead.date.strftime('%d/%m/%Y') if lead.date else '-' }}</td>
+                                <td>{{ lead.date.strftime('%d-%m-%Y') if lead.date else '-' }}</td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
                                         <a href="{{ url_for('leads_b2b.view', sr_no=lead.sr_no) }}" class="btn btn-outline-primary btn-sm" title="View">

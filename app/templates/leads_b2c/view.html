@@ -51,7 +51,7 @@
                             <dd class="col-sm-7">{{ lead.email or '-' }}</dd>
 
                             <dt class="col-sm-5">Enquiry Date:</dt>
-                            <dd class="col-sm-7">{{ lead.enquiry_date.strftime('%d/%m/%Y') if lead.enquiry_date else '-' }}</dd>
+                            <dd class="col-sm-7">{{ lead.enquiry_date.strftime('%d-%m-%Y') if lead.enquiry_date else '-' }}</dd>
                         </dl>
                     </div>
                     <div class="col-md-6">
@@ -110,7 +110,7 @@
             <div class="card-body">
                 {% for followup in lead.follow_ups %}
                 <div class="border-bottom pb-2 mb-2">
-                    <small class="text-muted">{{ followup.follow_up_on.strftime('%d/%m/%Y') }}</small>
+                    <small class="text-muted">{{ followup.follow_up_on.strftime('%d-%m-%Y') }}</small>
                     <p class="mb-1">{{ followup.notes or 'No notes' }}</p>
                     <small class="text-info">{{ followup.outcome.value.replace('_', ' ') }}</small>
                 </div>

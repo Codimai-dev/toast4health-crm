@@ -190,6 +190,11 @@
                         <i class="bi bi-clock"></i> Follow-ups
                     </a>
                     {% endif %}
+                    {% if current_user.has_module_access('camps') %}
+                    <a href="{{ url_for('camps.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('camps.') }}">
+                        <i class="bi bi-heart-pulse"></i> Health Camps
+                    </a>
+                    {% endif %}
 
                     <!-- Customer Section -->
                     <div class="list-group-item bg-secondary text-white">
@@ -277,6 +282,11 @@
                         {% if current_user.has_module_access('follow_ups') %}
                         <a href="{{ url_for('follow_ups.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('follow_ups.') }}">
                             <i class="bi bi-clock"></i> Follow-ups
+                        </a>
+                        {% endif %}
+                        {% if current_user.has_module_access('camps') %}
+                        <a href="{{ url_for('camps.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('camps.') }}">
+                            <i class="bi bi-heart-pulse"></i> Health Camps
                         </a>
                         {% endif %}
 

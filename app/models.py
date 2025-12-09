@@ -127,7 +127,7 @@ class User(UserMixin, db.Model, TimestampMixin, UserTrackingMixin):
         if self.role == UserRole.ADMIN:
             # Admins have access to everything
             return ['dashboard', 'leads_b2c', 'leads_b2b', 'follow_ups', 'customers',
-                   'bookings', 'employees', 'expenses', 'channel_partners', 'services', 'settings']
+                   'bookings', 'employees', 'expenses', 'channel_partners', 'services', 'camps', 'settings']
 
         if self.permissions:
             try:
@@ -137,8 +137,8 @@ class User(UserMixin, db.Model, TimestampMixin, UserTrackingMixin):
 
         # Default permissions based on role
         defaults = {
-            UserRole.SALES: ['dashboard', 'leads_b2c', 'leads_b2b', 'follow_ups'],
-            UserRole.OPS: ['dashboard', 'customers', 'bookings', 'employees', 'expenses', 'channel_partners', 'services'],
+            UserRole.SALES: ['dashboard', 'leads_b2c', 'leads_b2b', 'follow_ups', 'camps'],
+            UserRole.OPS: ['dashboard', 'customers', 'bookings', 'employees', 'expenses', 'channel_partners', 'services', 'camps'],
             UserRole.FINANCE: ['dashboard', 'bookings', 'expenses'],
             UserRole.VIEWER: ['dashboard']  # Read-only access
         }
@@ -715,6 +715,61 @@ class Payment(db.Model, TimestampMixin, UserTrackingMixin):
 
     def __repr__(self):
         return f'<Payment {self.id}: ₹{self.payment_amount} on {self.payment_date}>'
+
+
+class Camp(db.Model, TimestampMixin, UserTrackingMixin):
+    """Camp model for tracking health camp entries."""
+
+    __tablename__ = 'camp'
+
+    id = db.Column(db.Integer, primary_key=True)
+    camp_id = db.Column(db.String(20), nullable=False, unique=True, index=True)
+    staff_id = db.Column(db.Integer, db.ForeignKey('employee.id'), nullable=True)
+    camp_date = db.Column(db.Date, nullable=False, index=True)
+    camp_location = db.Column(db.String(200), nullable=False)
+    referred_by = db.Column(db.String(100), nullable=True)
+    patient_name = db.Column(db.String(100), nullable=False, index=True)
+    age = db.Column(db.String(10), nullable=True)
+    gender = db.Column(db.String(20), nullable=True)
+    test_done = db.Column(db.Boolean, nullable=False, default=False)
+    package = db.Column(db.String(100), nullable=True)
+    diagnostic_partner = db.Column(db.String(100), nullable=True)
+    phone_no = db.Column(db.String(20), nullable=False, index=True)
+    payment = db.Column(db.Numeric(10, 2), nullable=True)
+
+    # Relationships
+    staff = db.relationship('Employee', backref='camps')
+
+    def __repr__(self):
+        return f'<Camp {self.camp_id}: {self.patient_name}>'
+
+    @staticmethod
+    def generate_camp_id():
+        """Generate a unique camp ID in format CAMP-XXX."""
+        # Find the highest existing camp ID
+        existing_ids = db.session.query(Camp.camp_id).filter(
+            Camp.camp_id.like('CAMP-%')
+        ).all()
+
+        if existing_ids:
+            # Extract the sequential numbers and find the max
+            numbers = []
+            for camp_id in existing_ids:
+                try:
+                    num_part = camp_id[0].split('-')[-1]
+                    numbers.append(int(num_part))
+                except (IndexError, ValueError):
+                    continue
+
+            next_num = max(numbers) + 1 if numbers else 1
+        else:
+            next_num = 1
+
+        return f'CAMP-{next_num:03d}'
+
+
+# Indexes for Camp
+Index('idx_camp_date_location_patient', Camp.camp_date, Camp.camp_location, Camp.patient_name)
 
 
 class AuditLog(db.Model):

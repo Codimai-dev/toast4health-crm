@@ -103,6 +103,9 @@ def create_app(config_name=None):
     from app.services import bp as services_bp
     app.register_blueprint(services_bp, url_prefix='/services')
 
+    from app.camps import bp as camps_bp
+    app.register_blueprint(camps_bp, url_prefix='/camps')
+
     from app.settings import bp as settings_bp
     app.register_blueprint(settings_bp, url_prefix='/settings')
     

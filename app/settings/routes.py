@@ -181,6 +181,19 @@ def hr_dropdowns():
     return render_template('settings/hr_dropdowns.html', title='HR Settings', settings_by_group=settings_by_group)
 
 
+@bp.route('/dropdowns/camps')
+@login_required
+def camp_dropdowns():
+    """Manage camp-related dropdown settings."""
+    if not current_user.has_permission(UserRole.ADMIN):
+        flash('Access denied. Admin privileges required.', 'error')
+        return redirect(url_for('dashboard.index'))
+
+    camp_packages = Setting.query.filter_by(group='CampPackage').order_by(Setting.sort_order).all()
+
+    return render_template('settings/camp_dropdowns.html', title='Camp Settings', camp_packages=camp_packages)
+
+
 @bp.route('/dropdowns/expenses')
 @login_required
 def expense_dropdowns():

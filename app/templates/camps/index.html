@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Health Camps - CRM System{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item active">Health Camps</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-heart-pulse text-primary"></i>
+                Health Camps
+            </h2>
+            <a href="{{ url_for('camps.add') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Add New Camp Entry
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Camps Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">All Camp Entries ({{ camps|length }})</h5>
+            </div>
+            <div class="card-body">
+                {% if camps %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Camp ID</th>
+                                <th>Camp Date</th>
+                                <th>Location</th>
+                                <th>Patient Name</th>
+                                <th>Age</th>
+                                <th>Gender</th>
+                                <th>Phone</th>
+                                <th>Staff Name</th>
+                                <th>Test Done</th>
+                                <th>Payment</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for camp in camps %}
+                            <tr>
+                                <td>{{ camp.camp_id }}</td>
+                                <td>{{ camp.camp_date.strftime('%d-%m-%Y') if camp.camp_date else '-' }}</td>
+                                <td>{{ camp.camp_location }}</td>
+                                <td>{{ camp.patient_name }}</td>
+                                <td>{{ camp.age or '-' }}</td>
+                                <td>{{ camp.gender or '-' }}</td>
+                                <td>{{ camp.phone_no }}</td>
+                                <td>{{ camp.staff.name if camp.staff else '-' }}</td>
+                                <td>
+                                    {% if camp.test_done %}
+                                        <span class="badge bg-success">Yes</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">No</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ '₹{:,.2f}'.format(camp.payment) if camp.payment else '-' }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('camps.view', camp_id=camp.camp_id) }}" class="btn btn-outline-primary btn-sm" title="View">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('camps.edit', camp_id=camp.camp_id) }}" class="btn btn-outline-secondary btn-sm" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-heart-pulse-fill fs-1 text-muted mb-3"></i>
+                    <h5 class="text-muted">No Camp Entries Found</h5>
+                    <p class="text-muted">Start by adding your first camp entry.</p>
+                    <a href="{{ url_for('camps.add') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Add First Camp Entry
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,105 @@
+/* Toast4Health CRM - Custom Theme Stylesheet */
+/* This file contains the brand color theme for Toast4Health CRM */
+
+/* Toast4Health Brand Colors */
+:root {
+    --t4h-primary: #F26419;        /* Vibrant Orange */
+    --t4h-primary-dark: #d45412;   /* Darker Orange */
+    --t4h-primary-light: #ff7a35;  /* Lighter Orange */
+    --t4h-secondary: #5BC0BE;      /* Turquoise Blue */
+    --t4h-secondary-dark: #4aa8a6; /* Darker Turquoise */
+    --t4h-secondary-light: #7dd3d1; /* Lighter Turquoise */
+    --t4h-accent: #F26419;         /* Orange accent */
+    --t4h-success: #28a745;
+    --t4h-info: #5BC0BE;
+    --t4h-warning: #ffc107;
+    --t4h-danger: #dc3545;
+    --t4h-light: #f8f9fa;
+    --t4h-dark: #212529;
+    --t4h-gray: #6c757d;
+}
+
+/* Brand-specific utility classes */
+.t4h-bg-primary {
+    background-color: var(--t4h-primary) !important;
+}
+
+.t4h-bg-secondary {
+    background-color: var(--t4h-secondary) !important;
+}
+
+.t4h-text-primary {
+    color: var(--t4h-primary) !important;
+}
+
+.t4h-text-secondary {
+    color: var(--t4h-secondary) !important;
+}
+
+.t4h-border-primary {
+    border-color: var(--t4h-primary) !important;
+}
+
+.t4h-border-secondary {
+    border-color: var(--t4h-secondary) !important;
+}
+
+/* Gradient backgrounds */
+.t4h-gradient-primary {
+    background: linear-gradient(135deg, var(--t4h-primary) 0%, var(--t4h-primary-dark) 100%) !important;
+}
+
+.t4h-gradient-secondary {
+    background: linear-gradient(135deg, var(--t4h-secondary) 0%, var(--t4h-secondary-dark) 100%) !important;
+}
+
+/* Logo styling */
+.t4h-logo {
+    height: 40px;
+    border-radius: 8px;
+    background: white;
+    padding: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.t4h-logo-sm {
+    height: 32px;
+}
+
+.t4h-logo-lg {
+    height: 60px;
+}
+
+.t4h-logo-xl {
+    height: 80px;
+}
+
+/* Custom hover effects */
+.t4h-hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.t4h-hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Toast4Health specific card styling */
+.t4h-card {
+    border-left: 4px solid var(--t4h-primary);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.t4h-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(242, 100, 25, 0.2);
+}
+
+.t4h-card-secondary {
+    border-left-color: var(--t4h-secondary);
+}
+
+.t4h-card-secondary:hover {
+    box-shadow: 0 8px 20px rgba(91, 192, 190, 0.2);
+}

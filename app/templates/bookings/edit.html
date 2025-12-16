@@ -184,15 +184,31 @@ document.addEventListener('DOMContentLoaded', function() {
     chargeTypeSelect.addEventListener('change', toggleRecurringFields);
     toggleRecurringFields(); // Initial check
 
-    // Auto-fill customer mobile
+    // Auto-fill customer mobile and services
     const customerSelect = document.querySelector('#customer_name');
     const customerMob = document.querySelector('#customer_mob');
+    const servicesSelect = document.querySelector('#services');
     const customerData = JSON.parse('{{ customer_data_json | safe }}');
 
     customerSelect.addEventListener('change', function() {
-        const mob = customerData[this.value];
-        if (mob) {
-            customerMob.value = mob;
+        const data = customerData[this.value];
+        if (data) {
+            // Auto-fill mobile
+            customerMob.value = data.mobile || '';
+            
+            // Auto-fill services
+            if (data.services) {
+                // Try to match the service with an option in the dropdown
+                const serviceOptions = servicesSelect.options;
+                for (let i = 0; i < serviceOptions.length; i++) {
+                    if (serviceOptions[i].value === data.services) {
+                        servicesSelect.value = data.services;
+                        break;
+                    }
+                }
+            } else {
+                servicesSelect.value = '';
+            }
         }
     });
 });

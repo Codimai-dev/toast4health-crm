@@ -44,11 +44,17 @@ def add():
     for cust in customers:
         key = f'customer:{cust.id}'
         customer_choices.append((key, f'{cust.customer_name} ({cust.customer_code})'))
-        customer_data[key] = cust.contact_no
+        customer_data[key] = {
+            'mobile': cust.contact_no,
+            'services': cust.services or ''
+        }
     for b2c in converted_b2c:
         key = f'b2c:{b2c.enquiry_id}'
         customer_choices.append((key, f'{b2c.customer_name} ({b2c.enquiry_id})'))
-        customer_data[key] = b2c.contact_no
+        customer_data[key] = {
+            'mobile': b2c.contact_no,
+            'services': b2c.services or ''
+        }
 
     form.customer_name.choices = [('', 'Select Customer')] + customer_choices
     
@@ -168,11 +174,17 @@ def edit(booking_code):
     for cust in customers:
         key = f'customer:{cust.id}'
         customer_choices.append((key, f'{cust.customer_name} ({cust.customer_code})'))
-        customer_data[key] = cust.contact_no
+        customer_data[key] = {
+            'mobile': cust.contact_no,
+            'services': cust.services or ''
+        }
     for b2c in converted_b2c:
         key = f'b2c:{b2c.enquiry_id}'
         customer_choices.append((key, f'{b2c.customer_name} ({b2c.enquiry_id})'))
-        customer_data[key] = b2c.contact_no
+        customer_data[key] = {
+            'mobile': b2c.contact_no,
+            'services': b2c.services or ''
+        }
 
     form.customer_name.choices = [('', 'Select Customer')] + customer_choices
     
@@ -186,13 +198,15 @@ def edit(booking_code):
     # Set initial customer selection
     if booking.customer_id:
         form.customer_name.data = f'customer:{booking.customer_id}'
-        form.customer_mob.data = customer_data.get(f'customer:{booking.customer_id}', booking.customer_mob)
+        customer_info = customer_data.get(f'customer:{booking.customer_id}', {})
+        form.customer_mob.data = customer_info.get('mobile', booking.customer_mob) if isinstance(customer_info, dict) else booking.customer_mob
     else:
         # Try to find matching B2C lead
         b2c_match = B2CLead.query.filter_by(customer_name=booking.customer_name, contact_no=booking.customer_mob, status='converted').first()
         if b2c_match:
             form.customer_name.data = f'b2c:{b2c_match.enquiry_id}'
-            form.customer_mob.data = customer_data.get(f'b2c:{b2c_match.enquiry_id}', booking.customer_mob)
+            customer_info = customer_data.get(f'b2c:{b2c_match.enquiry_id}', {})
+            form.customer_mob.data = customer_info.get('mobile', booking.customer_mob) if isinstance(customer_info, dict) else booking.customer_mob
 
     # Set date fields as strings for the form
     if booking.start_date:

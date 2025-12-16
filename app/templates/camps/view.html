@@ -46,17 +46,6 @@
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-4">
-                        <strong>Staff Name:</strong>
-                    </div>
-                    <div class="col-md-8">
-                        {{ camp.staff.name if camp.staff else '-' }}
-                        {% if camp.staff %}
-                            <span class="badge bg-secondary">{{ camp.staff.employee_code }}</span>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-4">
                         <strong>Camp Date:</strong>
                     </div>
                     <div class="col-md-8">
@@ -73,10 +62,37 @@
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-4">
-                        <strong>Referred By:</strong>
+                        <strong>Org Name:</strong>
                     </div>
                     <div class="col-md-8">
-                        {{ camp.referred_by or '-' }}
+                        {{ camp.org_name or '-' }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>T4H Staff:</strong>
+                    </div>
+                    <div class="col-md-8">
+                        {{ camp.staff.name if camp.staff else '-' }}
+                        {% if camp.staff %}
+                            <span class="badge bg-secondary">{{ camp.staff.employee_code }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Camp Package:</strong>
+                    </div>
+                    <div class="col-md-8">
+                        {{ camp.package or '-' }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Diagnostic Partner:</strong>
+                    </div>
+                    <div class="col-md-8">
+                        {{ camp.diagnostic_partner or '-' }}
                     </div>
                 </div>
             </div>
@@ -135,42 +151,6 @@
             </div>
         </div>
 
-        <!-- Service & Payment Details -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Service & Payment Details</h5>
-            </div>
-            <div class="card-body">
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <strong>Package:</strong>
-                    </div>
-                    <div class="col-md-8">
-                        {{ camp.package or '-' }}
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <strong>Diagnostic Partner:</strong>
-                    </div>
-                    <div class="col-md-8">
-                        {{ camp.diagnostic_partner or '-' }}
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <strong>Payment:</strong>
-                    </div>
-                    <div class="col-md-8">
-                        {% if camp.payment %}
-                            <span class="badge bg-success fs-6">₹{{ '{:,.2f}'.format(camp.payment) }}</span>
-                        {% else %}
-                            -
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Sidebar with Audit Info -->

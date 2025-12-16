@@ -727,15 +727,14 @@ class Camp(db.Model, TimestampMixin, UserTrackingMixin):
     staff_id = db.Column(db.Integer, db.ForeignKey('employee.id'), nullable=True)
     camp_date = db.Column(db.Date, nullable=False, index=True)
     camp_location = db.Column(db.String(200), nullable=False)
-    referred_by = db.Column(db.String(100), nullable=True)
+    org_name = db.Column(db.String(200), nullable=True)
+    package = db.Column(db.String(100), nullable=True)
+    diagnostic_partner = db.Column(db.String(100), nullable=True)
     patient_name = db.Column(db.String(100), nullable=False, index=True)
     age = db.Column(db.String(10), nullable=True)
     gender = db.Column(db.String(20), nullable=True)
     test_done = db.Column(db.Boolean, nullable=False, default=False)
-    package = db.Column(db.String(100), nullable=True)
-    diagnostic_partner = db.Column(db.String(100), nullable=True)
     phone_no = db.Column(db.String(20), nullable=False, index=True)
-    payment = db.Column(db.Numeric(10, 2), nullable=True)
 
     # Relationships
     staff = db.relationship('Employee', backref='camps')

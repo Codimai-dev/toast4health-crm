@@ -30,18 +30,17 @@ def add():
     if form.validate_on_submit():
         camp = Camp(
             camp_id=generated_camp_id,
-            staff_id=int(form.staff_name.data) if form.staff_name.data else None,
+            staff_id=int(form.t4h_staff.data) if form.t4h_staff.data else None,
             camp_date=form.camp_date.data,
             camp_location=form.camp_location.data,
-            referred_by=form.referred_by.data,
+            org_name=form.org_name.data,
+            package=form.package.data,
+            diagnostic_partner=form.diagnostic_partner.data,
             patient_name=form.patient_name.data,
             age=form.age.data,
             gender=form.gender.data if form.gender.data else None,
             test_done=form.test_done.data,
-            package=form.package.data,
-            diagnostic_partner=form.diagnostic_partner.data,
             phone_no=form.phone_no.data,
-            payment=form.payment.data,
             created_by=current_user.id,
             updated_by=current_user.id
         )
@@ -73,32 +72,30 @@ def edit(camp_id):
     if request.method == 'GET':
         # Pre-populate form with existing data
         form.camp_id.data = camp.camp_id
-        form.staff_name.data = str(camp.staff_id) if camp.staff_id else ''
+        form.t4h_staff.data = str(camp.staff_id) if camp.staff_id else ''
         form.camp_date.data = camp.camp_date
         form.camp_location.data = camp.camp_location
-        form.referred_by.data = camp.referred_by
+        form.org_name.data = camp.org_name
+        form.package.data = camp.package
+        form.diagnostic_partner.data = camp.diagnostic_partner
         form.patient_name.data = camp.patient_name
         form.age.data = camp.age
         form.gender.data = camp.gender
         form.test_done.data = camp.test_done
-        form.package.data = camp.package
-        form.diagnostic_partner.data = camp.diagnostic_partner
         form.phone_no.data = camp.phone_no
-        form.payment.data = camp.payment
     
     if form.validate_on_submit():
-        camp.staff_id = int(form.staff_name.data) if form.staff_name.data else None
+        camp.staff_id = int(form.t4h_staff.data) if form.t4h_staff.data else None
         camp.camp_date = form.camp_date.data
         camp.camp_location = form.camp_location.data
-        camp.referred_by = form.referred_by.data
+        camp.org_name = form.org_name.data
+        camp.package = form.package.data
+        camp.diagnostic_partner = form.diagnostic_partner.data
         camp.patient_name = form.patient_name.data
         camp.age = form.age.data
         camp.gender = form.gender.data if form.gender.data else None
         camp.test_done = form.test_done.data
-        camp.package = form.package.data
-        camp.diagnostic_partner = form.diagnostic_partner.data
         camp.phone_no = form.phone_no.data
-        camp.payment = form.payment.data
         camp.updated_by = current_user.id
         
         db.session.commit()

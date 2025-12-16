@@ -21,10 +21,21 @@
             <div class="card-body">
                 <p class="text-muted">Manage dropdown options for camp-related forms.</p>
 
-                <p class="alert alert-info">
-                    <i class="bi bi-info-circle"></i> 
-                    <strong>Note:</strong> Camp referral sources are managed in the <a href="{{ url_for('settings.leads_dropdowns') }}">Lead Settings</a> page under "Source" options.
-                </p>
+                <!-- Important Information -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="alert alert-info">
+                            <i class="bi bi-people-fill"></i> 
+                            <strong>T4H Staff:</strong> Staff members are managed in the <a href="{{ url_for('employees.index') }}" class="alert-link">Employees</a> section. Add or edit employees there to update the T4H Staff dropdown in camp forms.
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="alert alert-info">
+                            <i class="bi bi-hospital"></i> 
+                            <strong>Diagnostic Partners:</strong> Enter diagnostic partner names directly in the camp form. This is a free-text field for flexibility.
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Camp Package Settings -->
                 <div class="mb-4">

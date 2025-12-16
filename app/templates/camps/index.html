@@ -38,13 +38,13 @@
                                 <th>Camp ID</th>
                                 <th>Camp Date</th>
                                 <th>Location</th>
+                                <th>Org Name</th>
                                 <th>Patient Name</th>
                                 <th>Age</th>
                                 <th>Gender</th>
                                 <th>Phone</th>
-                                <th>Staff Name</th>
+                                <th>T4H Staff</th>
                                 <th>Test Done</th>
-                                <th>Payment</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -54,6 +54,7 @@
                                 <td>{{ camp.camp_id }}</td>
                                 <td>{{ camp.camp_date.strftime('%d-%m-%Y') if camp.camp_date else '-' }}</td>
                                 <td>{{ camp.camp_location }}</td>
+                                <td>{{ camp.org_name or '-' }}</td>
                                 <td>{{ camp.patient_name }}</td>
                                 <td>{{ camp.age or '-' }}</td>
                                 <td>{{ camp.gender or '-' }}</td>
@@ -66,7 +67,6 @@
                                         <span class="badge bg-warning">No</span>
                                     {% endif %}
                                 </td>
-                                <td>{{ '₹{:,.2f}'.format(camp.payment) if camp.payment else '-' }}</td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
                                         <a href="{{ url_for('camps.view', camp_id=camp.camp_id) }}" class="btn btn-outline-primary btn-sm" title="View">

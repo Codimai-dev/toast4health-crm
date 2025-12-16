@@ -1,8 +1,8 @@
 """Camp forms."""
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, DateField, SelectField, BooleanField, DecimalField, SubmitField
-from wtforms.validators import DataRequired, Optional, NumberRange
+from wtforms import StringField, DateField, SelectField, BooleanField, SubmitField
+from wtforms.validators import DataRequired, Optional
 
 from app.models import Employee, Setting
 
@@ -12,35 +12,33 @@ class CampForm(FlaskForm):
 
     camp_id = StringField('Camp ID', validators=[DataRequired()],
                          render_kw={'class': 'form-control', 'readonly': True, 'autocomplete': 'off'})
-    staff_name = SelectField('Staff Name', validators=[DataRequired()],
-                            render_kw={'class': 'form-select', 'autocomplete': 'off'})
     camp_date = DateField('Camp Date', validators=[DataRequired()],
                          render_kw={'class': 'form-control', 'autocomplete': 'off'})
     camp_location = StringField('Camp Location', validators=[DataRequired()],
                                render_kw={'class': 'form-control', 'placeholder': 'Enter camp location', 'autocomplete': 'off'})
-    referred_by = SelectField('Referred By', choices=[], validators=[Optional()],
-                             render_kw={'class': 'form-select', 'autocomplete': 'off'})
+    org_name = StringField('Org Name', validators=[Optional()],
+                          render_kw={'class': 'form-control', 'placeholder': 'Enter organization name (optional)', 'autocomplete': 'off'})
+    t4h_staff = SelectField('T4H Staff', validators=[DataRequired()],
+                            render_kw={'class': 'form-select', 'autocomplete': 'off'})
+    package = SelectField('Camp Package', choices=[], validators=[Optional()],
+                         render_kw={'class': 'form-select', 'autocomplete': 'off'})
+    diagnostic_partner = StringField('Diagnostic Partner', validators=[Optional()],
+                                    render_kw={'class': 'form-control', 'placeholder': 'Enter diagnostic partner (optional)', 'autocomplete': 'off'})
     patient_name = StringField('Patient Name', validators=[DataRequired()],
                               render_kw={'class': 'form-control', 'placeholder': 'Enter patient name', 'autocomplete': 'off'})
+    phone_no = StringField('Phone No', validators=[DataRequired()],
+                          render_kw={'class': 'form-control', 'placeholder': 'Enter phone number', 'autocomplete': 'off'})
     age = StringField('Age', validators=[Optional()],
                      render_kw={'class': 'form-control', 'placeholder': 'Enter age', 'autocomplete': 'off'})
     gender = SelectField('Gender', choices=[('', 'Select Gender'), ('MALE', 'Male'), ('FEMALE', 'Female'), ('OTHER', 'Other')],
                         validators=[Optional()], render_kw={'class': 'form-select', 'autocomplete': 'off'})
     test_done = BooleanField('Test Done?', render_kw={'class': 'form-check-input'})
-    package = SelectField('Package', choices=[], validators=[Optional()],
-                         render_kw={'class': 'form-select', 'autocomplete': 'off'})
-    diagnostic_partner = StringField('Diagnostic Partner', validators=[Optional()],
-                                    render_kw={'class': 'form-control', 'placeholder': 'Enter diagnostic partner (optional)', 'autocomplete': 'off'})
-    phone_no = StringField('Phone No', validators=[DataRequired()],
-                          render_kw={'class': 'form-control', 'placeholder': 'Enter phone number', 'autocomplete': 'off'})
-    payment = DecimalField('Payment', validators=[Optional(), NumberRange(min=0)], places=2,
-                          render_kw={'class': 'form-control', 'placeholder': 'Enter payment amount', 'autocomplete': 'off'})
     submit = SubmitField('Save Camp Entry', render_kw={'class': 'btn btn-primary'})
 
     def __init__(self, *args, **kwargs):
         super(CampForm, self).__init__(*args, **kwargs)
         # Populate staff name choices from employees
-        self.staff_name.choices = [('', 'Select Staff')] + [
+        self.t4h_staff.choices = [('', 'Select Staff')] + [
             (str(emp.id), f"{emp.name} ({emp.employee_code})")
             for emp in Employee.query.filter_by().order_by(Employee.name).all()
         ]
@@ -48,9 +46,4 @@ class CampForm(FlaskForm):
         self.package.choices = [('', 'Select Package')] + [
             (setting.key, setting.value) 
             for setting in Setting.get_options('CampPackage')
-        ]
-        # Populate referred by choices from settings (using Source group for now, or create new CampReferralSource)
-        self.referred_by.choices = [('', 'Select Referrer')] + [
-            (setting.key, setting.value)
-            for setting in Setting.get_options('Source')
         ]

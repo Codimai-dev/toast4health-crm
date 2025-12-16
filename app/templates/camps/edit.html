@@ -38,17 +38,6 @@
                             {{ form.camp_id() }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            {{ form.staff_name.label(class="form-label") }}
-                            {{ form.staff_name() }}
-                            {% if form.staff_name.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.staff_name.errors %}
-                                        <small>{{ error }}</small>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="col-md-4 mb-3">
                             {{ form.camp_date.label(class="form-label") }}
                             {{ form.camp_date() }}
                             {% if form.camp_date.errors %}
@@ -59,9 +48,7 @@
                                 </div>
                             {% endif %}
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             {{ form.camp_location.label(class="form-label") }}
                             {{ form.camp_location() }}
                             {% if form.camp_location.errors %}
@@ -72,9 +59,32 @@
                                 </div>
                             {% endif %}
                         </div>
-                        <div class="col-md-6 mb-3">
-                            {{ form.referred_by.label(class="form-label") }}
-                            {{ form.referred_by() }}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form.org_name.label(class="form-label") }}
+                            {{ form.org_name() }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.t4h_staff.label(class="form-label") }}
+                            {{ form.t4h_staff() }}
+                            {% if form.t4h_staff.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.t4h_staff.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.package.label(class="form-label") }}
+                            {{ form.package() }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            {{ form.diagnostic_partner.label(class="form-label") }}
+                            {{ form.diagnostic_partner() }}
                         </div>
                     </div>
                 </div>
@@ -124,37 +134,6 @@
                                 {{ form.test_done() }}
                                 {{ form.test_done.label(class="form-check-label") }}
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Service & Payment Details</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ form.package.label(class="form-label") }}
-                            {{ form.package() }}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            {{ form.diagnostic_partner.label(class="form-label") }}
-                            {{ form.diagnostic_partner() }}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ form.payment.label(class="form-label") }}
-                            {{ form.payment() }}
-                            {% if form.payment.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.payment.errors %}
-                                        <small>{{ error }}</small>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
                         </div>
                     </div>
                 </div>

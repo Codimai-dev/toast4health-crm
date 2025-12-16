@@ -45,6 +45,7 @@ class UserForm(FlaskForm):
     expenses_access = BooleanField('Expenses', render_kw={'class': 'form-check-input'})
     channel_partners_access = BooleanField('Channel Partners', render_kw={'class': 'form-check-input'})
     services_access = BooleanField('Services', render_kw={'class': 'form-check-input'})
+    camps_access = BooleanField('Health Camps', render_kw={'class': 'form-check-input'})
 
     is_active = BooleanField('Active', default=True, render_kw={'class': 'form-check-input'})
     submit = SubmitField('Create User', render_kw={'class': 'btn btn-primary'})
@@ -79,6 +80,7 @@ class EditUserForm(FlaskForm):
     expenses_access = BooleanField('Expenses', render_kw={'class': 'form-check-input'})
     channel_partners_access = BooleanField('Channel Partners', render_kw={'class': 'form-check-input'})
     services_access = BooleanField('Services', render_kw={'class': 'form-check-input'})
+    camps_access = BooleanField('Health Camps', render_kw={'class': 'form-check-input'})
 
     is_active = BooleanField('Active', render_kw={'class': 'form-check-input'})
     submit = SubmitField('Update User', render_kw={'class': 'btn btn-primary'})
@@ -371,6 +373,8 @@ def create_user():
             allowed_modules.append('channel_partners')
         if form.services_access.data:
             allowed_modules.append('services')
+        if form.camps_access.data:
+            allowed_modules.append('camps')
 
         user = User(
             full_name=form.full_name.data,
@@ -432,6 +436,8 @@ def edit_user(user_id):
             allowed_modules.append('channel_partners')
         if form.services_access.data:
             allowed_modules.append('services')
+        if form.camps_access.data:
+            allowed_modules.append('camps')
 
         form.populate_obj(user)
         user.role = UserRole[form.role.data]
@@ -458,6 +464,7 @@ def edit_user(user_id):
     form.expenses_access.data = 'expenses' in allowed
     form.channel_partners_access.data = 'channel_partners' in allowed
     form.services_access.data = 'services' in allowed
+    form.camps_access.data = 'camps' in allowed
 
     return render_template('settings/edit_user.html', title='Edit User', form=form, user=user)
 

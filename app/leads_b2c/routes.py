@@ -224,18 +224,19 @@ def add():
         db.session.add(lead)
         db.session.commit()
 
-        # Create automatic follow-up for the new B2C lead
-        followup = FollowUp(
-            lead_type=LeadType.B2C,
-            b2c_lead_id=lead.enquiry_id,
-            follow_up_on=date.today(),
-            outcome=FollowUpOutcome.SCHEDULED,
-            notes='Automatic follow-up created for new B2C lead',
-            next_follow_up_on=None,
-            owner_id=current_user.id
-        )
-        db.session.add(followup)
-        db.session.commit()
+        # Create automatic follow-up for the new B2C lead only if status is not 'converted'
+        if form.status.data != 'converted':
+            followup = FollowUp(
+                lead_type=LeadType.B2C,
+                b2c_lead_id=lead.enquiry_id,
+                follow_up_on=date.today(),
+                outcome=FollowUpOutcome.SCHEDULED,
+                notes='Automatic follow-up created for new B2C lead',
+                next_follow_up_on=None,
+                owner_id=current_user.id
+            )
+            db.session.add(followup)
+            db.session.commit()
 
         flash('B2C lead added successfully!', 'success')
         return redirect(url_for('leads_b2c.index'))

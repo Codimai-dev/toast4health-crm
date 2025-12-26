@@ -63,7 +63,7 @@ class Gender(enum.Enum):
 
 
 class AttendanceStatus(enum.Enum):
-    ""Attendance status enumeration.""
+    """Attendance status enumeration."""
     PRESENT = "PRESENT"
     ABSENT = "ABSENT"
     HALF_DAY = "HALF_DAY"
@@ -71,7 +71,7 @@ class AttendanceStatus(enum.Enum):
 
 
 class LeaveType(enum.Enum):
-    ""Leave type enumeration.""
+    """Leave type enumeration."""
     CASUAL = "CASUAL"
     SICK = "SICK"
     EARNED = "EARNED"
@@ -81,7 +81,7 @@ class LeaveType(enum.Enum):
 
 
 class LeaveStatus(enum.Enum):
-    ""Leave status enumeration.""
+    """Leave status enumeration."""
     PENDING = "PENDING"
     APPROVED = "APPROVED"
     REJECTED = "REJECTED"
@@ -89,7 +89,7 @@ class LeaveStatus(enum.Enum):
 
 
 class TaskStatus(enum.Enum):
-    ""Task status enumeration.""
+    """Task status enumeration."""
     TODO = "TODO"
     IN_PROGRESS = "IN_PROGRESS"
     COMPLETED = "COMPLETED"
@@ -97,7 +97,7 @@ class TaskStatus(enum.Enum):
 
 
 class TaskPriority(enum.Enum):
-    ""Task priority enumeration.""
+    """Task priority enumeration."""
     LOW = "LOW"
     MEDIUM = "MEDIUM"
     HIGH = "HIGH"
@@ -616,7 +616,7 @@ Index('idx_employee_name_email_contact_designation',
 
 
 class Attendance(db.Model, TimestampMixin, UserTrackingMixin):
-    ""Attendance tracking model.""
+    """Attendance tracking model."""
 
     __tablename__ = 'attendance'
 
@@ -641,7 +641,7 @@ class Attendance(db.Model, TimestampMixin, UserTrackingMixin):
 
 
 class Leave(db.Model, TimestampMixin, UserTrackingMixin):
-    ""Leave management model.""
+    """Leave management model."""
 
     __tablename__ = 'leave'
 
@@ -666,7 +666,7 @@ class Leave(db.Model, TimestampMixin, UserTrackingMixin):
 
 
 class Task(db.Model, TimestampMixin, UserTrackingMixin):
-    ""Task assignment model.""
+    """Task assignment model."""
 
     __tablename__ = 'task'
 
@@ -694,7 +694,7 @@ class Task(db.Model, TimestampMixin, UserTrackingMixin):
 
 
 class PerformanceMetric(db.Model, TimestampMixin):
-    ""Performance metrics for employees.""
+    """Performance metrics for employees."""
 
     __tablename__ = 'performance_metric'
 
@@ -719,7 +719,7 @@ class PerformanceMetric(db.Model, TimestampMixin):
 
     @property
     def conversion_rate(self):
-        ""Calculate lead conversion rate.""
+        """Calculate lead conversion rate."""
         if self.leads_assigned > 0:
             return (self.leads_converted / self.leads_assigned) * 100
         return 0

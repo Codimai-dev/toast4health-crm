@@ -1,8 +1,8 @@
-"""Main application entry point for the Flask CRM."""
+﻿"""Main application entry point for the Flask CRM."""
 
 import os
 from app import create_app, db
-from app.models import *  # Import all models for Flask-Migrate
+from app.models import *  # Import all models including employee management  # Import all models for Flask-Migrate
 
 # Create the Flask application
 app = create_app(os.environ.get('FLASK_CONFIG'))

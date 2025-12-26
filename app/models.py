@@ -1,4 +1,4 @@
-"""SQLAlchemy models for the CRM application."""
+﻿"""SQLAlchemy models for the CRM application."""
 
 import enum
 import json
@@ -59,6 +59,49 @@ class Gender(enum.Enum):
 
 
 
+
+
+
+class AttendanceStatus(enum.Enum):
+    ""Attendance status enumeration.""
+    PRESENT = "PRESENT"
+    ABSENT = "ABSENT"
+    HALF_DAY = "HALF_DAY"
+    LATE = "LATE"
+
+
+class LeaveType(enum.Enum):
+    ""Leave type enumeration.""
+    CASUAL = "CASUAL"
+    SICK = "SICK"
+    EARNED = "EARNED"
+    MATERNITY = "MATERNITY"
+    PATERNITY = "PATERNITY"
+    OTHER = "OTHER"
+
+
+class LeaveStatus(enum.Enum):
+    ""Leave status enumeration.""
+    PENDING = "PENDING"
+    APPROVED = "APPROVED"
+    REJECTED = "REJECTED"
+    CANCELLED = "CANCELLED"
+
+
+class TaskStatus(enum.Enum):
+    ""Task status enumeration.""
+    TODO = "TODO"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
+    CANCELLED = "CANCELLED"
+
+
+class TaskPriority(enum.Enum):
+    ""Task priority enumeration.""
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
+    URGENT = "URGENT"
 
 class LeadSource(enum.Enum):
     """Lead source enumeration."""
@@ -463,7 +506,7 @@ class Booking(db.Model, TimestampMixin, UserTrackingMixin):
         # Handle GST calculation based on type
         if self.gst_type == 'inclusive':
             # GST is already included in the base amount
-            # Extract GST from the total: GST = Base × (Rate / (100 + Rate))
+            # Extract GST from the total: GST = Base ├ù (Rate / (100 + Rate))
             if self.gst_percentage and self.gst_percentage > 0:
                 gst_multiplier = Decimal(self.gst_percentage) / (100 + Decimal(self.gst_percentage))
                 self.gst_value = base_amount * gst_multiplier
@@ -570,6 +613,120 @@ class Employee(db.Model, TimestampMixin, UserTrackingMixin):
 # Indexes for Employee
 Index('idx_employee_name_email_contact_designation',
       Employee.name, Employee.email, Employee.contact_no, Employee.designation)
+
+
+class Attendance(db.Model, TimestampMixin, UserTrackingMixin):
+    ""Attendance tracking model.""
+
+    __tablename__ = 'attendance'
+
+    id = db.Column(db.Integer, primary_key=True)
+    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'), nullable=False, index=True)
+    date = db.Column(db.Date, nullable=False, index=True)
+    status = db.Column(db.Enum(AttendanceStatus), nullable=False, default=AttendanceStatus.PRESENT)
+    check_in_time = db.Column(db.Time, nullable=True)
+    check_out_time = db.Column(db.Time, nullable=True)
+    working_hours = db.Column(db.Numeric(4, 2), nullable=True)  # Hours worked
+    notes = db.Column(db.Text, nullable=True)
+
+    # Relationships
+    employee = db.relationship('Employee', backref='attendance_records')
+
+    __table_args__ = (
+        Index('idx_attendance_employee_date', 'employee_id', 'date', unique=True),
+    )
+
+    def __repr__(self):
+        return f'<Attendance {self.employee.name} on {self.date}: {self.status.value}>'
+
+
+class Leave(db.Model, TimestampMixin, UserTrackingMixin):
+    ""Leave management model.""
+
+    __tablename__ = 'leave'
+
+    id = db.Column(db.Integer, primary_key=True)
+    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'), nullable=False, index=True)
+    leave_type = db.Column(db.Enum(LeaveType), nullable=False)
+    start_date = db.Column(db.Date, nullable=False, index=True)
+    end_date = db.Column(db.Date, nullable=False, index=True)
+    days_requested = db.Column(db.Numeric(4, 1), nullable=False)
+    reason = db.Column(db.Text, nullable=True)
+    status = db.Column(db.Enum(LeaveStatus), nullable=False, default=LeaveStatus.PENDING)
+    approved_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    approved_at = db.Column(db.DateTime, nullable=True)
+    comments = db.Column(db.Text, nullable=True)
+
+    # Relationships
+    employee = db.relationship('Employee', backref='leave_requests')
+    approver = db.relationship('User', foreign_keys=[approved_by], backref='approved_leaves')
+
+    def __repr__(self):
+        return f'<Leave {self.employee.name}: {self.leave_type.value} ({self.start_date} to {self.end_date})>'
+
+
+class Task(db.Model, TimestampMixin, UserTrackingMixin):
+    ""Task assignment model.""
+
+    __tablename__ = 'task'
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    assigned_to = db.Column(db.Integer, db.ForeignKey('employee.id'), nullable=False, index=True)
+    assigned_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    priority = db.Column(db.Enum(TaskPriority), nullable=False, default=TaskPriority.MEDIUM)
+    status = db.Column(db.Enum(TaskStatus), nullable=False, default=TaskStatus.TODO)
+    due_date = db.Column(db.Date, nullable=True, index=True)
+    completed_at = db.Column(db.DateTime, nullable=True)
+    lead_id = db.Column(db.String(20), nullable=True)  # For lead-related tasks
+    booking_id = db.Column(db.Integer, db.ForeignKey('booking.id'), nullable=True)
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=True)
+
+    # Relationships
+    employee = db.relationship('Employee', backref='assigned_tasks')
+    assigner = db.relationship('User', foreign_keys=[assigned_by], backref='assigned_tasks')
+    booking = db.relationship('Booking', backref='tasks')
+    customer = db.relationship('Customer', backref='tasks')
+
+    def __repr__(self):
+        return f'<Task {self.title}: {self.employee.name} ({self.status.value})>'
+
+
+class PerformanceMetric(db.Model, TimestampMixin):
+    ""Performance metrics for employees.""
+
+    __tablename__ = 'performance_metric'
+
+    id = db.Column(db.Integer, primary_key=True)
+    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'), nullable=False, index=True)
+    metric_date = db.Column(db.Date, nullable=False, index=True)
+    leads_assigned = db.Column(db.Integer, nullable=False, default=0)
+    leads_converted = db.Column(db.Integer, nullable=False, default=0)
+    bookings_completed = db.Column(db.Integer, nullable=False, default=0)
+    revenue_generated = db.Column(db.Numeric(10, 2), nullable=False, default=0)
+    follow_ups_done = db.Column(db.Integer, nullable=False, default=0)
+    customer_satisfaction = db.Column(db.Numeric(3, 1), nullable=True)  # Rating out of 5
+    tasks_completed = db.Column(db.Integer, nullable=False, default=0)
+    attendance_percentage = db.Column(db.Numeric(5, 2), nullable=True)  # Monthly percentage
+
+    # Relationships
+    employee = db.relationship('Employee', backref='performance_metrics')
+
+    __table_args__ = (
+        Index('idx_performance_employee_date', 'employee_id', 'metric_date', unique=True),
+    )
+
+    @property
+    def conversion_rate(self):
+        ""Calculate lead conversion rate.""
+        if self.leads_assigned > 0:
+            return (self.leads_converted / self.leads_assigned) * 100
+        return 0
+
+    def __repr__(self):
+        return f'<PerformanceMetric {self.employee.name} on {self.metric_date}>'
+
 
 
 
@@ -730,7 +887,7 @@ class Payment(db.Model, TimestampMixin, UserTrackingMixin):
     booking = db.relationship('Booking', backref='payments')
 
     def __repr__(self):
-        return f'<Payment {self.id}: ₹{self.payment_amount} on {self.payment_date}>'
+        return f'<Payment {self.id}: Γé╣{self.payment_amount} on {self.payment_date}>'
 
 
 class Camp(db.Model, TimestampMixin, UserTrackingMixin):
@@ -938,7 +1095,7 @@ class PaymentReceived(db.Model, TimestampMixin, UserTrackingMixin):
     sale = db.relationship('Sale', backref='payments_received')
     
     def __repr__(self):
-        return f'<PaymentReceived {self.reference_number}: ₹{self.amount}>'
+        return f'<PaymentReceived {self.reference_number}: Γé╣{self.amount}>'
 
     @staticmethod
     def generate_reference_number():
@@ -988,7 +1145,7 @@ class PaymentMade(db.Model, TimestampMixin, UserTrackingMixin):
     purchase = db.relationship('Purchase', backref='payments_made')
     
     def __repr__(self):
-        return f'<PaymentMade {self.reference_number}: ₹{self.amount}>'
+        return f'<PaymentMade {self.reference_number}: Γé╣{self.amount}>'
 
     @staticmethod
     def generate_reference_number():
@@ -1083,3 +1240,5 @@ class AuditLog(db.Model):
 
     def __repr__(self):
         return f'<AuditLog {self.entity}:{self.entity_id} {self.action}>'
+
+

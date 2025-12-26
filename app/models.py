@@ -771,6 +771,42 @@ class Camp(db.Model, TimestampMixin, UserTrackingMixin):
 Index('idx_camp_date_location_patient', Camp.camp_date, Camp.camp_location, Camp.patient_name)
 
 
+class CampDefault(db.Model, TimestampMixin, UserTrackingMixin):
+    """CampDefault model for storing predefined camp information values.
+    
+    This model stores default/template values for camp fields that can be
+    predefined by admins. Only one active default can exist at a time.
+    """
+
+    __tablename__ = 'camp_default'
+
+    id = db.Column(db.Integer, primary_key=True)
+    staff_id = db.Column(db.Integer, db.ForeignKey('employee.id'), nullable=True)
+    camp_date = db.Column(db.Date, nullable=True)
+    camp_location = db.Column(db.String(200), nullable=True)
+    org_name = db.Column(db.String(200), nullable=True)
+    package = db.Column(db.String(100), nullable=True)
+    diagnostic_partner = db.Column(db.String(100), nullable=True)
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
+
+    # Relationships
+    staff = db.relationship('Employee', backref='camp_defaults')
+
+    def __repr__(self):
+        return f'<CampDefault {self.id}: {self.camp_location or "N/A"}>'
+
+    @classmethod
+    def get_active_default(cls):
+        """Get the active camp default if it exists."""
+        return cls.query.filter_by(is_active=True).first()
+
+    @classmethod
+    def clear_all_defaults(cls):
+        """Deactivate all camp defaults."""
+        cls.query.update({'is_active': False})
+        db.session.commit()
+
+
 class AuditLog(db.Model):
     """Audit log model for tracking changes."""
 

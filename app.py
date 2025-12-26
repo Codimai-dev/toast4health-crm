@@ -24,6 +24,7 @@ def make_shell_context():
         'ChannelPartner': ChannelPartner,
         'Setting': Setting,
         'Camp': Camp,
+        'CampDefault': CampDefault,
         'AuditLog': AuditLog
     }
 

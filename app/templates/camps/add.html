@@ -16,12 +16,33 @@
                 <i class="bi bi-heart-pulse-fill text-primary"></i>
                 Add Camp Entry
             </h2>
-            <a href="{{ url_for('camps.index') }}" class="btn btn-secondary">
-                <i class="bi bi-arrow-left"></i> Back to Camps
-            </a>
+            <div class="d-flex gap-2">
+                {% if is_admin %}
+                    {% if has_default %}
+                        <button type="button" class="btn btn-warning" onclick="removePredefine()">
+                            <i class="bi bi-x-circle"></i> Remove Predefined Values
+                        </button>
+                    {% else %}
+                        <button type="button" class="btn btn-info" onclick="predefineValues()">
+                            <i class="bi bi-save"></i> Predefine Camp Information
+                        </button>
+                    {% endif %}
+                {% endif %}
+                <a href="{{ url_for('camps.index') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Camps
+                </a>
+            </div>
         </div>
     </div>
 </div>
+
+{% if has_default %}
+<div class="alert alert-info alert-dismissible fade show" role="alert">
+    <i class="bi bi-info-circle"></i> 
+    <strong>Predefined Values Active:</strong> Camp Information fields below are pre-filled with default values set by an administrator.
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
 
 <div class="row">
     <div class="col-lg-10">
@@ -146,4 +167,63 @@
         </form>
     </div>
 </div>
+
+<script>
+function predefineValues() {
+    if (!confirm('This will save the current Camp Information fields as default values for all users. Continue?')) {
+        return;
+    }
+    
+    // Create a form to submit the predefined values
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{{ url_for("camps.predefine") }}';
+    
+    // Add CSRF token
+    const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrf_token';
+    csrfInput.value = csrfToken;
+    form.appendChild(csrfInput);
+    
+    // Get Camp Information field values
+    const fields = ['t4h_staff', 'camp_date', 'camp_location', 'org_name', 'package', 'diagnostic_partner'];
+    fields.forEach(fieldName => {
+        const field = document.querySelector(`[name="${fieldName}"]`);
+        if (field && field.value) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = fieldName;
+            input.value = field.value;
+            form.appendChild(input);
+        }
+    });
+    
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function removePredefine() {
+    if (!confirm('This will remove all predefined default values. Continue?')) {
+        return;
+    }
+    
+    // Create a form to submit the removal request
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{{ url_for("camps.remove_predefine") }}';
+    
+    // Add CSRF token
+    const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrf_token';
+    csrfInput.value = csrfToken;
+    form.appendChild(csrfInput);
+    
+    document.body.appendChild(form);
+    form.submit();
+}
+</script>
 {% endblock %}

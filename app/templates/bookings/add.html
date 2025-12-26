@@ -134,9 +134,26 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
+                            {{ form.gst_type.label(class="form-label") }}
+                            {{ form.gst_type() }}
+                            <small class="form-text text-muted">
+                                <strong>Exclusive:</strong> GST added on top | <strong>Inclusive:</strong> GST already included in amount
+                            </small>
+                            {% if form.gst_type.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.gst_type.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
                             {{ form.gst_percentage.label(class="form-label") }}
                             {{ form.gst_percentage() }}
+                            <small class="form-text text-muted">Auto-set based on GST type (can be modified)</small>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6 mb-3">
                             {{ form.amount_paid.label(class="form-label") }}
                             {{ form.amount_paid() }}
@@ -206,6 +223,29 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+
+    // GST Type auto-population
+    const gstTypeSelect = document.querySelector('#gst_type');
+    const gstPercentageInput = document.querySelector('#gst_percentage');
+    
+    // Default GST rates (can be customized)
+    const defaultGSTRates = {
+        'inclusive': 18,  // Default 18% for inclusive
+        'exclusive': 18   // Default 18% for exclusive
+    };
+
+    function updateGSTPercentage() {
+        const gstType = gstTypeSelect.value;
+        // Only auto-fill if the field is empty or has default value
+        if (!gstPercentageInput.value || gstPercentageInput.value === '0') {
+            gstPercentageInput.value = defaultGSTRates[gstType] || 18;
+        }
+    }
+
+    gstTypeSelect.addEventListener('change', updateGSTPercentage);
+    
+    // Initialize on page load
+    updateGSTPercentage();
 });
 </script>
 {% endblock %}

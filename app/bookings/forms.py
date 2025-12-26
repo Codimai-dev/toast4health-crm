@@ -28,6 +28,9 @@ class BookingForm(FlaskForm):
                                 render_kw={'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'autocomplete': 'off'})
     other_expanse = DecimalField('Other Expenses', validators=[Optional()],
                                render_kw={'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'autocomplete': 'off'})
+    gst_type = SelectField('GST Type', choices=[('exclusive', 'Exclusive GST'), ('inclusive', 'Inclusive GST')],
+                          validators=[DataRequired()], default='exclusive',
+                          render_kw={'class': 'form-control', 'autocomplete': 'off'})
     gst_percentage = IntegerField('GST Percentage', validators=[Optional()],
                                 render_kw={'class': 'form-control', 'placeholder': '0', 'autocomplete': 'off'})
     amount_paid = DecimalField('Amount Paid', validators=[Optional()],

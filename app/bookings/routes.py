@@ -117,6 +117,7 @@ def add():
             shift_hours=form.shift.data,
             service_charge=form.service_charge.data,
             other_expanse=form.other_expanse.data or 0,
+            gst_type=form.gst_type.data or 'exclusive',
             gst_percentage=form.gst_percentage.data or 0,
             amount_paid=form.amount_paid.data or 0,
             created_by=current_user.id,
@@ -265,6 +266,7 @@ def edit(booking_code):
         booking.end_date = end_date
         booking.charge_type = form.charge_type.data
         booking.shift_hours = form.shift.data
+        booking.gst_type = form.gst_type.data or 'exclusive'
         booking.updated_by = current_user.id
         booking.calculate_totals()
         db.session.commit()

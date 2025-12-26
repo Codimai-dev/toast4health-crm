@@ -423,6 +423,7 @@ class Booking(db.Model, TimestampMixin, UserTrackingMixin):
     shift_hours = db.Column(db.Integer, nullable=True)
     service_charge = db.Column(db.Numeric(10, 2), nullable=False, default=0)
     other_expanse = db.Column(db.Numeric(10, 2), nullable=False, default=0)
+    gst_type = db.Column(db.String(20), nullable=False, default='exclusive')  # 'inclusive' or 'exclusive'
     gst_percentage = db.Column(db.Integer, nullable=False, default=0)
     gst_value = db.Column(db.Numeric(10, 2), nullable=False, default=0)
     total_amount = db.Column(db.Numeric(10, 2), nullable=False)
@@ -458,8 +459,23 @@ class Booking(db.Model, TimestampMixin, UserTrackingMixin):
             base_service_charge *= total_shifts
 
         base_amount = base_service_charge + (self.other_expanse or 0)
-        self.gst_value = base_amount * (self.gst_percentage or 0) / 100
-        self.total_amount = base_amount + self.gst_value
+        
+        # Handle GST calculation based on type
+        if self.gst_type == 'inclusive':
+            # GST is already included in the base amount
+            # Extract GST from the total: GST = Base × (Rate / (100 + Rate))
+            if self.gst_percentage and self.gst_percentage > 0:
+                gst_multiplier = Decimal(self.gst_percentage) / (100 + Decimal(self.gst_percentage))
+                self.gst_value = base_amount * gst_multiplier
+                self.total_amount = base_amount
+            else:
+                self.gst_value = 0
+                self.total_amount = base_amount
+        else:
+            # GST is exclusive - add on top of base amount (existing behavior)
+            self.gst_value = base_amount * (self.gst_percentage or 0) / 100
+            self.total_amount = base_amount + self.gst_value
+        
         self.pending_amount = self.total_amount - (self.amount_paid or 0)
     
     def __repr__(self):

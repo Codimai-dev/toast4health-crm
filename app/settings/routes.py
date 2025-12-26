@@ -45,6 +45,8 @@ class UserForm(FlaskForm):
     expenses_access = BooleanField('Expenses', render_kw={'class': 'form-check-input'})
     channel_partners_access = BooleanField('Channel Partners', render_kw={'class': 'form-check-input'})
     services_access = BooleanField('Services', render_kw={'class': 'form-check-input'})
+    camps_access = BooleanField('Health Camps', render_kw={'class': 'form-check-input'})
+    finance_access = BooleanField('Financial Management', render_kw={'class': 'form-check-input'})
 
     is_active = BooleanField('Active', default=True, render_kw={'class': 'form-check-input'})
     submit = SubmitField('Create User', render_kw={'class': 'btn btn-primary'})
@@ -79,6 +81,8 @@ class EditUserForm(FlaskForm):
     expenses_access = BooleanField('Expenses', render_kw={'class': 'form-check-input'})
     channel_partners_access = BooleanField('Channel Partners', render_kw={'class': 'form-check-input'})
     services_access = BooleanField('Services', render_kw={'class': 'form-check-input'})
+    camps_access = BooleanField('Health Camps', render_kw={'class': 'form-check-input'})
+    finance_access = BooleanField('Financial Management', render_kw={'class': 'form-check-input'})
 
     is_active = BooleanField('Active', render_kw={'class': 'form-check-input'})
     submit = SubmitField('Update User', render_kw={'class': 'btn btn-primary'})
@@ -179,6 +183,19 @@ def hr_dropdowns():
         settings_by_group[group] = Setting.query.filter_by(group=group).order_by(Setting.sort_order).all()
 
     return render_template('settings/hr_dropdowns.html', title='HR Settings', settings_by_group=settings_by_group)
+
+
+@bp.route('/dropdowns/camps')
+@login_required
+def camp_dropdowns():
+    """Manage camp-related dropdown settings."""
+    if not current_user.has_permission(UserRole.ADMIN):
+        flash('Access denied. Admin privileges required.', 'error')
+        return redirect(url_for('dashboard.index'))
+
+    camp_packages = Setting.query.filter_by(group='CampPackage').order_by(Setting.sort_order).all()
+
+    return render_template('settings/camp_dropdowns.html', title='Camp Settings', camp_packages=camp_packages)
 
 
 @bp.route('/dropdowns/expenses')
@@ -358,6 +375,10 @@ def create_user():
             allowed_modules.append('channel_partners')
         if form.services_access.data:
             allowed_modules.append('services')
+        if form.camps_access.data:
+            allowed_modules.append('camps')
+        if form.finance_access.data:
+            allowed_modules.append('finance')
 
         user = User(
             full_name=form.full_name.data,
@@ -419,6 +440,10 @@ def edit_user(user_id):
             allowed_modules.append('channel_partners')
         if form.services_access.data:
             allowed_modules.append('services')
+        if form.camps_access.data:
+            allowed_modules.append('camps')
+        if form.finance_access.data:
+            allowed_modules.append('finance')
 
         form.populate_obj(user)
         user.role = UserRole[form.role.data]
@@ -445,6 +470,8 @@ def edit_user(user_id):
     form.expenses_access.data = 'expenses' in allowed
     form.channel_partners_access.data = 'channel_partners' in allowed
     form.services_access.data = 'services' in allowed
+    form.camps_access.data = 'camps' in allowed
+    form.finance_access.data = 'finance' in allowed
 
     return render_template('settings/edit_user.html', title='Edit User', form=form, user=user)
 

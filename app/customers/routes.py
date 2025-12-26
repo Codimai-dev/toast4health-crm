@@ -59,8 +59,16 @@ def index():
 @require_module_access('customers')
 def add():
     """Add a new customer."""
+    from app.models import Service
+    
     form = CustomerForm()
     form.customer_code.data = Customer.generate_customer_code()
+    
+    # Populate service choices
+    services = Service.query.order_by(Service.name).all()
+    service_choices = [('', 'Select Service (Optional)')] + [(s.name, s.name) for s in services]
+    form.services.choices = service_choices
+    
     if form.validate_on_submit():
         customer = Customer(
             customer_code=form.customer_code.data,
@@ -92,8 +100,16 @@ def view(id):
 @require_module_access('customers')
 def edit(id):
     """Edit a customer."""
+    from app.models import Service
+    
     customer = Customer.query.get_or_404(id)
     form = CustomerForm(obj=customer)
+    
+    # Populate service choices
+    services = Service.query.order_by(Service.name).all()
+    service_choices = [('', 'Select Service (Optional)')] + [(s.name, s.name) for s in services]
+    form.services.choices = service_choices
+    
     if form.validate_on_submit():
         form.populate_obj(customer)
         customer.updated_by = current_user.id

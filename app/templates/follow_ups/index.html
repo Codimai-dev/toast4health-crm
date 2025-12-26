@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Follow-ups - CRM System{% endblock %}
+{% block title %}Follow-ups - Toast4Health CRM{% endblock %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
@@ -56,12 +56,12 @@
                                 </td>
                                 <td>{{ followup.b2c_lead_ref.customer_name }}</td>
                                 <td>{{ followup.b2c_lead_ref.contact_no }}</td>
-                                <td>{{ followup.follow_up_on.strftime('%d/%m/%Y') }}</td>
+                                <td>{{ followup.follow_up_on.strftime('%d-%m-%Y') }}</td>
                                 <td>{{ followup.notes or '-' }}</td>
                                 <td>
                                     <span class="badge bg-info">{{ followup.outcome.value.replace('_', ' ') }}</span>
                                 </td>
-                                <td>{{ followup.next_follow_up_on.strftime('%d/%m/%Y') if followup.next_follow_up_on else '-' }}</td>
+                                <td>{{ followup.next_follow_up_on.strftime('%d-%m-%Y') if followup.next_follow_up_on else '-' }}</td>
                                 <td>{{ followup.owner.full_name }}</td>
                                 <td>
                                     <a href="{{ url_for('leads_b2c.view', enquiry_id=followup.b2c_lead_ref.enquiry_id) }}" class="btn btn-outline-primary btn-sm" title="View Lead">
@@ -121,12 +121,12 @@
                                 </td>
                                 <td>{{ followup.b2b_lead_ref.organization_name }}</td>
                                 <td>{{ followup.b2b_lead_ref.org_poc_name_and_role or '-' }}</td>
-                                <td>{{ followup.follow_up_on.strftime('%d/%m/%Y') }}</td>
+                                <td>{{ followup.follow_up_on.strftime('%d-%m-%Y') }}</td>
                                 <td>{{ followup.notes or '-' }}</td>
                                 <td>
                                     <span class="badge bg-info">{{ followup.outcome.value.replace('_', ' ') }}</span>
                                 </td>
-                                <td>{{ followup.next_follow_up_on.strftime('%d/%m/%Y') if followup.next_follow_up_on else '-' }}</td>
+                                <td>{{ followup.next_follow_up_on.strftime('%d-%m-%Y') if followup.next_follow_up_on else '-' }}</td>
                                 <td>{{ followup.owner.full_name }}</td>
                                 <td>
                                     <a href="{{ url_for('leads_b2b.view', sr_no=followup.b2b_lead_ref.sr_no) }}" class="btn btn-outline-primary btn-sm" title="View Lead">

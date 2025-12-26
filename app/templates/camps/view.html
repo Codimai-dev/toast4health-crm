@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}View Camp Entry - Toast4Health CRM{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('camps.index') }}">Health Camps</a></li>
+<li class="breadcrumb-item active">{{ camp.camp_id }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-heart-pulse text-primary"></i>
+                Camp Entry: {{ camp.camp_id }}
+            </h2>
+            <div>
+                <a href="{{ url_for('camps.edit', camp_id=camp.camp_id) }}" class="btn btn-warning">
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+                <a href="{{ url_for('camps.index') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Camps
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Camp Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Camp Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Camp ID:</strong>
+                    </div>
+                    <div class="col-md-8">
+                        {{ camp.camp_id }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Camp Date:</strong>
+                    </div>
+                    <div class="col-md-8">
+                        {{ camp.camp_date.strftime('%d-%m-%Y') if camp.camp_date else '-' }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Camp Location:</strong>
+                    </div>
+                    <div class="col-md-8">
+                        {{ camp.camp_location }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Org Name:</strong>
+                    </div>
+                    <div class="col-md-8">
+                        {{ camp.org_name or '-' }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>T4H Staff:</strong>
+                    </div>
+                    <div class="col-md-8">
+                        {{ camp.staff.name if camp.staff else '-' }}
+                        {% if camp.staff %}
+                            <span class="badge bg-secondary">{{ camp.staff.employee_code }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Camp Package:</strong>
+                    </div>
+                    <div class="col-md-8">
+                        {{ camp.package or '-' }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Diagnostic Partner:</strong>
+                    </div>
+                    <div class="col-md-8">
+                        {{ camp.diagnostic_partner or '-' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patient Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Patient Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Patient Name:</strong>
+                    </div>
+                    <div class="col-md-8">
+                        {{ camp.patient_name }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Phone Number:</strong>
+                    </div>
+                    <div class="col-md-8">
+                        {{ camp.phone_no }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Age:</strong>
+                    </div>
+                    <div class="col-md-8">
+                        {{ camp.age or '-' }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Gender:</strong>
+                    </div>
+                    <div class="col-md-8">
+                        {{ camp.gender or '-' }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Test Done:</strong>
+                    </div>
+                    <div class="col-md-8">
+                        {% if camp.test_done %}
+                            <span class="badge bg-success">Yes</span>
+                        {% else %}
+                            <span class="badge bg-warning">No</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Sidebar with Audit Info -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Record Information</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-2"><small class="text-muted">Created At:</small><br>
+                    {{ camp.created_at.strftime('%d-%m-%Y %I:%M %p') if camp.created_at else '-' }}</p>
+                <p class="mb-2"><small class="text-muted">Created By:</small><br>
+                    {{ camp.creator.full_name if camp.creator else '-' }}</p>
+                <p class="mb-2"><small class="text-muted">Updated At:</small><br>
+                    {{ camp.updated_at.strftime('%d-%m-%Y %I:%M %p') if camp.updated_at else '-' }}</p>
+                <p class="mb-0"><small class="text-muted">Updated By:</small><br>
+                    {{ camp.updater.full_name if camp.updater else '-' }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

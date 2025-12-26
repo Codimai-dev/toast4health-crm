@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}View Payment Made - Toast4Health CRM{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('finance.dashboard') }}">Finance</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('finance.payments_made') }}">Payments Made</a></li>
+<li class="breadcrumb-item active">{{ payment.reference_number }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="bi bi-cash-coin"></i> Payment Made Details</h4>
+                    <div>
+                        <a href="{{ url_for('finance.payments_made_edit', id=payment.id) }}" class="btn btn-warning">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
+                        <a href="{{ url_for('finance.payments_made_delete', id=payment.id) }}" class="btn btn-danger btn-delete">
+                            <i class="bi bi-trash"></i> Delete
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Reference Number:</strong><br>
+                            {{ payment.reference_number }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Date:</strong><br>
+                            {{ payment.date.strftime('%d-%b-%Y') }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Payee Name:</strong><br>
+                            {{ payment.payee_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Payment Method:</strong><br>
+                            <span class="badge bg-info">{{ payment.payment_method }}</span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Amount:</strong><br>
+                            <h4 class="text-danger">₹{{ "{:,.2f}".format(payment.amount) }}</h4>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Bill Number:</strong><br>
+                            {{ payment.bill_number or 'N/A' }}
+                        </div>
+                    </div>
+
+                    {% if payment.remarks %}
+                    <div class="mb-3">
+                        <strong>Remarks:</strong><br>
+                        {{ payment.remarks }}
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            Created: {{ payment.created_at.strftime('%d-%b-%Y %H:%M') }}
+                            {% if payment.creator %} by {{ payment.creator.full_name }}{% endif %}
+                        </small>
+                    </div>
+
+                    <a href="{{ url_for('finance.payments_made') }}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Payments Made
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Edit User - CRM System{% endblock %}
+{% block title %}Edit User - Toast4Health CRM{% endblock %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
@@ -121,6 +121,14 @@
                                     {{ form.services_access() }}
                                     {{ form.services_access.label(class="form-check-label") }}
                                 </div>
+                                <div class="form-check mb-2">
+                                    {{ form.camps_access() }}
+                                    {{ form.camps_access.label(class="form-check-label") }}
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ form.finance_access() }}
+                                    {{ form.finance_access.label(class="form-check-label") }}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -142,10 +150,10 @@
             <div class="card-body">
                 <dl class="row">
                     <dt class="col-sm-5">Created:</dt>
-                    <dd class="col-sm-7">{{ user.created_at.strftime('%d/%m/%Y %H:%M') }}</dd>
+                    <dd class="col-sm-7">{{ user.created_at.strftime('%d-%m-%Y %H:%M') }}</dd>
 
                     <dt class="col-sm-5">Last Login:</dt>
-                    <dd class="col-sm-7">{{ user.last_login_at.strftime('%d/%m/%Y %H:%M') if user.last_login_at else 'Never' }}</dd>
+                    <dd class="col-sm-7">{{ user.last_login_at.strftime('%d-%m-%Y %H:%M') if user.last_login_at else 'Never' }}</dd>
 
                     <dt class="col-sm-5">Created By:</dt>
                     <dd class="col-sm-7">{{ user.creator.full_name if user.creator else 'System' }}</dd>

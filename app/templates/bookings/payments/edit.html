@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Edit Payment - CRM System{% endblock %}
+{% block title %}Edit Payment - Toast4Health CRM{% endblock %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
@@ -123,7 +123,7 @@
                     <dd class="col-sm-7">₹{{ "%.2f"|format(payment.payment_amount or 0) }}</dd>
 
                     <dt class="col-sm-5">Date:</dt>
-                    <dd class="col-sm-7">{{ payment.payment_date.strftime('%d/%m/%Y') if payment.payment_date else '-' }}</dd>
+                    <dd class="col-sm-7">{{ payment.payment_date.strftime('%d-%m-%Y') if payment.payment_date else '-' }}</dd>
 
                     <dt class="col-sm-5">Method:</dt>
                     <dd class="col-sm-7">{{ payment.payment_method or '-' }}</dd>

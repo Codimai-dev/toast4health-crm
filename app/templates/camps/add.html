@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block title %}Add Camp Entry - Toast4Health CRM{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('camps.index') }}">Health Camps</a></li>
+<li class="breadcrumb-item active">Add Camp Entry</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-heart-pulse-fill text-primary"></i>
+                Add Camp Entry
+            </h2>
+            <div class="d-flex gap-2">
+                {% if is_admin %}
+                    {% if has_default %}
+                        <button type="button" class="btn btn-warning" onclick="removePredefine()">
+                            <i class="bi bi-x-circle"></i> Remove Predefined Values
+                        </button>
+                    {% else %}
+                        <button type="button" class="btn btn-info" onclick="predefineValues()">
+                            <i class="bi bi-save"></i> Predefine Camp Information
+                        </button>
+                    {% endif %}
+                {% endif %}
+                <a href="{{ url_for('camps.index') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Camps
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if has_default %}
+<div class="alert alert-info alert-dismissible fade show" role="alert">
+    <i class="bi bi-info-circle"></i> 
+    <strong>Predefined Values Active:</strong> Camp Information fields below are pre-filled with default values set by an administrator.
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-lg-10">
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Camp Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form.camp_id.label(class="form-label") }}
+                            {{ form.camp_id() }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.camp_date.label(class="form-label") }}
+                            {{ form.camp_date() }}
+                            {% if form.camp_date.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.camp_date.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.camp_location.label(class="form-label") }}
+                            {{ form.camp_location() }}
+                            {% if form.camp_location.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.camp_location.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form.org_name.label(class="form-label") }}
+                            {{ form.org_name() }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.t4h_staff.label(class="form-label") }}
+                            {{ form.t4h_staff() }}
+                            {% if form.t4h_staff.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.t4h_staff.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.package.label(class="form-label") }}
+                            {{ form.package() }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            {{ form.diagnostic_partner.label(class="form-label") }}
+                            {{ form.diagnostic_partner() }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Patient Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.patient_name.label(class="form-label") }}
+                            {{ form.patient_name() }}
+                            {% if form.patient_name.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.patient_name.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.phone_no.label(class="form-label") }}
+                            {{ form.phone_no() }}
+                            {% if form.phone_no.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.phone_no.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form.age.label(class="form-label") }}
+                            {{ form.age() }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.gender.label(class="form-label") }}
+                            {{ form.gender() }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="form-check">
+                                {{ form.test_done() }}
+                                {{ form.test_done.label(class="form-check-label") }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mb-4">
+                {{ form.submit() }}
+                <a href="{{ url_for('camps.index') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function predefineValues() {
+    if (!confirm('This will save the current Camp Information fields as default values for all users. Continue?')) {
+        return;
+    }
+    
+    // Create a form to submit the predefined values
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{{ url_for("camps.predefine") }}';
+    
+    // Add CSRF token
+    const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrf_token';
+    csrfInput.value = csrfToken;
+    form.appendChild(csrfInput);
+    
+    // Get Camp Information field values
+    const fields = ['t4h_staff', 'camp_date', 'camp_location', 'org_name', 'package', 'diagnostic_partner'];
+    fields.forEach(fieldName => {
+        const field = document.querySelector(`[name="${fieldName}"]`);
+        if (field && field.value) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = fieldName;
+            input.value = field.value;
+            form.appendChild(input);
+        }
+    });
+    
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function removePredefine() {
+    if (!confirm('This will remove all predefined default values. Continue?')) {
+        return;
+    }
+    
+    // Create a form to submit the removal request
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{{ url_for("camps.remove_predefine") }}';
+    
+    // Add CSRF token
+    const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrf_token';
+    csrfInput.value = csrfToken;
+    form.appendChild(csrfInput);
+    
+    document.body.appendChild(form);
+    form.submit();
+}
+</script>
+{% endblock %}

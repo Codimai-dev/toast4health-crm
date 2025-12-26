@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Dropdown Settings - CRM System{% endblock %}
+{% block title %}Dropdown Settings - Toast4Health CRM{% endblock %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
@@ -44,20 +44,10 @@
                     <div class="col-md-6 col-lg-3 mb-3">
                         <div class="card h-100">
                             <div class="card-body text-center">
-                                <i class="bi bi-cash-coin text-warning" style="font-size: 2rem;"></i>
+                                <i class="bi bi-receipt text-warning" style="font-size: 2rem;"></i>
                                 <h6 class="card-title mt-2">Expense Settings</h6>
                                 <p class="card-text small text-muted">Manage expense categories and sub-categories</p>
                                 <a href="{{ url_for('settings.expense_dropdowns') }}" class="btn btn-warning btn-sm">Manage Expenses</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3 mb-3">
-                        <div class="card h-100">
-                            <div class="card-body text-center">
-                                <i class="bi bi-cash-stack text-secondary" style="font-size: 2rem;"></i>
-                                <h6 class="card-title mt-2">Finance Settings</h6>
-                                <p class="card-text small text-muted">Manage other finance-related options</p>
-                                <a href="{{ url_for('settings.finance_dropdowns') }}" class="btn btn-secondary btn-sm">Manage Finance</a>
                             </div>
                         </div>
                     </div>
@@ -68,6 +58,16 @@
                                 <h6 class="card-title mt-2">HR Settings</h6>
                                 <p class="card-text small text-muted">Manage employee types</p>
                                 <a href="{{ url_for('settings.hr_dropdowns') }}" class="btn btn-info btn-sm">Manage HR</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-heart-pulse text-danger" style="font-size: 2rem;"></i>
+                                <h6 class="card-title mt-2">Camp Settings</h6>
+                                <p class="card-text small text-muted">Manage camp packages and options</p>
+                                <a href="{{ url_for('settings.camp_dropdowns') }}" class="btn btn-danger btn-sm">Manage Camps</a>
                             </div>
                         </div>
                     </div>

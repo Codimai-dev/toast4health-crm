@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Settings - CRM System{% endblock %}
+{% block title %}Settings - Toast4Health CRM{% endblock %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
@@ -28,14 +28,14 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="appName" class="form-label">Application Name</label>
-                                <input type="text" class="form-control" id="appName" value="CRM System" readonly>
+                                <input type="text" class="form-control" id="appName" value="Toast4Health CRM" readonly autocomplete="off">
                                 <div class="form-text">Application name is configured in the system.</div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="version" class="form-label">Version</label>
-                                <input type="text" class="form-control" id="version" value="1.0.0" readonly>
+                                <input type="text" class="form-control" id="version" value="1.0.0" readonly autocomplete="off">
                                 <div class="form-text">Current application version.</div>
                             </div>
                         </div>
@@ -73,7 +73,7 @@
                                     <span class="input-group-text bg-success text-white">
                                         <i class="bi bi-check-circle"></i>
                                     </span>
-                                    <input type="text" class="form-control" value="Connected" readonly>
+                                    <input type="text" class="form-control" value="Connected" readonly autocomplete="off">
                                 </div>
                             </div>
                         </div>
@@ -84,7 +84,7 @@
                                     <span class="input-group-text">
                                         <i class="bi bi-folder"></i>
                                     </span>
-                                    <input type="text" class="form-control" value="app/static/uploads/" readonly>
+                                    <input type="text" class="form-control" value="app/static/uploads/" readonly autocomplete="off">
                                 </div>
                             </div>
                         </div>
@@ -149,7 +149,7 @@
                     <label for="confirmationText" class="form-label fw-bold">
                         Type "DELETE ALL DATA" to confirm:
                     </label>
-                    <input type="text" class="form-control" id="confirmationText" placeholder="DELETE ALL DATA">
+                    <input type="text" class="form-control" id="confirmationText" placeholder="DELETE ALL DATA" autocomplete="off">
                 </div>
             </div>
             <div class="modal-footer">

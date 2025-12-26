@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Profile - CRM System{% endblock %}
+{% block title %}Profile - Toast4Health CRM{% endblock %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
@@ -63,7 +63,7 @@
                         <strong>Last Login:</strong>
                     </div>
                     <div class="col-sm-8">
-                        {{ user.last_login_at.strftime('%B %d, %Y at %I:%M %p') }}
+                        {{ user.last_login_at.strftime('%d-%m-%Y at %I:%M %p') }}
                     </div>
                 </div>
                 {% endif %}
@@ -73,7 +73,7 @@
                         <strong>Account Created:</strong>
                     </div>
                     <div class="col-sm-8">
-                        {{ user.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                        {{ user.created_at.strftime('%d-%m-%Y at %I:%M %p') }}
                     </div>
                 </div>
 
@@ -82,7 +82,7 @@
                         <strong>Last Updated:</strong>
                     </div>
                     <div class="col-sm-8">
-                        {{ user.updated_at.strftime('%B %d, %Y at %I:%M %p') }}
+                        {{ user.updated_at.strftime('%d-%m-%Y at %I:%M %p') }}
                     </div>
                 </div>
             </div>

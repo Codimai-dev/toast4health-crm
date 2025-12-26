@@ -15,17 +15,17 @@ def seed():
     click.echo('Seeding database...')
     
     # Create admin user
-    admin = User.query.filter_by(email='admin@example.com').first()
+    admin = User.query.filter_by(email='admin@toast4health.com').first()
     if not admin:
         admin = User(
-            email='admin@example.com',
+            email='admin@toast4health.com',
             full_name='System Administrator',
             role=UserRole.ADMIN,
             is_active=True
         )
-        admin.set_password('Admin@12345')
+        admin.set_password('toast4health')
         db.session.add(admin)
-        click.echo('Created admin user: admin@example.com / Admin@12345')
+        click.echo('Created admin user: admin@toast4health.com / toast4health')
     else:
         click.echo('Admin user already exists')
     

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Payments - CRM System{% endblock %}
+{% block title %}Payments - Toast4Health CRM{% endblock %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
@@ -46,7 +46,7 @@
                         <tbody>
                             {% for payment in payments %}
                             <tr>
-                                <td>{{ payment.payment_date.strftime('%d/%m/%Y') if payment.payment_date else '-' }}</td>
+                                <td>{{ payment.payment_date.strftime('%d-%m-%Y') if payment.payment_date else '-' }}</td>
                                 <td>
                                     <a href="{{ url_for('bookings.view', booking_code=payment.booking.booking_code) }}" class="text-decoration-none">
                                         {{ payment.booking.booking_code }}

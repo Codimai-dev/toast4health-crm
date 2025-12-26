@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Add Expense - CRM System{% endblock %}
+{% block title %}Add Expense - Toast4Health CRM{% endblock %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
@@ -85,14 +85,14 @@
                                 </div>
                             {% endif %}
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6 mb-3" id="booking-field">
                             {{ form.booking_id.label(class="form-label") }}
                             {{ form.booking_id() }}
                         </div>
                     </div>
                     <div class="mb-3">
-                        {{ form.other_id.label(class="form-label") }}
-                        {{ form.other_id() }}
+                        {{ form.employee_id.label(class="form-label") }}
+                        {{ form.employee_id() }}
                     </div>
                     <div class="d-flex gap-2">
                         {{ form.submit() }}
@@ -110,6 +110,18 @@
 document.addEventListener('DOMContentLoaded', function() {
     const categorySelect = document.getElementById('category');
     const subCategorySelect = document.getElementById('sub_category');
+    const bookingField = document.getElementById('booking-field');
+
+    function toggleBookingField() {
+        const selectedSubCategory = subCategorySelect.value;
+        if (selectedSubCategory === 'company_expense_salary') {
+            bookingField.style.display = 'none';
+            // Clear the value
+            document.getElementById('booking_id').value = '';
+        } else {
+            bookingField.style.display = 'block';
+        }
+    }
 
     function loadSubCategories() {
         const selectedCategory = categorySelect.value;
@@ -128,15 +140,26 @@ document.addEventListener('DOMContentLoaded', function() {
                         option.textContent = subCat.value;
                         subCategorySelect.appendChild(option);
                     });
+                    // After loading, toggle booking field
+                    toggleBookingField();
                 })
                 .catch(error => {
                     console.error('Error loading sub-categories:', error);
                 });
+        } else {
+            // If no category, hide booking field or show? Probably show
+            toggleBookingField();
         }
     }
 
     // Listen for category changes
     categorySelect.addEventListener('change', loadSubCategories);
+
+    // Listen for sub-category changes
+    subCategorySelect.addEventListener('change', toggleBookingField);
+
+    // Initial toggle
+    toggleBookingField();
 });
 </script>
 {% endblock %}

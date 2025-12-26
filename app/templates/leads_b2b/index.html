@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}B2B Leads - CRM System{% endblock %}
+{% block title %}B2B Leads - Toast4Health CRM{% endblock %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
@@ -58,7 +58,7 @@
                                 <td>
                                     <span class="badge bg-primary">{{ lead.status or 'New' }}</span>
                                 </td>
-                                <td>{{ lead.date.strftime('%d/%m/%Y') if lead.date else '-' }}</td>
+                                <td>{{ lead.date.strftime('%d-%m-%Y') if lead.date else '-' }}</td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
                                         <a href="{{ url_for('leads_b2b.view', sr_no=lead.sr_no) }}" class="btn btn-outline-primary btn-sm" title="View">

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Payments Made - Toast4Health CRM{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('finance.dashboard') }}">Finance</a></li>
+<li class="breadcrumb-item active">Payments Made</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-cash-coin"></i> Payments Made</h2>
+        <a href="{{ url_for('finance.payments_made_add') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add Payment Made
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% if payments %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Reference #</th>
+                            <th>Date</th>
+                            <th>Payee</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Bill #</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in payments %}
+                        <tr>
+                            <td><a href="{{ url_for('finance.payments_made_view', id=payment.id) }}">{{ payment.reference_number }}</a></td>
+                            <td>{{ payment.date.strftime('%d-%b-%Y') }}</td>
+                            <td>{{ payment.payee_name }}</td>
+                            <td class="text-danger">₹{{ "{:,.2f}".format(payment.amount) }}</td>
+                            <td><span class="badge bg-info">{{ payment.payment_method }}</span></td>
+                            <td>{{ payment.bill_number or '-' }}</td>
+                            <td>
+                                <a href="{{ url_for('finance.payments_made_view', id=payment.id) }}" class="btn btn-sm btn-info" title="View">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ url_for('finance.payments_made_edit', id=payment.id) }}" class="btn btn-sm btn-warning" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="{{ url_for('finance.payments_made_delete', id=payment.id) }}" class="btn btn-sm btn-danger btn-delete" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center text-muted">No payments received found. <a href="{{ url_for('finance.payments_made_add') }}">Add your first payment</a>.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

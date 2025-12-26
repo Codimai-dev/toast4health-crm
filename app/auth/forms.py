@@ -11,9 +11,9 @@ class LoginForm(FlaskForm):
     """User login form."""
     
     email = StringField('Email', validators=[DataRequired(), Email()], 
-                       render_kw={'class': 'form-control', 'placeholder': 'Enter your email'})
+                       render_kw={'class': 'form-control', 'placeholder': 'Enter your email', 'autocomplete': 'off'})
     password = PasswordField('Password', validators=[DataRequired()],
-                           render_kw={'class': 'form-control', 'placeholder': 'Enter your password'})
+                           render_kw={'class': 'form-control', 'placeholder': 'Enter your password', 'autocomplete': 'off'})
     remember_me = BooleanField('Remember Me', render_kw={'class': 'form-check-input'})
     submit = SubmitField('Sign In', render_kw={'class': 'btn btn-primary w-100'})
 
@@ -23,7 +23,7 @@ class ResetPasswordRequestForm(FlaskForm):
     """Password reset request form."""
     
     email = StringField('Email', validators=[DataRequired(), Email()],
-                       render_kw={'class': 'form-control', 'placeholder': 'Enter your email'})
+                       render_kw={'class': 'form-control', 'placeholder': 'Enter your email', 'autocomplete': 'off'})
     submit = SubmitField('Request Password Reset', render_kw={'class': 'btn btn-primary w-100'})
 
 
@@ -33,11 +33,11 @@ class ResetPasswordForm(FlaskForm):
     password = PasswordField('New Password', validators=[
         DataRequired(),
         Length(min=8, message='Password must be at least 8 characters long')
-    ], render_kw={'class': 'form-control', 'placeholder': 'Enter new password'})
+    ], render_kw={'class': 'form-control', 'placeholder': 'Enter new password', 'autocomplete': 'off'})
     password2 = PasswordField('Confirm Password', validators=[
         DataRequired(),
         EqualTo('password', message='Passwords must match')
-    ], render_kw={'class': 'form-control', 'placeholder': 'Confirm new password'})
+    ], render_kw={'class': 'form-control', 'placeholder': 'Confirm new password', 'autocomplete': 'off'})
     submit = SubmitField('Reset Password', render_kw={'class': 'btn btn-primary w-100'})
 
 
@@ -45,13 +45,13 @@ class ChangePasswordForm(FlaskForm):
     """Change password form."""
     
     current_password = PasswordField('Current Password', validators=[DataRequired()],
-                                   render_kw={'class': 'form-control', 'placeholder': 'Enter current password'})
+                                   render_kw={'class': 'form-control', 'placeholder': 'Enter current password', 'autocomplete': 'off'})
     password = PasswordField('New Password', validators=[
         DataRequired(),
         Length(min=8, message='Password must be at least 8 characters long')
-    ], render_kw={'class': 'form-control', 'placeholder': 'Enter new password'})
+    ], render_kw={'class': 'form-control', 'placeholder': 'Enter new password', 'autocomplete': 'off'})
     password2 = PasswordField('Confirm Password', validators=[
         DataRequired(),
         EqualTo('password', message='Passwords must match')
-    ], render_kw={'class': 'form-control', 'placeholder': 'Confirm new password'})
+    ], render_kw={'class': 'form-control', 'placeholder': 'Confirm new password', 'autocomplete': 'off'})
     submit = SubmitField('Change Password', render_kw={'class': 'btn btn-primary'})

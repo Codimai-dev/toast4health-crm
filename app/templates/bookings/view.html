@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}View Booking - CRM System{% endblock %}
+{% block title %}View Booking - Toast4Health CRM{% endblock %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
@@ -51,10 +51,10 @@
                             <dd class="col-sm-7">{{ booking.charge_type or 'Fixed charge' }}</dd>
 
                             <dt class="col-sm-5">Start Date:</dt>
-                            <dd class="col-sm-7">{{ booking.start_date.strftime('%d/%m/%Y') if booking.start_date else '-' }}</dd>
+                            <dd class="col-sm-7">{{ booking.start_date.strftime('%d-%m-%Y') if booking.start_date else '-' }}</dd>
 
                             <dt class="col-sm-5">End Date:</dt>
-                            <dd class="col-sm-7">{{ booking.end_date.strftime('%d/%m/%Y') if booking.end_date else '-' }}</dd>
+                            <dd class="col-sm-7">{{ booking.end_date.strftime('%d-%m-%Y') if booking.end_date else '-' }}</dd>
 
                             {% if booking.shift_hours %}
                             <dt class="col-sm-5">Shift (hours):</dt>
@@ -99,7 +99,7 @@
                     <div class="col-md-6">
                         <dl class="row">
                             <dt class="col-sm-5">Last Payment:</dt>
-                            <dd class="col-sm-7">{{ booking.last_payment_date.strftime('%d/%m/%Y') if booking.last_payment_date else '-' }}</dd>
+                            <dd class="col-sm-7">{{ booking.last_payment_date.strftime('%d-%m-%Y') if booking.last_payment_date else '-' }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -172,7 +172,7 @@
                         <tbody>
                             {% for payment in payments %}
                             <tr>
-                                <td>{{ payment.payment_date.strftime('%d/%m/%Y') if payment.payment_date else '-' }}</td>
+                                <td>{{ payment.payment_date.strftime('%d-%m-%Y') if payment.payment_date else '-' }}</td>
                                 <td>₹{{ "%.2f"|format(payment.payment_amount or 0) }}</td>
                                 <td>{{ payment.payment_method or '-' }}</td>
                                 <td>{{ payment.notes or '-' }}</td>

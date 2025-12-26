@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Edit Booking - CRM System{% endblock %}
+{% block title %}Edit Booking - Toast4Health CRM{% endblock %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
@@ -139,9 +139,26 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
+                            {{ form.gst_type.label(class="form-label") }}
+                            {{ form.gst_type() }}
+                            <small class="form-text text-muted">
+                                <strong>Exclusive:</strong> GST added on top | <strong>Inclusive:</strong> GST already included in amount
+                            </small>
+                            {% if form.gst_type.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.gst_type.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
                             {{ form.gst_percentage.label(class="form-label") }}
                             {{ form.gst_percentage() }}
+                            <small class="form-text text-muted">Auto-set based on GST type (can be modified)</small>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6 mb-3">
                             {{ form.amount_paid.label(class="form-label") }}
                             {{ form.amount_paid() }}
@@ -170,19 +187,67 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-   const chargeTypeSelect = document.querySelector('#charge_type');
-   const recurringFields = document.querySelector('.recurring-fields');
+    const chargeTypeSelect = document.querySelector('#charge_type');
+    const recurringFields = document.querySelector('.recurring-fields');
 
-   function toggleRecurringFields() {
-       if (chargeTypeSelect.value === 'Recurring charge') {
-           recurringFields.style.display = 'block';
-       } else {
-           recurringFields.style.display = 'none';
-       }
-   }
+    function toggleRecurringFields() {
+        if (chargeTypeSelect.value === 'Recurring charge') {
+            recurringFields.style.display = 'block';
+        } else {
+            recurringFields.style.display = 'none';
+        }
+    }
 
-   chargeTypeSelect.addEventListener('change', toggleRecurringFields);
-   toggleRecurringFields(); // Initial check
+    chargeTypeSelect.addEventListener('change', toggleRecurringFields);
+    toggleRecurringFields(); // Initial check
+
+    // Auto-fill customer mobile and services
+    const customerSelect = document.querySelector('#customer_name');
+    const customerMob = document.querySelector('#customer_mob');
+    const servicesSelect = document.querySelector('#services');
+    const customerData = JSON.parse('{{ customer_data_json | safe }}');
+
+    customerSelect.addEventListener('change', function() {
+        const data = customerData[this.value];
+        if (data) {
+            // Auto-fill mobile
+            customerMob.value = data.mobile || '';
+            
+            // Auto-fill services
+            if (data.services) {
+                // Try to match the service with an option in the dropdown
+                const serviceOptions = servicesSelect.options;
+                for (let i = 0; i < serviceOptions.length; i++) {
+                    if (serviceOptions[i].value === data.services) {
+                        servicesSelect.value = data.services;
+                        break;
+                    }
+                }
+            } else {
+                servicesSelect.value = '';
+            }
+        }
+    });
+
+    // GST Type auto-population
+    const gstTypeSelect = document.querySelector('#gst_type');
+    const gstPercentageInput = document.querySelector('#gst_percentage');
+    
+    // Default GST rates (can be customized)
+    const defaultGSTRates = {
+        'inclusive': 18,  // Default 18% for inclusive
+        'exclusive': 18   // Default 18% for exclusive
+    };
+
+    function updateGSTPercentage() {
+        const gstType = gstTypeSelect.value;
+        // Only auto-fill if the field is empty or has default value
+        if (!gstPercentageInput.value || gstPercentageInput.value === '0') {
+            gstPercentageInput.value = defaultGSTRates[gstType] || 18;
+        }
+    }
+
+    gstTypeSelect.addEventListener('change', updateGSTPercentage);
 });
 </script>
 {% endblock %}

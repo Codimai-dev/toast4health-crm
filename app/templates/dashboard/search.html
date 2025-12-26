@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Search Results - CRM System{% endblock %}
+{% block title %}Search Results - Toast4Health CRM{% endblock %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
@@ -48,7 +48,7 @@
                                 <br><small class="text-muted">{{ item.customer_code }} • {{ item.contact_no }} • {{ item.email or 'No email' }}</small>
                             {% elif category == 'Bookings' %}
                                 <strong>{{ item.customer_name }}</strong>
-                                <br><small class="text-muted">{{ item.booking_code }} • {{ item.services }} • {{ item.start_date.strftime('%Y-%m-%d') }}</small>
+                                <br><small class="text-muted">{{ item.booking_code }} • {{ item.services }} • {{ item.start_date.strftime('%d-%m-%Y') }}</small>
                             {% elif category == 'Employees' %}
                                 <strong>{{ item.name }}</strong>
                                 <br><small class="text-muted">{{ item.employee_code }} • {{ item.designation or 'No designation' }} • {{ item.contact_no }}</small>
@@ -57,7 +57,7 @@
                                 <br><small class="text-muted">{{ item.partner_code }} • {{ item.contact_no }} • {{ item.email or 'No email' }}</small>
                             {% elif category == 'Expenses' %}
                                 <strong>{{ item.category }}</strong>
-                                <br><small class="text-muted">{{ item.expense_code }} • {{ item.sub_category or 'No subcategory' }} • {{ item.date.strftime('%Y-%m-%d') }}</small>
+                                <br><small class="text-muted">{{ item.expense_code }} • {{ item.sub_category or 'No subcategory' }} • {{ item.date.strftime('%d-%m-%Y') }}</small>
                             {% endif %}
                         </div>
                         <div>

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}View Expense - CRM System{% endblock %}
+{% block title %}View Expense - Toast4Health CRM{% endblock %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
@@ -42,7 +42,7 @@
                             <dd class="col-sm-7">{{ expense.expense_code }}</dd>
 
                             <dt class="col-sm-5">Date:</dt>
-                            <dd class="col-sm-7">{{ expense.date.strftime('%d/%m/%Y') if expense.date else '-' }}</dd>
+                            <dd class="col-sm-7">{{ expense.date.strftime('%d-%m-%Y') if expense.date else '-' }}</dd>
 
                             <dt class="col-sm-5">Category:</dt>
                             <dd class="col-sm-7">{{ expense.category }}</dd>
@@ -61,9 +61,9 @@
                             <dd class="col-sm-7">{{ expense.booking.booking_code }} - {{ expense.booking.customer_name }}</dd>
                             {% endif %}
 
-                            {% if expense.other_id %}
-                            <dt class="col-sm-5">Other ID:</dt>
-                            <dd class="col-sm-7">{{ expense.other_id }}</dd>
+                            {% if expense.employee %}
+                            <dt class="col-sm-5">Employee:</dt>
+                            <dd class="col-sm-7">{{ expense.employee.employee_code }} - {{ expense.employee.name }}</dd>
                             {% endif %}
                         </dl>
                     </div>

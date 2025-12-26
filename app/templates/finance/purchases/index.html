@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Purchases - Toast4Health CRM{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('finance.dashboard') }}">Finance</a></li>
+<li class="breadcrumb-item active">Purchases</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-cart-plus"></i> Purchases</h2>
+        <a href="{{ url_for('finance.purchases_add') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add Purchase
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% if purchases %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Bill #</th>
+                            <th>Date</th>
+                            <th>Vendor Name</th>
+                            <th>Item/Description</th>
+                            <th>Amount</th>
+                            <th>Payment Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for purchase in purchases %}
+                        <tr>
+                            <td><a href="{{ url_for('finance.purchases_view', id=purchase.id) }}">{{ purchase.bill_number }}</a></td>
+                            <td>{{ purchase.date.strftime('%d-%b-%Y') }}</td>
+                            <td>{{ purchase.vendor_name }}</td>
+                            <td>{{ purchase.item_description[:50] }}{% if purchase.item_description|length > 50 %}...{% endif %}</td>
+                            <td>₹{{ "{:,.2f}".format(purchase.amount) }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if purchase.payment_status == 'Received' else 'warning' if purchase.payment_status == 'Partial' else 'danger' }}">
+                                    {{ purchase.payment_status }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('finance.purchases_view', id=purchase.id) }}" class="btn btn-sm btn-info" title="View">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ url_for('finance.purchases_edit', id=purchase.id) }}" class="btn btn-sm btn-warning" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="{{ url_for('finance.purchases_delete', id=purchase.id) }}" class="btn btn-sm btn-danger btn-delete" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center text-muted">No purchases found. <a href="{{ url_for('finance.purchases_add') }}">Add your first purchase</a>.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

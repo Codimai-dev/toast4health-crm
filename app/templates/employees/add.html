@@ -30,8 +30,25 @@
                 <h5 class="card-title mb-0">Employee Information</h5>
             </div>
             <div class="card-body">
-                <form method="POST" enctype="multipart/form-data">
+                <form method="POST" enctype="multipart/form-data" novalidate>
                     {{ form.hidden_tag() }}
+
+                    <!-- Display Form-level Errors -->
+                    {% if form.errors %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <h6 class="alert-heading"><i class="bi bi-exclamation-triangle-fill"></i> Please correct the following errors:</h6>
+                        <ul class="mb-0">
+                        {% for field_name, error_messages in form.errors.items() %}
+                            {% if field_name != 'csrf_token' %}
+                                {% for error in error_messages %}
+                                    <li><strong>{{ form[field_name].label.text }}:</strong> {{ error }}</li>
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endif %}
 
                     <!-- Basic Information -->
                     <h6 class="text-primary mb-3"><i class="bi bi-info-circle"></i> Basic Information</h6>

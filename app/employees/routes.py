@@ -76,43 +76,73 @@ def add():
     form = EmployeeForm()
     form.employee_code.data = Employee.generate_employee_code()
     if form.validate_on_submit():
-        # Handle file uploads
-        pdf_path = save_uploaded_file(form.pdf_file, 'uploads/pdfs', f"emp_{form.employee_code.data}")
-        image_path = save_uploaded_file(form.employ_image_file, 'uploads/images', f"emp_{form.employee_code.data}")
+        try:
+            # Handle file uploads
+            pdf_path = save_uploaded_file(form.pdf_file, 'uploads/pdfs', f"emp_{form.employee_code.data}")
+            image_path = save_uploaded_file(form.employ_image_file, 'uploads/images', f"emp_{form.employee_code.data}")
 
-        # Use uploaded file path if available, otherwise use URL
-        final_pdf_link = pdf_path if pdf_path else form.pdf_link.data
-        final_employ_image = image_path if image_path else form.employ_image.data
+            # Use uploaded file path if available, otherwise use URL
+            final_pdf_link = pdf_path if pdf_path else form.pdf_link.data
+            final_employ_image = image_path if image_path else form.employ_image.data
 
-        employee = Employee(
-            employee_code=form.employee_code.data,
-            name=form.name.data,
-            contact_no=form.contact_no.data,
-            email=form.email.data,
-            designation=form.designation.data,
-            employ_type=form.employ_type.data,
-            gender=form.gender.data if form.gender.data and form.gender.data != '' else None,
-            dob=form.dob.data,
-            degree=form.degree.data,
-            total_experience=form.total_experience.data,
-            whatsapp_no=form.whatsapp_no.data,
-            aadhar_no=form.aadhar_no.data,
-            bank_name=form.bank_name.data,
-            branch_name=form.branch_name.data,
-            account_no=form.account_no.data,
-            ifsc_code=form.ifsc_code.data,
-            temporary_address=form.temporary_address.data,
-            permanent_address=form.permanent_address.data,
-            skill_set=form.skill_set.data,
-            pdf_link=final_pdf_link,
-            employ_image=final_employ_image,
-            created_by=current_user.id,
-            updated_by=current_user.id
-        )
-        db.session.add(employee)
-        db.session.commit()
-        flash('Employee added successfully!', 'success')
-        return redirect(url_for('employees.index'))
+            employee = Employee(
+                employee_code=form.employee_code.data,
+                name=form.name.data,
+                contact_no=form.contact_no.data,
+                email=form.email.data,
+                designation=form.designation.data,
+                employ_type=form.employ_type.data,
+                gender=form.gender.data if form.gender.data and form.gender.data != '' else None,
+                dob=form.dob.data,
+                degree=form.degree.data,
+                total_experience=form.total_experience.data,
+                whatsapp_no=form.whatsapp_no.data,
+                aadhar_no=form.aadhar_no.data,
+                bank_name=form.bank_name.data,
+                branch_name=form.branch_name.data,
+                account_no=form.account_no.data,
+                ifsc_code=form.ifsc_code.data,
+                temporary_address=form.temporary_address.data,
+                permanent_address=form.permanent_address.data,
+                skill_set=form.skill_set.data,
+                pdf_link=final_pdf_link,
+                employ_image=final_employ_image,
+                created_by=current_user.id,
+                updated_by=current_user.id
+            )
+            db.session.add(employee)
+            db.session.commit()
+            flash('Employee added successfully!', 'success')
+            return redirect(url_for('employees.index'))
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.error(f'Error adding employee: {str(e)}')
+            
+            # Provide user-friendly error messages
+            error_message = 'Failed to add employee. '
+            if 'unique constraint' in str(e).lower() or 'duplicate' in str(e).lower():
+                if 'employee_code' in str(e).lower():
+                    error_message += 'Employee code already exists. Please try again with a different code.'
+                elif 'email' in str(e).lower():
+                    error_message += 'Email address already exists. Please use a different email.'
+                elif 'contact' in str(e).lower():
+                    error_message += 'Contact number already exists. Please use a different contact number.'
+                else:
+                    error_message += 'A duplicate value was found. Please check your input.'
+            elif 'foreign key' in str(e).lower():
+                error_message += 'Invalid reference to another record. Please check your selections.'
+            elif 'not null' in str(e).lower() or 'null value' in str(e).lower():
+                error_message += 'Required field is missing. Please fill in all required fields.'
+            elif 'file' in str(e).lower() or 'upload' in str(e).lower():
+                error_message += 'File upload failed. Please check the file type and size.'
+            else:
+                error_message += f'Please check your input and try again. Error: {str(e)}'
+            
+            flash(error_message, 'error')
+    elif request.method == 'POST' and not form.validate():
+        # Display validation errors
+        flash('Please correct the errors in the form below.', 'error')
+    
     return render_template('employees/add.html', title='Add Employee', form=form)
 
 
@@ -238,64 +268,89 @@ def edit(id):
         form.employ_image.data = employee_dict['employ_image']
 
     if form.validate_on_submit():
-        # Handle file uploads
-        pdf_path = save_uploaded_file(form.pdf_file, 'uploads/pdfs', f"emp_{form.employee_code.data}")
-        image_path = save_uploaded_file(form.employ_image_file, 'uploads/images', f"emp_{form.employee_code.data}")
-
-        # Use uploaded file path if available, otherwise use URL
-        final_pdf_link = pdf_path if pdf_path else form.pdf_link.data
-        final_employ_image = image_path if image_path else form.employ_image.data
-
-        # Update the database using raw SQL
-        update_data = {
-            'employee_code': form.employee_code.data,
-            'name': form.name.data,
-            'contact_no': form.contact_no.data,
-            'email': form.email.data,
-            'designation': form.designation.data,
-            'employ_type': form.employ_type.data,
-            'gender': form.gender.data if form.gender.data and form.gender.data != '' else None,
-            'dob': form.dob.data.isoformat() if form.dob.data else None,  # Convert date to ISO format for SQL
-            'degree': form.degree.data,
-            'total_experience': form.total_experience.data,
-            'whatsapp_no': form.whatsapp_no.data,
-            'aadhar_no': form.aadhar_no.data,
-            'bank_name': form.bank_name.data,
-            'branch_name': form.branch_name.data,
-            'account_no': form.account_no.data,
-            'ifsc_code': form.ifsc_code.data,
-            'temporary_address': form.temporary_address.data,
-            'permanent_address': form.permanent_address.data,
-            'skill_set': form.skill_set.data,
-            'pdf_link': final_pdf_link,
-            'employ_image': final_employ_image,
-            'updated_by': current_user.id
-        }
-
-        # Build the UPDATE query dynamically
-        set_parts = []
-        for key in update_data.keys():
-            if update_data[key] is not None:
-                set_parts.append(f"{key} = :{key}")
-            else:
-                set_parts.append(f"{key} = NULL")
-
-        update_query = f"""
-            UPDATE employee
-            SET {', '.join(set_parts)}
-            WHERE id = :id
-        """
-        update_data['id'] = id
-
         try:
+            # Handle file uploads
+            pdf_path = save_uploaded_file(form.pdf_file, 'uploads/pdfs', f"emp_{form.employee_code.data}")
+            image_path = save_uploaded_file(form.employ_image_file, 'uploads/images', f"emp_{form.employee_code.data}")
+
+            # Use uploaded file path if available, otherwise use URL
+            final_pdf_link = pdf_path if pdf_path else form.pdf_link.data
+            final_employ_image = image_path if image_path else form.employ_image.data
+
+            # Update the database using raw SQL
+            update_data = {
+                'employee_code': form.employee_code.data,
+                'name': form.name.data,
+                'contact_no': form.contact_no.data,
+                'email': form.email.data,
+                'designation': form.designation.data,
+                'employ_type': form.employ_type.data,
+                'gender': form.gender.data if form.gender.data and form.gender.data != '' else None,
+                'dob': form.dob.data.isoformat() if form.dob.data else None,  # Convert date to ISO format for SQL
+                'degree': form.degree.data,
+                'total_experience': form.total_experience.data,
+                'whatsapp_no': form.whatsapp_no.data,
+                'aadhar_no': form.aadhar_no.data,
+                'bank_name': form.bank_name.data,
+                'branch_name': form.branch_name.data,
+                'account_no': form.account_no.data,
+                'ifsc_code': form.ifsc_code.data,
+                'temporary_address': form.temporary_address.data,
+                'permanent_address': form.permanent_address.data,
+                'skill_set': form.skill_set.data,
+                'pdf_link': final_pdf_link,
+                'employ_image': final_employ_image,
+                'updated_by': current_user.id
+            }
+
+            # Build the UPDATE query dynamically
+            set_parts = []
+            for key in update_data.keys():
+                if update_data[key] is not None:
+                    set_parts.append(f"{key} = :{key}")
+                else:
+                    set_parts.append(f"{key} = NULL")
+
+            update_query = f"""
+                UPDATE employee
+                SET {', '.join(set_parts)}
+                WHERE id = :id
+            """
+            update_data['id'] = id
+
             db.session.execute(text(update_query), update_data)
             db.session.commit()
             flash('Employee updated successfully!', 'success')
             return redirect(url_for('employees.index'))
         except Exception as e:
-            print("Database error:", str(e))
             db.session.rollback()
-            flash('Error updating employee!', 'error')
+            current_app.logger.error(f'Error updating employee: {str(e)}')
+            
+            # Provide user-friendly error messages
+            error_message = 'Failed to update employee. '
+            if 'unique constraint' in str(e).lower() or 'duplicate' in str(e).lower():
+                if 'employee_code' in str(e).lower():
+                    error_message += 'Employee code already exists. Please use a different code.'
+                elif 'email' in str(e).lower():
+                    error_message += 'Email address already exists. Please use a different email.'
+                elif 'contact' in str(e).lower():
+                    error_message += 'Contact number already exists. Please use a different contact number.'
+                else:
+                    error_message += 'A duplicate value was found. Please check your input.'
+            elif 'foreign key' in str(e).lower():
+                error_message += 'Invalid reference to another record. Please check your selections.'
+            elif 'not null' in str(e).lower() or 'null value' in str(e).lower():
+                error_message += 'Required field is missing. Please fill in all required fields.'
+            elif 'file' in str(e).lower() or 'upload' in str(e).lower():
+                error_message += 'File upload failed. Please check the file type and size.'
+            else:
+                error_message += f'Please check your input and try again. Error: {str(e)}'
+            
+            flash(error_message, 'error')
+    elif request.method == 'POST' and not form.validate():
+        # Display validation errors
+        flash('Please correct the errors in the form below.', 'error')
+    
     return render_template('employees/edit.html', title='Edit Employee', form=form, employee=employee)
 
 

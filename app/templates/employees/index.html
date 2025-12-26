@@ -24,6 +24,33 @@
     </div>
 </div>
 
+<!-- Employee Management Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-3 text-muted">
+                    <i class="bi bi-gear-fill"></i> Employee Management Features
+                </h6>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ url_for('employees.attendance') }}" class="btn btn-outline-info">
+                        <i class="bi bi-calendar-check"></i> Attendance Management
+                    </a>
+                    <a href="{{ url_for('employees.leave') }}" class="btn btn-outline-warning">
+                        <i class="bi bi-calendar-x"></i> Leave Management
+                    </a>
+                    <a href="{{ url_for('employees.tasks') }}" class="btn btn-outline-success">
+                        <i class="bi bi-list-check"></i> Task Management
+                    </a>
+                    <a href="{{ url_for('employees.performance') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-graph-up"></i> Performance Metrics
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Employees Table -->
 <div class="row">
     <div class="col-12">

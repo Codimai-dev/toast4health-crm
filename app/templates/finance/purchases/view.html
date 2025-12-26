@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}View Purchase - Toast4Health CRM{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('finance.dashboard') }}">Finance</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('finance.purchases') }}">Purchases</a></li>
+<li class="breadcrumb-item active">{{ purchase.bill_number }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="bi bi-cart-plus"></i> Purchase Details</h4>
+                    <div>
+                        <a href="{{ url_for('finance.purchases_edit', id=purchase.id) }}" class="btn btn-warning">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
+                        <a href="{{ url_for('finance.purchases_delete', id=purchase.id) }}" class="btn btn-danger btn-delete">
+                            <i class="bi bi-trash"></i> Delete
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Bill Number:</strong><br>
+                            {{ purchase.bill_number }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Date:</strong><br>
+                            {{ purchase.date.strftime('%d-%b-%Y') }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Vendor Name:</strong><br>
+                            {{ purchase.vendor_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Payment Status:</strong><br>
+                            <span class="badge bg-{{ 'success' if purchase.payment_status == 'Received' else 'warning' if purchase.payment_status == 'Partial' else 'danger' }}">
+                                {{ purchase.payment_status }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Item/Description:</strong><br>
+                        {{ purchase.item_description }}
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Amount:</strong><br>
+                        <h4>₹{{ "{:,.2f}".format(purchase.amount) }}</h4>
+                    </div>
+
+                    {% if purchase.notes %}
+                    <div class="mb-3">
+                        <strong>Notes:</strong><br>
+                        {{ purchase.notes }}
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            Created: {{ purchase.created_at.strftime('%d-%b-%Y %H:%M') }}
+                            {% if purchase.creator %} by {{ purchase.creator.full_name }}{% endif %}
+                        </small>
+                    </div>
+
+                    <a href="{{ url_for('finance.purchases') }}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Purchases
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

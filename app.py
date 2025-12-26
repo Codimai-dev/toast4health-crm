@@ -25,6 +25,11 @@ def make_shell_context():
         'Setting': Setting,
         'Camp': Camp,
         'CampDefault': CampDefault,
+        'Sale': Sale,
+        'Purchase': Purchase,
+        'PaymentReceived': PaymentReceived,
+        'PaymentMade': PaymentMade,
+        'ChartOfAccount': ChartOfAccount,
         'AuditLog': AuditLog
     }
 

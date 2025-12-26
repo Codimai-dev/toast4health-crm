@@ -127,7 +127,7 @@ class User(UserMixin, db.Model, TimestampMixin, UserTrackingMixin):
         if self.role == UserRole.ADMIN:
             # Admins have access to everything
             return ['dashboard', 'leads_b2c', 'leads_b2b', 'follow_ups', 'customers',
-                   'bookings', 'employees', 'expenses', 'channel_partners', 'services', 'camps', 'settings']
+                   'bookings', 'employees', 'expenses', 'channel_partners', 'services', 'camps', 'finance', 'settings']
 
         if self.permissions:
             try:
@@ -139,7 +139,7 @@ class User(UserMixin, db.Model, TimestampMixin, UserTrackingMixin):
         defaults = {
             UserRole.SALES: ['dashboard', 'leads_b2c', 'leads_b2b', 'follow_ups', 'camps'],
             UserRole.OPS: ['dashboard', 'customers', 'bookings', 'employees', 'expenses', 'channel_partners', 'services', 'camps'],
-            UserRole.FINANCE: ['dashboard', 'bookings', 'expenses'],
+            UserRole.FINANCE: ['dashboard', 'bookings', 'expenses', 'finance'],
             UserRole.VIEWER: ['dashboard']  # Read-only access
         }
         return defaults.get(self.role, ['dashboard'])
@@ -821,6 +821,230 @@ class CampDefault(db.Model, TimestampMixin, UserTrackingMixin):
         """Deactivate all camp defaults."""
         cls.query.update({'is_active': False})
         db.session.commit()
+
+
+class Sale(db.Model, TimestampMixin, UserTrackingMixin):
+    """Sales/Revenue model for financial management."""
+
+    __tablename__ = 'sale'
+
+    id = db.Column(db.Integer, primary_key=True)
+    invoice_number = db.Column(db.String(50), nullable=False, unique=True, index=True)
+    date = db.Column(db.Date, nullable=False, index=True)
+    customer_name = db.Column(db.String(200), nullable=False, index=True)
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=True)
+    product_service = db.Column(db.String(300), nullable=False)
+    amount = db.Column(db.Numeric(12, 2), nullable=False)
+    payment_status = db.Column(db.String(50), nullable=False, default='Pending', index=True)
+    notes = db.Column(db.Text, nullable=True)
+    
+    # Relationships
+    customer = db.relationship('Customer', backref='sales')
+    
+    def __repr__(self):
+        return f'<Sale {self.invoice_number}: {self.customer_name}>'
+
+    @staticmethod
+    def generate_invoice_number():
+        """Generate a unique invoice number in format INV-YYYY-XXX."""
+        from datetime import datetime
+        year = datetime.now().year
+        existing_invoices = db.session.query(Sale.invoice_number).filter(
+            Sale.invoice_number.like(f'INV-{year}-%')
+        ).all()
+
+        if existing_invoices:
+            numbers = []
+            for inv in existing_invoices:
+                try:
+                    num_part = inv[0].split('-')[-1]
+                    numbers.append(int(num_part))
+                except (IndexError, ValueError):
+                    continue
+            next_num = max(numbers) + 1 if numbers else 1
+        else:
+            next_num = 1
+
+        return f'INV-{year}-{next_num:04d}'
+
+
+# Indexes for Sale
+Index('idx_sale_date_customer_status', Sale.date, Sale.customer_name, Sale.payment_status)
+
+
+class Purchase(db.Model, TimestampMixin, UserTrackingMixin):
+    """Purchases model for financial management."""
+
+    __tablename__ = 'purchase'
+
+    id = db.Column(db.Integer, primary_key=True)
+    bill_number = db.Column(db.String(50), nullable=False, unique=True, index=True)
+    date = db.Column(db.Date, nullable=False, index=True)
+    vendor_name = db.Column(db.String(200), nullable=False, index=True)
+    item_description = db.Column(db.String(300), nullable=False)
+    amount = db.Column(db.Numeric(12, 2), nullable=False)
+    payment_status = db.Column(db.String(50), nullable=False, default='Pending', index=True)
+    notes = db.Column(db.Text, nullable=True)
+    
+    def __repr__(self):
+        return f'<Purchase {self.bill_number}: {self.vendor_name}>'
+
+    @staticmethod
+    def generate_bill_number():
+        """Generate a unique bill number in format BILL-YYYY-XXX."""
+        from datetime import datetime
+        year = datetime.now().year
+        existing_bills = db.session.query(Purchase.bill_number).filter(
+            Purchase.bill_number.like(f'BILL-{year}-%')
+        ).all()
+
+        if existing_bills:
+            numbers = []
+            for bill in existing_bills:
+                try:
+                    num_part = bill[0].split('-')[-1]
+                    numbers.append(int(num_part))
+                except (IndexError, ValueError):
+                    continue
+            next_num = max(numbers) + 1 if numbers else 1
+        else:
+            next_num = 1
+
+        return f'BILL-{year}-{next_num:04d}'
+
+
+# Indexes for Purchase
+Index('idx_purchase_date_vendor_status', Purchase.date, Purchase.vendor_name, Purchase.payment_status)
+
+
+class PaymentReceived(db.Model, TimestampMixin, UserTrackingMixin):
+    """Payment Received model for tracking incoming payments."""
+
+    __tablename__ = 'payment_received'
+
+    id = db.Column(db.Integer, primary_key=True)
+    reference_number = db.Column(db.String(50), nullable=False, unique=True, index=True)
+    date = db.Column(db.Date, nullable=False, index=True)
+    customer_name = db.Column(db.String(200), nullable=False, index=True)
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=True)
+    amount = db.Column(db.Numeric(12, 2), nullable=False)
+    payment_method = db.Column(db.String(50), nullable=False)
+    invoice_number = db.Column(db.String(50), nullable=True)
+    sale_id = db.Column(db.Integer, db.ForeignKey('sale.id'), nullable=True)
+    remarks = db.Column(db.Text, nullable=True)
+    
+    # Relationships
+    customer = db.relationship('Customer', backref='payments_received')
+    sale = db.relationship('Sale', backref='payments_received')
+    
+    def __repr__(self):
+        return f'<PaymentReceived {self.reference_number}: ₹{self.amount}>'
+
+    @staticmethod
+    def generate_reference_number():
+        """Generate a unique reference number in format PAY-IN-YYYY-XXX."""
+        from datetime import datetime
+        year = datetime.now().year
+        existing_refs = db.session.query(PaymentReceived.reference_number).filter(
+            PaymentReceived.reference_number.like(f'PAY-IN-{year}-%')
+        ).all()
+
+        if existing_refs:
+            numbers = []
+            for ref in existing_refs:
+                try:
+                    num_part = ref[0].split('-')[-1]
+                    numbers.append(int(num_part))
+                except (IndexError, ValueError):
+                    continue
+            next_num = max(numbers) + 1 if numbers else 1
+        else:
+            next_num = 1
+
+        return f'PAY-IN-{year}-{next_num:04d}'
+
+
+# Indexes for PaymentReceived
+Index('idx_payment_received_date_customer', PaymentReceived.date, PaymentReceived.customer_name)
+
+
+class PaymentMade(db.Model, TimestampMixin, UserTrackingMixin):
+    """Payment Made model for tracking outgoing payments."""
+
+    __tablename__ = 'payment_made'
+
+    id = db.Column(db.Integer, primary_key=True)
+    reference_number = db.Column(db.String(50), nullable=False, unique=True, index=True)
+    date = db.Column(db.Date, nullable=False, index=True)
+    payee_name = db.Column(db.String(200), nullable=False, index=True)
+    amount = db.Column(db.Numeric(12, 2), nullable=False)
+    payment_method = db.Column(db.String(50), nullable=False)
+    bill_number = db.Column(db.String(50), nullable=True)
+    purchase_id = db.Column(db.Integer, db.ForeignKey('purchase.id'), nullable=True)
+    category = db.Column(db.String(100), nullable=False)
+    remarks = db.Column(db.Text, nullable=True)
+    
+    # Relationships
+    purchase = db.relationship('Purchase', backref='payments_made')
+    
+    def __repr__(self):
+        return f'<PaymentMade {self.reference_number}: ₹{self.amount}>'
+
+    @staticmethod
+    def generate_reference_number():
+        """Generate a unique reference number in format PAY-OUT-YYYY-XXX."""
+        from datetime import datetime
+        year = datetime.now().year
+        existing_refs = db.session.query(PaymentMade.reference_number).filter(
+            PaymentMade.reference_number.like(f'PAY-OUT-{year}-%')
+        ).all()
+
+        if existing_refs:
+            numbers = []
+            for ref in existing_refs:
+                try:
+                    num_part = ref[0].split('-')[-1]
+                    numbers.append(int(num_part))
+                except (IndexError, ValueError):
+                    continue
+            next_num = max(numbers) + 1 if numbers else 1
+        else:
+            next_num = 1
+
+        return f'PAY-OUT-{year}-{next_num:04d}'
+
+
+# Indexes for PaymentMade
+Index('idx_payment_made_date_payee_category', PaymentMade.date, PaymentMade.payee_name, PaymentMade.category)
+
+
+class AccountType(enum.Enum):
+    """Account type enumeration."""
+    ASSET = "ASSET"
+    LIABILITY = "LIABILITY"
+    EQUITY = "EQUITY"
+    INCOME = "INCOME"
+    EXPENSE = "EXPENSE"
+
+
+class ChartOfAccount(db.Model, TimestampMixin, UserTrackingMixin):
+    """Chart of Accounts model for accounting structure."""
+
+    __tablename__ = 'chart_of_account'
+
+    id = db.Column(db.Integer, primary_key=True)
+    account_code = db.Column(db.Integer, nullable=False, unique=True, index=True)
+    account_name = db.Column(db.String(200), nullable=False, index=True)
+    account_type = db.Column(db.Enum(AccountType), nullable=False, index=True)
+    description = db.Column(db.Text, nullable=True)
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
+    
+    def __repr__(self):
+        return f'<ChartOfAccount {self.account_code}: {self.account_name}>'
+
+
+# Indexes for ChartOfAccount
+Index('idx_chart_of_account_code_type', ChartOfAccount.account_code, ChartOfAccount.account_type)
 
 
 class AuditLog(db.Model):

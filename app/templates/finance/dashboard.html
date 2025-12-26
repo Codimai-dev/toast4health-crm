@@ -1,0 +1,330 @@
+{% extends "base.html" %}
+
+{% block title %}Financial Dashboard - Toast4Health CRM{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('finance.dashboard') }}">Finance</a></li>
+<li class="breadcrumb-item active">Financial Dashboard</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-graph-up"></i> Financial Dashboard ({{ current_year }})</h2>
+    </div>
+
+    <!-- Financial Summary Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="card stats-card primary">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Total Sales/Revenue</h6>
+                    <h3 class="mb-0">₹{{ "{:,.2f}".format(total_sales) }}</h3>
+                    <small class="text-muted">{{ sales_count }} transactions</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card stats-card danger">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Total Purchases</h6>
+                    <h3 class="mb-0">₹{{ "{:,.2f}".format(total_purchases) }}</h3>
+                    <small class="text-muted">{{ purchases_count }} transactions</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card stats-card warning">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Total Expenses</h6>
+                    <h3 class="mb-0">₹{{ "{:,.2f}".format(total_expenses) }}</h3>
+                    <small class="text-muted">{{ expenses_count }} transactions</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card stats-card success">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Gross Profit</h6>
+                    <h3 class="mb-0 {{ 'text-success' if gross_profit >= 0 else 'text-danger' }}">₹{{ "{:,.2f}".format(gross_profit) }}</h3>
+                    <small class="text-muted">Sales - Purchases</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Net Position Summary -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="card stats-card info">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Payments Received</h6>
+                    <h3 class="mb-0 text-success">₹{{ "{:,.2f}".format(total_payments_received) }}</h3>
+                    <small class="text-muted">{{ payments_received_count }} transactions</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card stats-card warning">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Payments Made</h6>
+                    <h3 class="mb-0 text-danger">₹{{ "{:,.2f}".format(total_payments_made) }}</h3>
+                    <small class="text-muted">{{ payments_made_count }} transactions</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card stats-card success">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Net Profit/Loss</h6>
+                    <h3 class="mb-0 {{ 'text-success' if net_profit >= 0 else 'text-danger' }}">₹{{ "{:,.2f}".format(net_profit) }}</h3>
+                    <small class="text-muted">Gross Profit - Expenses</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card stats-card primary">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Cash Position</h6>
+                    <h3 class="mb-0 {{ 'text-success' if cash_position >= 0 else 'text-danger' }}">₹{{ "{:,.2f}".format(cash_position) }}</h3>
+                    <small class="text-muted">Received - Made</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Summary Chart -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-bar-chart-line"></i> Monthly Summary ({{ current_year }})</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="monthlyChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-cart-plus"></i> Recent Sales</h5>
+                    <a href="{{ url_for('finance.sales') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_sales %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Customer</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sale in recent_sales %}
+                                <tr>
+                                    <td><a href="{{ url_for('finance.sales_view', id=sale.id) }}">{{ sale.invoice_number }}</a></td>
+                                    <td>{{ sale.customer_name }}</td>
+                                    <td>₹{{ "{:,.2f}".format(sale.amount) }}</td>
+                                    <td>{{ sale.date.strftime('%d-%b-%Y') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No sales transactions yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-cart-dash"></i> Recent Purchases</h5>
+                    <a href="{{ url_for('finance.purchases') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_purchases %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Bill #</th>
+                                    <th>Vendor</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for purchase in recent_purchases %}
+                                <tr>
+                                    <td><a href="{{ url_for('finance.purchases_view', id=purchase.id) }}">{{ purchase.bill_number }}</a></td>
+                                    <td>{{ purchase.vendor_name }}</td>
+                                    <td>₹{{ "{:,.2f}".format(purchase.amount) }}</td>
+                                    <td>{{ purchase.date.strftime('%d-%b-%Y') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No purchase transactions yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-cash-coin"></i> Recent Payments Received</h5>
+                    <a href="{{ url_for('finance.payments_received') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_payments_received %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Ref #</th>
+                                    <th>Customer</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in recent_payments_received %}
+                                <tr>
+                                    <td><a href="{{ url_for('finance.payments_received_view', id=payment.id) }}">{{ payment.reference_number }}</a></td>
+                                    <td>{{ payment.customer_name }}</td>
+                                    <td>₹{{ "{:,.2f}".format(payment.amount) }}</td>
+                                    <td>{{ payment.date.strftime('%d-%b-%Y') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No payment received transactions yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-wallet2"></i> Recent Payments Made</h5>
+                    <a href="{{ url_for('finance.payments_made') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_payments_made %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Ref #</th>
+                                    <th>Payee</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in recent_payments_made %}
+                                <tr>
+                                    <td><a href="{{ url_for('finance.payments_made_view', id=payment.id) }}">{{ payment.reference_number }}</a></td>
+                                    <td>{{ payment.payee_name }}</td>
+                                    <td>₹{{ "{:,.2f}".format(payment.amount) }}</td>
+                                    <td>{{ payment.date.strftime('%d-%b-%Y') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No payment made transactions yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Monthly summary chart
+    const ctx = document.getElementById('monthlyChart').getContext('2d');
+    const monthlyData = {{ monthly_data | tojson }};
+    
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: monthlyData.map(d => d.month_name),
+            datasets: [
+                {
+                    label: 'Sales',
+                    data: monthlyData.map(d => d.sales),
+                    backgroundColor: 'rgba(242, 100, 25, 0.7)',
+                    borderColor: 'rgba(242, 100, 25, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Purchases',
+                    data: monthlyData.map(d => d.purchases),
+                    backgroundColor: 'rgba(220, 53, 69, 0.7)',
+                    borderColor: 'rgba(220, 53, 69, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Expenses',
+                    data: monthlyData.map(d => d.expenses),
+                    backgroundColor: 'rgba(255, 193, 7, 0.7)',
+                    borderColor: 'rgba(255, 193, 7, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Net Profit',
+                    data: monthlyData.map(d => d.net_profit),
+                    backgroundColor: 'rgba(91, 192, 190, 0.7)',
+                    borderColor: 'rgba(91, 192, 190, 1)',
+                    borderWidth: 1,
+                    type: 'line'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '₹' + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,447 @@
+{% extends "base.html" %}
+
+{% block title %}Dropdown Settings - Toast4Health CRM{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('settings.index') }}">Settings</a></li>
+<li class="breadcrumb-item active">Dropdowns</li>
+{% endblock %}
+
+{% block content %}
+<style>
+.module-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+.module-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-color: var(--bs-primary);
+}
+.dropdown-group {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+.dropdown-item-row:hover {
+    background-color: #f0f0f0;
+}
+.sub-category-section {
+    display: none;
+    padding-left: 30px;
+    margin-top: 10px;
+}
+.sub-category-section.expanded {
+    display: block;
+}
+.nested-indicator {
+    color: #6c757d;
+    margin-right: 5px;
+}
+</style>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-list-ul"></i> Unified Dropdown Management
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Manage all dropdown options for the application. Click on a module card to view and edit its dropdowns.</p>
+                
+                <!-- Module Cards Grid -->
+                <div class="row g-3" id="moduleCards">
+                    {% for module in modules %}
+                    <div class="col-md-6 col-lg-4 col-xl-3">
+                        <div class="card module-card h-100" onclick="showModuleDropdowns('{{ module.id }}')">
+                            <div class="card-body text-center">
+                                <i class="bi {{ module.icon }} text-{{ module.color }}" style="font-size: 2.5rem;"></i>
+                                <h6 class="card-title mt-3 mb-1">{{ module.name }}</h6>
+                                <small class="text-muted">{{ module.dropdown_count }} dropdown(s)</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dropdown Management Modal -->
+<div class="modal fade" id="dropdownManagementModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-gear"></i> 
+                    <span id="modalModuleName"></span> - Dropdown Settings
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                <div id="dropdownGroupsContainer"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Dropdown Item Modal -->
+<div class="modal fade" id="addDropdownModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Dropdown Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addDropdownForm">
+                    <input type="hidden" id="addDropdownGroup">
+                    <input type="hidden" id="addDropdownParentKey">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Dropdown Group</label>
+                        <input type="text" class="form-control" id="addDropdownGroupDisplay" readonly>
+                    </div>
+                    
+                    <div class="mb-3" id="parentKeyContainer" style="display: none;">
+                        <label class="form-label">Parent Category</label>
+                        <input type="text" class="form-control" id="addDropdownParentKeyDisplay" readonly>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Key *</label>
+                        <input type="text" class="form-control" id="addDropdownKey" required autocomplete="off">
+                        <small class="form-text text-muted" id="keyHint">Use lowercase with underscores (e.g., new_option)</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Display Value *</label>
+                        <input type="text" class="form-control" id="addDropdownValue" required autocomplete="off">
+                        <small class="form-text text-muted">The text that will be shown in the dropdown</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveDropdownBtn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const moduleDropdownData = {{ module_dropdowns|tojson }};
+let currentEditingId = null;
+let currentEditingGroup = null;
+
+function showModuleDropdowns(moduleId) {
+    const module = moduleDropdownData[moduleId];
+    if (!module) return;
+    
+    document.getElementById('modalModuleName').textContent = module.name;
+    const container = document.getElementById('dropdownGroupsContainer');
+    container.innerHTML = '';
+    
+    if (module.groups.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">No dropdowns configured for this module yet.</div>';
+    } else {
+        module.groups.forEach(group => {
+            container.appendChild(createDropdownGroupElement(group));
+        });
+    }
+    
+    new bootstrap.Modal(document.getElementById('dropdownManagementModal')).show();
+}
+
+function createDropdownGroupElement(group) {
+    const groupDiv = document.createElement('div');
+    groupDiv.className = 'dropdown-group';
+    
+    const headerDiv = document.createElement('div');
+    headerDiv.className = 'd-flex justify-content-between align-items-center mb-3';
+    
+    const titleDiv = document.createElement('div');
+    titleDiv.innerHTML = `<h6 class="mb-0"><i class="bi bi-chevron-down"></i> ${group.display_name}</h6>`;
+    if (group.description) {
+        titleDiv.innerHTML += `<small class="text-muted">${group.description}</small>`;
+    }
+    
+    const addBtn = document.createElement('button');
+    addBtn.className = 'btn btn-sm btn-outline-success';
+    addBtn.innerHTML = '<i class="bi bi-plus"></i> Add Item';
+    addBtn.onclick = () => openAddModal(group.name, group.display_name, null);
+    
+    headerDiv.appendChild(titleDiv);
+    headerDiv.appendChild(addBtn);
+    groupDiv.appendChild(headerDiv);
+    
+    // Create table
+    const table = document.createElement('table');
+    table.className = 'table table-sm table-hover mb-0';
+    table.innerHTML = `
+        <thead class="table-light">
+            <tr>
+                <th width="30%">Key</th>
+                <th width="40%">Display Value</th>
+                <th width="30%" class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody id="tbody-${group.name}"></tbody>
+    `;
+    
+    groupDiv.appendChild(table);
+    
+    const tbody = table.querySelector('tbody');
+    
+    if (group.items.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No items yet</td></tr>';
+    } else {
+        group.items.forEach(item => {
+            tbody.appendChild(createItemRow(item, group));
+        });
+    }
+    
+    return groupDiv;
+}
+
+function createItemRow(item, group) {
+    const tr = document.createElement('tr');
+    tr.className = 'dropdown-item-row';
+    tr.dataset.id = item.id;
+    
+    let actionsHtml = `
+        <button class="btn btn-sm btn-outline-primary" onclick="editItem(${item.id}, '${group.name}')">
+            <i class="bi bi-pencil"></i>
+        </button>
+        <button class="btn btn-sm btn-outline-danger" onclick="deleteItem(${item.id}, '${item.key}', '${group.name}')">
+            <i class="bi bi-trash"></i>
+        </button>
+    `;
+    
+    // Check if this is a nested group (parent category)
+    if (group.nested && item.has_children) {
+        actionsHtml = `
+            <button class="btn btn-sm btn-outline-info" onclick="toggleSubCategories('${item.key}', '${group.name}')">
+                <i class="bi bi-eye"></i> Sub-items (${item.children_count})
+            </button>
+        ` + actionsHtml;
+        
+        tr.innerHTML = `
+            <td><strong>${item.key}</strong></td>
+            <td>
+                <span class="value-display">${item.value}</span>
+                <input type="text" class="form-control form-control-sm d-none value-edit" value="${item.value}">
+            </td>
+            <td class="text-end">${actionsHtml}</td>
+        `;
+        
+        // Add sub-items section (initially hidden)
+        if (item.children && item.children.length > 0) {
+            const subSection = document.createElement('tr');
+            subSection.className = 'sub-category-section';
+            subSection.id = `sub-${item.key}`;
+            subSection.innerHTML = `
+                <td colspan="3">
+                    <div class="ms-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted"><i class="bi bi-arrow-return-right"></i> Sub-items for ${item.value}</small>
+                            <button class="btn btn-xs btn-outline-success" onclick="openAddModal('${group.child_group}', 'Sub-item', '${item.key}')">
+                                <i class="bi bi-plus"></i> Add Sub-item
+                            </button>
+                        </div>
+                        <table class="table table-sm mb-0">
+                            <tbody id="sub-tbody-${item.key}">
+                                ${item.children.map(child => `
+                                    <tr data-id="${child.id}">
+                                        <td width="30%"><span class="nested-indicator">└─</span>${child.key}</td>
+                                        <td width="40%">
+                                            <span class="value-display">${child.value}</span>
+                                            <input type="text" class="form-control form-control-sm d-none value-edit" value="${child.value}">
+                                        </td>
+                                        <td width="30%" class="text-end">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="editItem(${child.id}, '${group.child_group}')">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteItem(${child.id}, '${child.key}', '${group.child_group}')">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+            `;
+            tr.after(subSection);
+        }
+    } else {
+        tr.innerHTML = `
+            <td>${item.key}</td>
+            <td>
+                <span class="value-display">${item.value}</span>
+                <input type="text" class="form-control form-control-sm d-none value-edit" value="${item.value}">
+            </td>
+            <td class="text-end">${actionsHtml}</td>
+        `;
+    }
+    
+    return tr;
+}
+
+function toggleSubCategories(key, groupName) {
+    const subSection = document.getElementById(`sub-${key}`);
+    if (subSection) {
+        subSection.classList.toggle('expanded');
+    }
+}
+
+function openAddModal(groupName, displayName, parentKey = null) {
+    document.getElementById('addDropdownGroup').value = groupName;
+    document.getElementById('addDropdownGroupDisplay').value = displayName;
+    document.getElementById('addDropdownKey').value = '';
+    document.getElementById('addDropdownValue').value = '';
+    
+    if (parentKey) {
+        document.getElementById('addDropdownParentKey').value = parentKey;
+        document.getElementById('addDropdownParentKeyDisplay').value = parentKey;
+        document.getElementById('parentKeyContainer').style.display = 'block';
+        document.getElementById('keyHint').textContent = `Will be prefixed with ${parentKey}_`;
+    } else {
+        document.getElementById('addDropdownParentKey').value = '';
+        document.getElementById('parentKeyContainer').style.display = 'none';
+        document.getElementById('keyHint').textContent = 'Use lowercase with underscores (e.g., new_option)';
+    }
+    
+    new bootstrap.Modal(document.getElementById('addDropdownModal')).show();
+}
+
+document.getElementById('saveDropdownBtn').addEventListener('click', function() {
+    const group = document.getElementById('addDropdownGroup').value;
+    const parentKey = document.getElementById('addDropdownParentKey').value;
+    let key = document.getElementById('addDropdownKey').value.trim();
+    const value = document.getElementById('addDropdownValue').value.trim();
+    
+    if (!key || !value) {
+        alert('Please fill in all required fields');
+        return;
+    }
+    
+    // If there's a parent key, prefix it
+    if (parentKey) {
+        if (!key.startsWith(parentKey + '_')) {
+            key = parentKey + '_' + key;
+        }
+    }
+    
+    fetch('/settings/dropdowns/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ group: group, key: key, value: value })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('addDropdownModal')).hide();
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred');
+    });
+});
+
+function editItem(id, group) {
+    const row = document.querySelector(`tr[data-id="${id}"]`);
+    const valueDisplay = row.querySelector('.value-display');
+    const valueEdit = row.querySelector('.value-edit');
+    const editBtn = row.querySelector('.btn-outline-primary');
+    
+    if (valueEdit.classList.contains('d-none')) {
+        // Enter edit mode
+        valueDisplay.classList.add('d-none');
+        valueEdit.classList.remove('d-none');
+        valueEdit.focus();
+        editBtn.innerHTML = '<i class="bi bi-check"></i>';
+        editBtn.classList.remove('btn-outline-primary');
+        editBtn.classList.add('btn-success');
+        currentEditingId = id;
+        currentEditingGroup = group;
+    } else {
+        // Save changes
+        const newValue = valueEdit.value.trim();
+        if (!newValue) {
+            alert('Value cannot be empty');
+            return;
+        }
+        
+        fetch(`/settings/dropdowns/${id}/edit`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ value: newValue })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                valueDisplay.textContent = newValue;
+                valueDisplay.classList.remove('d-none');
+                valueEdit.classList.add('d-none');
+                editBtn.innerHTML = '<i class="bi bi-pencil"></i>';
+                editBtn.classList.remove('btn-success');
+                editBtn.classList.add('btn-outline-primary');
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred');
+        });
+    }
+}
+
+function deleteItem(id, key, group) {
+    if (!confirm(`Are you sure you want to delete "${key}"?`)) {
+        return;
+    }
+    
+    fetch(`/settings/dropdowns/${id}/delete`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred');
+    });
+}
+</script>
+{% endblock %}

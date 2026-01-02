@@ -111,12 +111,323 @@ def index():
 @bp.route('/dropdowns')
 @login_required
 def dropdowns():
-    """Dropdown settings overview page."""
+    """Unified dropdown settings page with all module dropdowns."""
     if not current_user.has_permission(UserRole.ADMIN):
         flash('Access denied. Admin privileges required.', 'error')
         return redirect(url_for('dashboard.index'))
 
-    return render_template('settings/dropdowns.html', title='Dropdown Settings')
+    # Define all modules with their dropdown configurations
+    modules_config = [
+        {
+            'id': 'b2c_leads',
+            'name': 'B2C Leads',
+            'icon': 'bi-person-lines-fill',
+            'color': 'primary',
+            'groups': [
+                {
+                    'name': 'Source',
+                    'display_name': 'Lead Sources',
+                    'description': 'Sources where B2C leads come from',
+                    'nested': False
+                },
+                {
+                    'name': 'LeadStatus',
+                    'display_name': 'Lead Status',
+                    'description': 'Status options for B2C leads',
+                    'nested': False
+                }
+            ]
+        },
+        {
+            'id': 'b2b_leads',
+            'name': 'B2B Leads',
+            'icon': 'bi-building',
+            'color': 'success',
+            'groups': [
+                {
+                    'name': 'B2BLeadType',
+                    'display_name': 'Lead Types',
+                    'description': 'Types of B2B leads',
+                    'nested': False
+                },
+                {
+                    'name': 'B2BMeetingStatus',
+                    'display_name': 'Meeting Status',
+                    'description': 'Status options for B2B meetings',
+                    'nested': False
+                }
+            ]
+        },
+        {
+            'id': 'follow_ups',
+            'name': 'Follow Ups',
+            'icon': 'bi-calendar-check',
+            'color': 'info',
+            'groups': [
+                {
+                    'name': 'FollowUpOutcome',
+                    'display_name': 'Follow-up Outcomes',
+                    'description': 'Possible outcomes for follow-up activities',
+                    'nested': False
+                }
+            ]
+        },
+        {
+            'id': 'health_camps',
+            'name': 'Health Camps',
+            'icon': 'bi-heart-pulse',
+            'color': 'danger',
+            'groups': [
+                {
+                    'name': 'CampPackage',
+                    'display_name': 'Camp Packages',
+                    'description': 'Available health camp packages',
+                    'nested': False
+                }
+            ]
+        },
+        {
+            'id': 'customers',
+            'name': 'Customers',
+            'icon': 'bi-people',
+            'color': 'secondary',
+            'groups': []  # Customers mainly use references to other tables
+        },
+        {
+            'id': 'employees',
+            'name': 'Employees',
+            'icon': 'bi-person-badge',
+            'color': 'info',
+            'groups': [
+                {
+                    'name': 'EmployeeType',
+                    'display_name': 'Employment Types',
+                    'description': 'Types of employment (Full-time, Part-time, etc.)',
+                    'nested': False
+                },
+                {
+                    'name': 'EmployeeDesignation',
+                    'display_name': 'Designations',
+                    'description': 'Job designations/titles',
+                    'nested': False
+                },
+                {
+                    'name': 'Gender',
+                    'display_name': 'Gender Options',
+                    'description': 'Gender options for employees',
+                    'nested': False
+                }
+            ]
+        },
+        {
+            'id': 'channel_partners',
+            'name': 'Channel Partners',
+            'icon': 'bi-diagram-3',
+            'color': 'warning',
+            'groups': []  # No dropdowns needed
+        },
+        {
+            'id': 'services',
+            'name': 'Services',
+            'icon': 'bi-tools',
+            'color': 'success',
+            'groups': []  # Services are managed separately as master data
+        },
+        {
+            'id': 'sales',
+            'name': 'Sales',
+            'icon': 'bi-cash-stack',
+            'color': 'success',
+            'groups': [
+                {
+                    'name': 'GSTType',
+                    'display_name': 'GST Types',
+                    'description': 'GST calculation types (Inclusive/Exclusive)',
+                    'nested': False
+                },
+                {
+                    'name': 'PaymentStatus',
+                    'display_name': 'Payment Status',
+                    'description': 'Payment status options',
+                    'nested': False
+                },
+                {
+                    'name': 'PaymentMethod',
+                    'display_name': 'Payment Methods',
+                    'description': 'Available payment methods',
+                    'nested': False
+                }
+            ]
+        },
+        {
+            'id': 'purchases',
+            'name': 'Purchases',
+            'icon': 'bi-cart',
+            'color': 'primary',
+            'groups': [
+                {
+                    'name': 'GSTType',
+                    'display_name': 'GST Types',
+                    'description': 'GST calculation types (Inclusive/Exclusive)',
+                    'nested': False
+                },
+                {
+                    'name': 'PaymentStatus',
+                    'display_name': 'Payment Status',
+                    'description': 'Payment status options',
+                    'nested': False
+                },
+                {
+                    'name': 'PaymentMethod',
+                    'display_name': 'Payment Methods',
+                    'description': 'Available payment methods',
+                    'nested': False
+                }
+            ]
+        },
+        {
+            'id': 'payments_received',
+            'name': 'Payments Received',
+            'icon': 'bi-arrow-down-circle',
+            'color': 'success',
+            'groups': [
+                {
+                    'name': 'PaymentMethod',
+                    'display_name': 'Payment Methods',
+                    'description': 'Available payment methods',
+                    'nested': False
+                },
+                {
+                    'name': 'TDSSection',
+                    'display_name': 'TDS Sections',
+                    'description': 'TDS section codes (194C, 194J, etc.)',
+                    'nested': False
+                }
+            ]
+        },
+        {
+            'id': 'payments_made',
+            'name': 'Payments Made',
+            'icon': 'bi-arrow-up-circle',
+            'color': 'danger',
+            'groups': [
+                {
+                    'name': 'PaymentMethod',
+                    'display_name': 'Payment Methods',
+                    'description': 'Available payment methods',
+                    'nested': False
+                },
+                {
+                    'name': 'TDSSection',
+                    'display_name': 'TDS Sections',
+                    'description': 'TDS section codes (194C, 194J, etc.)',
+                    'nested': False
+                },
+                {
+                    'name': 'PaymentCategory',
+                    'display_name': 'Payment Categories',
+                    'description': 'Categories for payments made',
+                    'nested': False
+                }
+            ]
+        },
+        {
+            'id': 'expenses',
+            'name': 'Expenses',
+            'icon': 'bi-receipt',
+            'color': 'warning',
+            'groups': [
+                {
+                    'name': 'ExpenseMainCategory',
+                    'display_name': 'Expense Categories',
+                    'description': 'Main expense categories',
+                    'nested': True,
+                    'child_group': 'ExpenseSubCategory'
+                }
+            ]
+        }
+    ]
+
+    # Fetch all settings from database
+    all_settings = Setting.query.order_by(Setting.group, Setting.sort_order).all()
+    settings_by_group = {}
+    for setting in all_settings:
+        if setting.group not in settings_by_group:
+            settings_by_group[setting.group] = []
+        settings_by_group[setting.group].append(setting)
+
+    # Build module dropdown data
+    module_dropdowns = {}
+    for module in modules_config:
+        module_data = {
+            'name': module['name'],
+            'icon': module['icon'],
+            'color': module['color'],
+            'groups': []
+        }
+        
+        for group_config in module['groups']:
+            group_name = group_config['name']
+            group_items = settings_by_group.get(group_name, [])
+            
+            # Process items
+            items_list = []
+            if group_config.get('nested'):
+                # Handle nested dropdowns (like expenses)
+                child_group = group_config.get('child_group')
+                child_settings = settings_by_group.get(child_group, [])
+                
+                for item in group_items:
+                    # Find children for this item
+                    children = [
+                        {
+                            'id': child.id,
+                            'key': child.key,
+                            'value': child.value
+                        }
+                        for child in child_settings
+                        if child.key.startswith(item.key + '_')
+                    ]
+                    
+                    items_list.append({
+                        'id': item.id,
+                        'key': item.key,
+                        'value': item.value,
+                        'has_children': True,
+                        'children': children,
+                        'children_count': len(children)
+                    })
+            else:
+                # Regular dropdowns
+                items_list = [
+                    {
+                        'id': item.id,
+                        'key': item.key,
+                        'value': item.value,
+                        'has_children': False
+                    }
+                    for item in group_items
+                ]
+            
+            module_data['groups'].append({
+                'name': group_name,
+                'display_name': group_config['display_name'],
+                'description': group_config.get('description', ''),
+                'nested': group_config.get('nested', False),
+                'child_group': group_config.get('child_group', ''),
+                'items': items_list
+            })
+        
+        module_dropdowns[module['id']] = module_data
+
+    # Calculate dropdown count for each module
+    for module in modules_config:
+        module['dropdown_count'] = len(module['groups'])
+
+    return render_template('settings/unified_dropdowns.html', 
+                         title='Dropdown Settings',
+                         modules=modules_config,
+                         module_dropdowns=module_dropdowns)
 
 
 @bp.route('/dropdowns/leads')

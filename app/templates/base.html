@@ -539,11 +539,6 @@
                         <i class="bi bi-person-badge"></i> Employees
                     </a>
                     {% endif %}
-                    {% if current_user.has_module_access('expenses') %}
-                    <a href="{{ url_for('expenses.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('expenses.') }}">
-                        <i class="bi bi-receipt"></i> Expenses
-                    </a>
-                    {% endif %}
                     {% if current_user.has_module_access('channel_partners') %}
                     <a href="{{ url_for('channel_partners.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('channel_partners.') }}">
                         <i class="bi bi-diagram-3"></i> Channel Partners
@@ -575,6 +570,13 @@
                     <a href="{{ url_for('finance.payments_made') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('finance.payments_made') }}">
                         <i class="bi bi-wallet2"></i> Payments Made
                     </a>
+                    {% endif %}
+                    {% if current_user.has_module_access('expenses') %}
+                    <a href="{{ url_for('expenses.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('expenses.') }}">
+                        <i class="bi bi-receipt"></i> Expenses
+                    </a>
+                    {% endif %}
+                    {% if current_user.has_module_access('finance') %}
                     <a href="{{ url_for('finance.chart_of_accounts') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('finance.chart_of_accounts') }}">
                         <i class="bi bi-journal-text"></i> Chart of Accounts
                     </a>
@@ -650,11 +652,6 @@
                             <i class="bi bi-person-badge"></i> Employees
                         </a>
                         {% endif %}
-                        {% if current_user.has_module_access('expenses') %}
-                        <a href="{{ url_for('expenses.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('expenses.') }}">
-                            <i class="bi bi-receipt"></i> Expenses
-                        </a>
-                        {% endif %}
                         {% if current_user.has_module_access('channel_partners') %}
                         <a href="{{ url_for('channel_partners.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('channel_partners.') }}">
                             <i class="bi bi-diagram-3"></i> Channel Partners
@@ -686,6 +683,13 @@
                         <a href="{{ url_for('finance.payments_made') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('finance.payments_made') }}">
                             <i class="bi bi-wallet2"></i> Payments Made
                         </a>
+                        {% endif %}
+                        {% if current_user.has_module_access('expenses') %}
+                        <a href="{{ url_for('expenses.index') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('expenses.') }}">
+                            <i class="bi bi-receipt"></i> Expenses
+                        </a>
+                        {% endif %}
+                        {% if current_user.has_module_access('finance') %}
                         <a href="{{ url_for('finance.chart_of_accounts') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint and request.endpoint.startswith('finance.chart_of_accounts') }}">
                             <i class="bi bi-journal-text"></i> Chart of Accounts
                         </a>

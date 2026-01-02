@@ -114,6 +114,20 @@ class PurchaseForm(FlaskForm):
                                 render_kw={'class': 'form-control', 'autocomplete': 'off'})
     notes = TextAreaField('Notes', validators=[Optional()],
                          render_kw={'class': 'form-control', 'rows': 3, 'placeholder': 'Optional notes', 'autocomplete': 'off'})
+    
+    # Payment fields (shown only when payment_status is Paid or Partial)
+    payment_amount = DecimalField('Payment Amount (₹)', validators=[Optional(), NumberRange(min=0)],
+                                 places=2, render_kw={'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'autocomplete': 'off'})
+    payment_date = DateField('Payment Date', validators=[Optional()],
+                            render_kw={'class': 'form-control', 'type': 'date', 'autocomplete': 'off'})
+    payment_method = SelectField('Payment Method', 
+                                choices=[('', 'Select Payment Method'), ('Cash', 'Cash'), ('Bank Transfer', 'Bank Transfer'), 
+                                        ('Cheque', 'Cheque'), ('UPI', 'UPI'), ('Card', 'Card'), ('Other', 'Other')],
+                                validators=[Optional()],
+                                render_kw={'class': 'form-control', 'autocomplete': 'off'})
+    payment_remarks = TextAreaField('Payment Remarks', validators=[Optional()],
+                                   render_kw={'class': 'form-control', 'rows': 2, 'placeholder': 'Optional payment remarks', 'autocomplete': 'off'})
+    
     submit = SubmitField('Save Purchase', render_kw={'class': 'btn btn-primary'})
 
 

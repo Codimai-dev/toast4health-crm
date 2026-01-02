@@ -401,13 +401,51 @@ def purchases_add():
         purchase.calculate_gst()
         
         db.session.add(purchase)
+        db.session.flush()  # Flush to get the purchase.id
+        
+        # If payment status is Paid or Partial, create a PaymentMade entry
+        if form.payment_status.data in ['Paid', 'Partial']:
+            # Validate payment fields
+            if not form.payment_amount.data or form.payment_amount.data <= 0:
+                flash('Payment amount is required when payment status is Paid or Partial!', 'danger')
+                db.session.rollback()
+                return render_template('finance/purchases/add.html', title='Add Purchase', form=form)
+            
+            if not form.payment_date.data:
+                flash('Payment date is required when payment status is Paid or Partial!', 'danger')
+                db.session.rollback()
+                return render_template('finance/purchases/add.html', title='Add Purchase', form=form)
+            
+            if not form.payment_method.data:
+                flash('Payment method is required when payment status is Paid or Partial!', 'danger')
+                db.session.rollback()
+                return render_template('finance/purchases/add.html', title='Add Purchase', form=form)
+            
+            payment = PaymentMade(
+                reference_number=PaymentMade.generate_reference_number(),
+                date=form.payment_date.data,
+                payee_name=form.vendor_name.data,
+                amount=form.payment_amount.data,
+                payment_method=form.payment_method.data,
+                bill_number=purchase.bill_number,
+                purchase_id=purchase.id,
+                category='Purchases',
+                remarks=form.payment_remarks.data or f"Payment for {purchase.bill_number}",
+                created_by=current_user.id,
+                updated_by=current_user.id
+            )
+            db.session.add(payment)
+        
         db.session.commit()
         flash('Purchase added successfully!', 'success')
+        if form.payment_status.data in ['Paid', 'Partial']:
+            flash('Payment made entry created automatically!', 'info')
         return redirect(url_for('finance.purchases'))
     
     # Pre-populate bill number
     form.bill_number.data = Purchase.generate_bill_number()
     form.date.data = date.today()
+    form.payment_date.data = date.today()
     return render_template('finance/purchases/add.html', title='Add Purchase', form=form)
 
 
@@ -429,6 +467,9 @@ def purchases_edit(id):
     form = PurchaseForm(obj=purchase)
     
     if form.validate_on_submit():
+        # Store old payment status to detect changes
+        old_payment_status = purchase.payment_status
+        
         purchase.date = form.date.data
         purchase.vendor_name = form.vendor_name.data
         purchase.item_description = form.item_description.data
@@ -442,9 +483,74 @@ def purchases_edit(id):
         # Calculate GST and total amount
         purchase.calculate_gst()
         
+        # Handle payment made entry
+        if form.payment_status.data in ['Paid', 'Partial']:
+            # Validate payment fields
+            if not form.payment_amount.data or form.payment_amount.data <= 0:
+                flash('Payment amount is required when payment status is Paid or Partial!', 'danger')
+                db.session.rollback()
+                return render_template('finance/purchases/edit.html', title='Edit Purchase', form=form, purchase=purchase)
+            
+            if not form.payment_date.data:
+                flash('Payment date is required when payment status is Paid or Partial!', 'danger')
+                db.session.rollback()
+                return render_template('finance/purchases/edit.html', title='Edit Purchase', form=form, purchase=purchase)
+            
+            if not form.payment_method.data:
+                flash('Payment method is required when payment status is Paid or Partial!', 'danger')
+                db.session.rollback()
+                return render_template('finance/purchases/edit.html', title='Edit Purchase', form=form, purchase=purchase)
+            
+            # Check if there's already a payment for this purchase
+            existing_payment = PaymentMade.query.filter_by(purchase_id=purchase.id).first()
+            
+            if existing_payment:
+                # Update existing payment
+                existing_payment.date = form.payment_date.data
+                existing_payment.payee_name = form.vendor_name.data
+                existing_payment.amount = form.payment_amount.data
+                existing_payment.payment_method = form.payment_method.data
+                existing_payment.remarks = form.payment_remarks.data or f"Payment for {purchase.bill_number}"
+                existing_payment.updated_by = current_user.id
+                flash('Purchase and payment made entry updated successfully!', 'success')
+            else:
+                # Create new payment entry
+                payment = PaymentMade(
+                    reference_number=PaymentMade.generate_reference_number(),
+                    date=form.payment_date.data,
+                    payee_name=form.vendor_name.data,
+                    amount=form.payment_amount.data,
+                    payment_method=form.payment_method.data,
+                    bill_number=purchase.bill_number,
+                    purchase_id=purchase.id,
+                    category='Purchases',
+                    remarks=form.payment_remarks.data or f"Payment for {purchase.bill_number}",
+                    created_by=current_user.id,
+                    updated_by=current_user.id
+                )
+                db.session.add(payment)
+                flash('Purchase updated and payment made entry created successfully!', 'success')
+        elif old_payment_status in ['Paid', 'Partial'] and form.payment_status.data == 'Pending':
+            # Payment status changed from Paid/Partial to Pending
+            # Optionally delete the payment entry (or just update the purchase)
+            flash('Purchase updated successfully! Note: Existing payment entry was not deleted.', 'warning')
+        else:
+            flash('Purchase updated successfully!', 'success')
+        
         db.session.commit()
-        flash('Purchase updated successfully!', 'success')
         return redirect(url_for('finance.purchases'))
+    
+    # Pre-populate form
+    if not form.is_submitted():
+        form.vendor_name.data = purchase.vendor_name
+        
+        # Pre-populate payment fields if there's an existing payment
+        existing_payment = PaymentMade.query.filter_by(purchase_id=purchase.id).first()
+        if existing_payment:
+            form.payment_amount.data = existing_payment.amount
+            form.payment_date.data = existing_payment.date
+            form.payment_method.data = existing_payment.payment_method
+            form.payment_remarks.data = existing_payment.remarks
     
     return render_template('finance/purchases/edit.html', title='Edit Purchase', form=form, purchase=purchase)
 

@@ -75,8 +75,37 @@
                         <div class="row">
                             <div class="col-md-12 mb-3">
                                 {{ form.payment_status.label(class="form-label") }}
-                                {{ form.payment_status(class="form-control") }}
+                                {{ form.payment_status(class="form-control", id="payment_status") }}
                             </div>
+                        </div>
+
+                        <!-- Payment Details Section (shown when status is Paid or Partial) -->
+                        <div id="payment-details-section" style="display: none;">
+                            <hr>
+                            <h5 class="mb-3"><i class="bi bi-wallet2"></i> Payment Details</h5>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.payment_amount.label(class="form-label") }}
+                                    {{ form.payment_amount(class="form-control") }}
+                                    <small class="text-muted">Amount being paid</small>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.payment_date.label(class="form-label") }}
+                                    {{ form.payment_date(class="form-control") }}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form.payment_method.label(class="form-label") }}
+                                {{ form.payment_method(class="form-control") }}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form.payment_remarks.label(class="form-label") }}
+                                {{ form.payment_remarks(class="form-control") }}
+                            </div>
+                            <hr>
                         </div>
 
                         <div class="mb-3">
@@ -105,6 +134,8 @@
         const gstPercentageField = document.getElementById('gst_percentage');
         const gstAmountField = document.getElementById('gst_amount');
         const totalAmountField = document.getElementById('total_amount');
+        const paymentStatusField = document.getElementById('payment_status');
+        const paymentDetailsSection = document.getElementById('payment-details-section');
 
         function calculateGST() {
             const baseAmount = parseFloat(baseAmountField.value) || 0;
@@ -134,13 +165,27 @@
             totalAmountField.value = totalAmount.toFixed(2);
         }
 
+        // Toggle payment details section based on payment status
+        function togglePaymentDetails() {
+            const status = paymentStatusField.value;
+            if (status === 'Paid' || status === 'Partial') {
+                paymentDetailsSection.style.display = 'block';
+            } else {
+                paymentDetailsSection.style.display = 'none';
+            }
+        }
+
         // Add event listeners for GST calculation
         baseAmountField.addEventListener('input', calculateGST);
         gstTypeField.addEventListener('change', calculateGST);
         gstPercentageField.addEventListener('input', calculateGST);
 
-        // Initial calculation
+        // Add event listener for payment status change
+        paymentStatusField.addEventListener('change', togglePaymentDetails);
+
+        // Initial calculation and toggle
         calculateGST();
+        togglePaymentDetails();
     });
 </script>
 {% endblock %}

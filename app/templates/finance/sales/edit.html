@@ -48,12 +48,38 @@
                             {{ form.product_service(class="form-control") }}
                         </div>
 
+                        <!-- GST Fields -->
                         <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.base_amount.label(class="form-label") }}
+                                {{ form.base_amount(class="form-control") }}
+                                <small class="text-muted">Enter the amount (before or including GST based on selection below)</small>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                {{ form.gst_type.label(class="form-label") }}
+                                {{ form.gst_type(class="form-control") }}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                {{ form.gst_percentage.label(class="form-label") }}
+                                {{ form.gst_percentage(class="form-control") }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.gst_amount.label(class="form-label") }}
+                                {{ form.gst_amount(class="form-control") }}
+                                <small class="text-muted">Auto-calculated GST amount</small>
+                            </div>
                             <div class="col-md-6 mb-3">
                                 {{ form.amount.label(class="form-label") }}
                                 {{ form.amount(class="form-control") }}
+                                <small class="text-muted">Auto-calculated total amount</small>
                             </div>
-                            <div class="col-md-6 mb-3">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
                                 {{ form.payment_status.label(class="form-label") }}
                                 {{ form.payment_status(class="form-control", id="payment_status") }}
                             </div>
@@ -109,21 +135,62 @@
 </div>
 
 <script>
-    // Show/hide payment details based on payment status
+    // GST Calculation
     document.addEventListener('DOMContentLoaded', function() {
+        const baseAmountField = document.getElementById('base_amount');
+        const gstTypeField = document.getElementById('gst_type');
+        const gstPercentageField = document.getElementById('gst_percentage');
+        const gstAmountField = document.getElementById('gst_amount');
+        const totalAmountField = document.getElementById('total_amount');
         const paymentStatusField = document.getElementById('payment_status');
         const paymentDetailsDiv = document.getElementById('payment_details');
-        const amountField = document.getElementById('amount');
         const paymentAmountField = document.getElementById('payment_amount');
 
+        function calculateGST() {
+            const baseAmount = parseFloat(baseAmountField.value) || 0;
+            const gstType = gstTypeField.value;
+            const gstPercentage = parseFloat(gstPercentageField.value) || 0;
+
+            let gstAmount = 0;
+            let totalAmount = 0;
+
+            if (gstType === 'inclusive') {
+                // GST is included in the base amount
+                // Extract GST: GST = Base × (Rate / (100 + Rate))
+                if (gstPercentage > 0) {
+                    gstAmount = baseAmount * (gstPercentage / (100 + gstPercentage));
+                    totalAmount = baseAmount;
+                } else {
+                    gstAmount = 0;
+                    totalAmount = baseAmount;
+                }
+            } else {
+                // GST is exclusive - add on top of base amount
+                gstAmount = baseAmount * (gstPercentage / 100);
+                totalAmount = baseAmount + gstAmount;
+            }
+
+            gstAmountField.value = gstAmount.toFixed(2);
+            totalAmountField.value = totalAmount.toFixed(2);
+        }
+
+        // Add event listeners for GST calculation
+        baseAmountField.addEventListener('input', calculateGST);
+        gstTypeField.addEventListener('change', calculateGST);
+        gstPercentageField.addEventListener('input', calculateGST);
+
+        // Initial calculation
+        calculateGST();
+
+        // Show/hide payment details based on payment status
         function togglePaymentDetails() {
             const status = paymentStatusField.value;
             if (status === 'Received' || status === 'Partial') {
                 paymentDetailsDiv.style.display = 'block';
                 
-                // Auto-fill payment amount with sale amount if Received and payment amount is empty
-                if (status === 'Received' && amountField.value && !paymentAmountField.value) {
-                    paymentAmountField.value = amountField.value;
+                // Auto-fill payment amount with total amount if Received and payment amount is empty
+                if (status === 'Received' && totalAmountField.value && !paymentAmountField.value) {
+                    paymentAmountField.value = totalAmountField.value;
                 }
             } else {
                 paymentDetailsDiv.style.display = 'none';
@@ -135,13 +202,6 @@
 
         // Listen for changes
         paymentStatusField.addEventListener('change', togglePaymentDetails);
-        
-        // Update payment amount when sale amount changes and status is Received
-        amountField.addEventListener('input', function() {
-            if (paymentStatusField.value === 'Received' && !paymentAmountField.value) {
-                paymentAmountField.value = amountField.value;
-            }
-        });
     });
 </script>
 {% endblock %}

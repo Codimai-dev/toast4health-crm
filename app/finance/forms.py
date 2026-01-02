@@ -18,8 +18,22 @@ class SaleForm(FlaskForm):
                                    render_kw={'class': 'form-control', 'placeholder': 'Enter new customer name', 'autocomplete': 'off'})
     product_service = StringField('Product/Service', validators=[DataRequired()],
                                  render_kw={'class': 'form-control', 'placeholder': 'Describe product or service', 'autocomplete': 'off'})
-    amount = DecimalField('Amount (₹)', validators=[DataRequired(), NumberRange(min=0)],
-                         places=2, render_kw={'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'autocomplete': 'off'})
+    
+    # GST fields
+    base_amount = DecimalField('Amount (₹)', validators=[DataRequired(), NumberRange(min=0)],
+                         places=2, render_kw={'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'autocomplete': 'off', 'id': 'base_amount'})
+    gst_type = SelectField('GST Type', 
+                          choices=[('exclusive', 'Exclusive'), ('inclusive', 'Inclusive')],
+                          validators=[DataRequired()], default='exclusive',
+                          render_kw={'class': 'form-control', 'autocomplete': 'off', 'id': 'gst_type'})
+    gst_percentage = IntegerField('GST %', validators=[DataRequired(), NumberRange(min=0, max=100)],
+                                 default=18,
+                                 render_kw={'class': 'form-control', 'placeholder': '18', 'autocomplete': 'off', 'id': 'gst_percentage'})
+    gst_amount = DecimalField('GST Amount (₹)', validators=[Optional()],
+                             places=2, render_kw={'class': 'form-control', 'placeholder': '0.00', 'readonly': True, 'autocomplete': 'off', 'id': 'gst_amount'})
+    amount = DecimalField('Total Amount (₹)', validators=[Optional()],
+                         places=2, render_kw={'class': 'form-control', 'placeholder': '0.00', 'readonly': True, 'autocomplete': 'off', 'id': 'total_amount'})
+    
     payment_status = SelectField('Payment Status', 
                                 choices=[('Pending', 'Pending'), ('Received', 'Received'), ('Partial', 'Partial')],
                                 validators=[DataRequired()], default='Pending',
@@ -78,8 +92,22 @@ class PurchaseForm(FlaskForm):
                              render_kw={'class': 'form-control', 'placeholder': 'Enter vendor name', 'autocomplete': 'off'})
     item_description = StringField('Item/Description', validators=[DataRequired()],
                                   render_kw={'class': 'form-control', 'placeholder': 'Describe item or service', 'autocomplete': 'off'})
-    amount = DecimalField('Amount (₹)', validators=[DataRequired(), NumberRange(min=0)],
-                         places=2, render_kw={'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'autocomplete': 'off'})
+    
+    # GST fields
+    base_amount = DecimalField('Amount (₹)', validators=[DataRequired(), NumberRange(min=0)],
+                         places=2, render_kw={'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'autocomplete': 'off', 'id': 'base_amount'})
+    gst_type = SelectField('GST Type', 
+                          choices=[('exclusive', 'Exclusive'), ('inclusive', 'Inclusive')],
+                          validators=[DataRequired()], default='exclusive',
+                          render_kw={'class': 'form-control', 'autocomplete': 'off', 'id': 'gst_type'})
+    gst_percentage = IntegerField('GST %', validators=[DataRequired(), NumberRange(min=0, max=100)],
+                                 default=18,
+                                 render_kw={'class': 'form-control', 'placeholder': '18', 'autocomplete': 'off', 'id': 'gst_percentage'})
+    gst_amount = DecimalField('GST Amount (₹)', validators=[Optional()],
+                             places=2, render_kw={'class': 'form-control', 'placeholder': '0.00', 'readonly': True, 'autocomplete': 'off', 'id': 'gst_amount'})
+    amount = DecimalField('Total Amount (₹)', validators=[Optional()],
+                         places=2, render_kw={'class': 'form-control', 'placeholder': '0.00', 'readonly': True, 'autocomplete': 'off', 'id': 'total_amount'})
+    
     payment_status = SelectField('Payment Status', 
                                 choices=[('Pending', 'Pending'), ('Paid', 'Paid'), ('Partial', 'Partial')],
                                 validators=[DataRequired()], default='Pending',

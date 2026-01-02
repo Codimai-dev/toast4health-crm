@@ -181,12 +181,17 @@ def sales_add():
             customer_name=customer_name,
             customer_id=customer_id,
             product_service=form.product_service.data,
-            amount=form.amount.data,
+            base_amount=form.base_amount.data,
+            gst_type=form.gst_type.data,
+            gst_percentage=form.gst_percentage.data,
             payment_status=form.payment_status.data,
             notes=form.notes.data,
             created_by=current_user.id,
             updated_by=current_user.id
         )
+        # Calculate GST and total amount
+        sale.calculate_gst()
+        
         db.session.add(sale)
         db.session.flush()  # Flush to get the sale.id
         
@@ -267,10 +272,15 @@ def sales_edit(id):
         sale.customer_name = customer_name
         sale.customer_id = customer.id if customer else None
         sale.product_service = form.product_service.data
-        sale.amount = form.amount.data
+        sale.base_amount = form.base_amount.data
+        sale.gst_type = form.gst_type.data
+        sale.gst_percentage = form.gst_percentage.data
         sale.payment_status = form.payment_status.data
         sale.notes = form.notes.data
         sale.updated_by = current_user.id
+        
+        # Calculate GST and total amount
+        sale.calculate_gst()
         
         # Handle payment received entry
         if form.payment_status.data in ['Received', 'Partial']:
@@ -379,12 +389,17 @@ def purchases_add():
             date=form.date.data,
             vendor_name=form.vendor_name.data,
             item_description=form.item_description.data,
-            amount=form.amount.data,
+            base_amount=form.base_amount.data,
+            gst_type=form.gst_type.data,
+            gst_percentage=form.gst_percentage.data,
             payment_status=form.payment_status.data,
             notes=form.notes.data,
             created_by=current_user.id,
             updated_by=current_user.id
         )
+        # Calculate GST and total amount
+        purchase.calculate_gst()
+        
         db.session.add(purchase)
         db.session.commit()
         flash('Purchase added successfully!', 'success')
@@ -417,10 +432,15 @@ def purchases_edit(id):
         purchase.date = form.date.data
         purchase.vendor_name = form.vendor_name.data
         purchase.item_description = form.item_description.data
-        purchase.amount = form.amount.data
+        purchase.base_amount = form.base_amount.data
+        purchase.gst_type = form.gst_type.data
+        purchase.gst_percentage = form.gst_percentage.data
         purchase.payment_status = form.payment_status.data
         purchase.notes = form.notes.data
         purchase.updated_by = current_user.id
+        
+        # Calculate GST and total amount
+        purchase.calculate_gst()
         
         db.session.commit()
         flash('Purchase updated successfully!', 'success')

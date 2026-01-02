@@ -991,12 +991,36 @@ class Sale(db.Model, TimestampMixin, UserTrackingMixin):
     customer_name = db.Column(db.String(200), nullable=False, index=True)
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=True)
     product_service = db.Column(db.String(300), nullable=False)
-    amount = db.Column(db.Numeric(12, 2), nullable=False)
+    
+    # GST fields
+    base_amount = db.Column(db.Numeric(12, 2), nullable=False, default=0)  # Amount before GST
+    gst_type = db.Column(db.String(20), nullable=False, default='exclusive')  # 'inclusive' or 'exclusive'
+    gst_percentage = db.Column(db.Integer, nullable=False, default=18)
+    gst_amount = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    amount = db.Column(db.Numeric(12, 2), nullable=False)  # Total amount (with GST)
+    
     payment_status = db.Column(db.String(50), nullable=False, default='Pending', index=True)
     notes = db.Column(db.Text, nullable=True)
     
     # Relationships
     customer = db.relationship('Customer', backref='sales')
+    
+    def calculate_gst(self):
+        """Calculate GST amount and total based on GST type."""
+        if self.gst_type == 'inclusive':
+            # GST is already included in base_amount
+            # Extract GST: GST = Base × (Rate / (100 + Rate))
+            if self.gst_percentage and self.gst_percentage > 0:
+                gst_multiplier = Decimal(self.gst_percentage) / (100 + Decimal(self.gst_percentage))
+                self.gst_amount = self.base_amount * gst_multiplier
+                self.amount = self.base_amount
+            else:
+                self.gst_amount = 0
+                self.amount = self.base_amount
+        else:
+            # GST is exclusive - add on top of base amount
+            self.gst_amount = self.base_amount * (self.gst_percentage or 0) / 100
+            self.amount = self.base_amount + self.gst_amount
     
     def __repr__(self):
         return f'<Sale {self.invoice_number}: {self.customer_name}>'
@@ -1039,9 +1063,33 @@ class Purchase(db.Model, TimestampMixin, UserTrackingMixin):
     date = db.Column(db.Date, nullable=False, index=True)
     vendor_name = db.Column(db.String(200), nullable=False, index=True)
     item_description = db.Column(db.String(300), nullable=False)
-    amount = db.Column(db.Numeric(12, 2), nullable=False)
+    
+    # GST fields
+    base_amount = db.Column(db.Numeric(12, 2), nullable=False, default=0)  # Amount before GST
+    gst_type = db.Column(db.String(20), nullable=False, default='exclusive')  # 'inclusive' or 'exclusive'
+    gst_percentage = db.Column(db.Integer, nullable=False, default=18)
+    gst_amount = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    amount = db.Column(db.Numeric(12, 2), nullable=False)  # Total amount (with GST)
+    
     payment_status = db.Column(db.String(50), nullable=False, default='Pending', index=True)
     notes = db.Column(db.Text, nullable=True)
+    
+    def calculate_gst(self):
+        """Calculate GST amount and total based on GST type."""
+        if self.gst_type == 'inclusive':
+            # GST is already included in base_amount
+            # Extract GST: GST = Base × (Rate / (100 + Rate))
+            if self.gst_percentage and self.gst_percentage > 0:
+                gst_multiplier = Decimal(self.gst_percentage) / (100 + Decimal(self.gst_percentage))
+                self.gst_amount = self.base_amount * gst_multiplier
+                self.amount = self.base_amount
+            else:
+                self.gst_amount = 0
+                self.amount = self.base_amount
+        else:
+            # GST is exclusive - add on top of base amount
+            self.gst_amount = self.base_amount * (self.gst_percentage or 0) / 100
+            self.amount = self.base_amount + self.gst_amount
     
     def __repr__(self):
         return f'<Purchase {self.bill_number}: {self.vendor_name}>'

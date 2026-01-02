@@ -206,7 +206,12 @@ function createDropdownGroupElement(group) {
         tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No items yet</td></tr>';
     } else {
         group.items.forEach(item => {
-            tbody.appendChild(createItemRow(item, group));
+            const itemRow = createItemRow(item, group);
+            tbody.appendChild(itemRow);
+            // If this item has a sub-section, append it right after the main row
+            if (itemRow.subSection) {
+                tbody.appendChild(itemRow.subSection);
+            }
         });
     }
     
@@ -230,7 +235,7 @@ function createItemRow(item, group) {
     // Check if this is a nested group (parent category)
     if (group.nested && item.has_children) {
         actionsHtml = `
-            <button class="btn btn-sm btn-outline-info" onclick="toggleSubCategories('${item.key}', '${group.name}')">
+            <button class="btn btn-sm btn-outline-info" onclick="toggleSubCategories('${item.key}')">
                 <i class="bi bi-eye"></i> Sub-items (${item.children_count})
             </button>
         ` + actionsHtml;
@@ -282,7 +287,8 @@ function createItemRow(item, group) {
                     </div>
                 </td>
             `;
-            tr.after(subSection);
+            // Store the sub-section in a data attribute so we can access it later
+            tr.subSection = subSection;
         }
     } else {
         tr.innerHTML = `
@@ -298,10 +304,22 @@ function createItemRow(item, group) {
     return tr;
 }
 
-function toggleSubCategories(key, groupName) {
+function toggleSubCategories(key) {
     const subSection = document.getElementById(`sub-${key}`);
     if (subSection) {
-        subSection.classList.toggle('expanded');
+        const isExpanded = subSection.classList.toggle('expanded');
+        
+        // Update button icon based on state
+        const parentRow = subSection.previousElementSibling;
+        if (parentRow) {
+            const toggleBtn = parentRow.querySelector('.btn-outline-info');
+            if (toggleBtn) {
+                const icon = toggleBtn.querySelector('i');
+                if (icon) {
+                    icon.className = isExpanded ? 'bi bi-eye-slash' : 'bi bi-eye';
+                }
+            }
+        }
     }
 }
 
@@ -368,9 +386,22 @@ document.getElementById('saveDropdownBtn').addEventListener('click', function() 
 
 function editItem(id, group) {
     const row = document.querySelector(`tr[data-id="${id}"]`);
+    if (!row) {
+        console.error('Row not found for id:', id);
+        alert('An error occurred: Row not found');
+        return;
+    }
+    
     const valueDisplay = row.querySelector('.value-display');
     const valueEdit = row.querySelector('.value-edit');
-    const editBtn = row.querySelector('.btn-outline-primary');
+    // Find the edit button - it could be either btn-outline-primary or btn-success
+    const editBtn = row.querySelector('.btn-outline-primary, .btn-success');
+    
+    if (!valueDisplay || !valueEdit || !editBtn) {
+        console.error('Required elements not found', {valueDisplay, valueEdit, editBtn});
+        alert('An error occurred: Required elements not found');
+        return;
+    }
     
     if (valueEdit.classList.contains('d-none')) {
         // Enter edit mode

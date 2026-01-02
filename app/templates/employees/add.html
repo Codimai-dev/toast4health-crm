@@ -155,6 +155,12 @@
                     <h6 class="text-primary mb-3 mt-4"><i class="bi bi-bank"></i> Banking Information</h6>
                     <div class="row">
                         <div class="col-md-6 mb-3">
+                            {{ form.pan_no.label(class="form-label") }}
+                            {{ form.pan_no() }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
                             {{ form.bank_name.label(class="form-label") }}
                             {{ form.bank_name() }}
                         </div>
@@ -191,19 +197,8 @@
                     <h6 class="text-primary mb-3 mt-4"><i class="bi bi-file-earmark"></i> Additional Information</h6>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            {{ form.pdf_link.label(class="form-label") }}
-                            {{ form.pdf_link() }}
-                        </div>
-                        <div class="col-md-6 mb-3">
                             {{ form.employ_image.label(class="form-label") }}
                             {{ form.employ_image() }}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ form.pdf_file.label(class="form-label") }}
-                            {{ form.pdf_file() }}
-                            <small class="text-muted">Upload PDF file (optional)</small>
                         </div>
                         <div class="col-md-6 mb-3">
                             {{ form.employ_image_file.label(class="form-label") }}

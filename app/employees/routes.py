@@ -46,7 +46,7 @@ def index():
             SELECT id, employee_code, employ_type, name, contact_no, dob, degree,
                    temporary_address, permanent_address, employ_image, aadhar_no,
                    total_experience, skill_set, gender, designation, whatsapp_no,
-                   email, pdf_link, bank_name, branch_name, account_no, ifsc_code,
+                   email, pan_no, bank_name, branch_name, account_no, ifsc_code,
                    created_at, updated_at, created_by, updated_by
             FROM employee
             ORDER BY created_at DESC
@@ -77,12 +77,10 @@ def add():
     form.employee_code.data = Employee.generate_employee_code()
     if form.validate_on_submit():
         try:
-            # Handle file uploads
-            pdf_path = save_uploaded_file(form.pdf_file, 'uploads/pdfs', f"emp_{form.employee_code.data}")
+            # Handle file upload for image
             image_path = save_uploaded_file(form.employ_image_file, 'uploads/images', f"emp_{form.employee_code.data}")
 
             # Use uploaded file path if available, otherwise use URL
-            final_pdf_link = pdf_path if pdf_path else form.pdf_link.data
             final_employ_image = image_path if image_path else form.employ_image.data
 
             employee = Employee(
@@ -98,6 +96,7 @@ def add():
                 total_experience=form.total_experience.data,
                 whatsapp_no=form.whatsapp_no.data,
                 aadhar_no=form.aadhar_no.data,
+                pan_no=form.pan_no.data,
                 bank_name=form.bank_name.data,
                 branch_name=form.branch_name.data,
                 account_no=form.account_no.data,
@@ -105,7 +104,6 @@ def add():
                 temporary_address=form.temporary_address.data,
                 permanent_address=form.permanent_address.data,
                 skill_set=form.skill_set.data,
-                pdf_link=final_pdf_link,
                 employ_image=final_employ_image,
                 created_by=current_user.id,
                 updated_by=current_user.id
@@ -164,7 +162,7 @@ def view(id):
             SELECT id, employee_code, employ_type, name, contact_no, dob, degree,
                    temporary_address, permanent_address, employ_image, aadhar_no,
                    total_experience, skill_set, gender, designation, whatsapp_no,
-                   email, pdf_link, bank_name, branch_name, account_no, ifsc_code,
+                   email, pan_no, bank_name, branch_name, account_no, ifsc_code,
                    created_at, updated_at, created_by, updated_by
             FROM employee
             WHERE id = :id
@@ -214,7 +212,7 @@ def edit(id):
             SELECT id, employee_code, employ_type, name, contact_no, dob, degree,
                    temporary_address, permanent_address, employ_image, aadhar_no,
                    total_experience, skill_set, gender, designation, whatsapp_no,
-                   email, pdf_link, bank_name, branch_name, account_no, ifsc_code,
+                   email, pan_no, bank_name, branch_name, account_no, ifsc_code,
                    created_at, updated_at, created_by, updated_by
             FROM employee
             WHERE id = :id
@@ -257,6 +255,7 @@ def edit(id):
         form.total_experience.data = employee_dict['total_experience']
         form.whatsapp_no.data = employee_dict['whatsapp_no']
         form.aadhar_no.data = employee_dict['aadhar_no']
+        form.pan_no.data = employee_dict['pan_no']
         form.bank_name.data = employee_dict['bank_name']
         form.branch_name.data = employee_dict['branch_name']
         form.account_no.data = employee_dict['account_no']
@@ -264,17 +263,14 @@ def edit(id):
         form.temporary_address.data = employee_dict['temporary_address']
         form.permanent_address.data = employee_dict['permanent_address']
         form.skill_set.data = employee_dict['skill_set']
-        form.pdf_link.data = employee_dict['pdf_link']
         form.employ_image.data = employee_dict['employ_image']
 
     if form.validate_on_submit():
         try:
-            # Handle file uploads
-            pdf_path = save_uploaded_file(form.pdf_file, 'uploads/pdfs', f"emp_{form.employee_code.data}")
+            # Handle file upload for image
             image_path = save_uploaded_file(form.employ_image_file, 'uploads/images', f"emp_{form.employee_code.data}")
 
             # Use uploaded file path if available, otherwise use URL
-            final_pdf_link = pdf_path if pdf_path else form.pdf_link.data
             final_employ_image = image_path if image_path else form.employ_image.data
 
             # Update the database using raw SQL
@@ -291,6 +287,7 @@ def edit(id):
                 'total_experience': form.total_experience.data,
                 'whatsapp_no': form.whatsapp_no.data,
                 'aadhar_no': form.aadhar_no.data,
+                'pan_no': form.pan_no.data,
                 'bank_name': form.bank_name.data,
                 'branch_name': form.branch_name.data,
                 'account_no': form.account_no.data,
@@ -298,7 +295,6 @@ def edit(id):
                 'temporary_address': form.temporary_address.data,
                 'permanent_address': form.permanent_address.data,
                 'skill_set': form.skill_set.data,
-                'pdf_link': final_pdf_link,
                 'employ_image': final_employ_image,
                 'updated_by': current_user.id
             }

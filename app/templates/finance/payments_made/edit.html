@@ -58,6 +58,41 @@
                             {{ form.bill_number(class="form-control") }}
                         </div>
 
+                        <!-- TDS Section -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="bi bi-calculator"></i> TDS (Tax Deducted at Source)</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        {{ form.tds_applicable.label(class="form-label") }}
+                                        {{ form.tds_applicable(class="form-control") }}
+                                    </div>
+                                    <div class="col-md-4 mb-3" id="tds_section_div_made" style="display:none;">
+                                        {{ form.tds_section.label(class="form-label") }}
+                                        {{ form.tds_section(class="form-control") }}
+                                    </div>
+                                    <div class="col-md-4 mb-3" id="tds_percentage_div_made" style="display:none;">
+                                        {{ form.tds_percentage.label(class="form-label") }}
+                                        {{ form.tds_percentage(class="form-control") }}
+                                    </div>
+                                </div>
+                                <div class="row" id="tds_amounts_div_made" style="display:none;">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.tds_amount.label(class="form-label") }}
+                                        {{ form.tds_amount(class="form-control") }}
+                                        <small class="text-muted">Automatically calculated</small>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.net_amount.label(class="form-label") }}
+                                        {{ form.net_amount(class="form-control") }}
+                                        <small class="text-muted">Actual amount paid after TDS</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="mb-3">
                             {{ form.remarks.label(class="form-label") }}
                             {{ form.remarks(class="form-control") }}
@@ -75,4 +110,58 @@
         </div>
     </div>
 </div>
+
+<script>
+// TDS calculation script for Payments Made
+document.addEventListener('DOMContentLoaded', function() {
+    const tdsApplicable = document.getElementById('tds_applicable_made');
+    const tdsSection = document.getElementById('tds_section_made');
+    const tdsPercentage = document.getElementById('tds_percentage_made');
+    const grossAmount = document.getElementById('gross_amount_made');
+    const tdsAmount = document.getElementById('tds_amount_made');
+    const netAmount = document.getElementById('net_amount_made');
+    
+    const tdsSectionDiv = document.getElementById('tds_section_div_made');
+    const tdsPercentageDiv = document.getElementById('tds_percentage_div_made');
+    const tdsAmountsDiv = document.getElementById('tds_amounts_div_made');
+    
+    function toggleTDSFields() {
+        if (tdsApplicable.value === 'yes') {
+            tdsSectionDiv.style.display = 'block';
+            tdsPercentageDiv.style.display = 'block';
+            tdsAmountsDiv.style.display = 'flex';
+            calculateTDS();
+        } else {
+            tdsSectionDiv.style.display = 'none';
+            tdsPercentageDiv.style.display = 'none';
+            tdsAmountsDiv.style.display = 'none';
+            tdsAmount.value = '0.00';
+            netAmount.value = grossAmount.value || '0.00';
+        }
+    }
+    
+    function calculateTDS() {
+        const gross = parseFloat(grossAmount.value) || 0;
+        const percentage = parseFloat(tdsPercentage.value) || 0;
+        
+        if (tdsApplicable.value === 'yes' && percentage > 0) {
+            const tds = (gross * percentage / 100).toFixed(2);
+            const net = (gross - tds).toFixed(2);
+            
+            tdsAmount.value = tds;
+            netAmount.value = net;
+        } else {
+            tdsAmount.value = '0.00';
+            netAmount.value = gross.toFixed(2);
+        }
+    }
+    
+    tdsApplicable.addEventListener('change', toggleTDSFields);
+    tdsPercentage.addEventListener('input', calculateTDS);
+    grossAmount.addEventListener('input', calculateTDS);
+    
+    // Initialize on page load
+    toggleTDSFields();
+});
+</script>
 {% endblock %}

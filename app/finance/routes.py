@@ -607,9 +607,15 @@ def payments_received_add():
             invoice_number=form.invoice_number.data if form.invoice_number.data else None,
             sale_id=sale_id,
             remarks=form.remarks.data,
+            tds_applicable=(form.tds_applicable.data == 'yes'),
+            tds_percentage=form.tds_percentage.data if form.tds_applicable.data == 'yes' else None,
+            tds_section=form.tds_section.data if form.tds_applicable.data == 'yes' else None,
             created_by=current_user.id,
             updated_by=current_user.id
         )
+        # Calculate TDS
+        payment.calculate_tds()
+        
         db.session.add(payment)
         db.session.commit()
         flash('Payment received added successfully!', 'success')
@@ -659,7 +665,13 @@ def payments_received_edit(id):
         payment.invoice_number = form.invoice_number.data if form.invoice_number.data else None
         payment.sale_id = sale_id
         payment.remarks = form.remarks.data
+        payment.tds_applicable = (form.tds_applicable.data == 'yes')
+        payment.tds_percentage = form.tds_percentage.data if form.tds_applicable.data == 'yes' else None
+        payment.tds_section = form.tds_section.data if form.tds_applicable.data == 'yes' else None
         payment.updated_by = current_user.id
+        
+        # Calculate TDS
+        payment.calculate_tds()
         
         db.session.commit()
         flash('Payment received updated successfully!', 'success')
@@ -669,6 +681,11 @@ def payments_received_edit(id):
     if not form.is_submitted():
         form.customer_name.data = payment.customer_name
         form.invoice_number.data = payment.invoice_number
+        form.tds_applicable.data = 'yes' if payment.tds_applicable else 'no'
+        form.tds_section.data = payment.tds_section
+        form.tds_percentage.data = payment.tds_percentage
+        form.tds_amount.data = payment.tds_amount
+        form.net_amount.data = payment.net_amount
     
     return render_template('finance/payments_received/edit.html', title='Edit Payment Received', form=form, payment=payment)
 
@@ -718,9 +735,15 @@ def payments_made_add():
             purchase_id=purchase_id,
             category=form.category.data,
             remarks=form.remarks.data,
+            tds_applicable=(form.tds_applicable.data == 'yes'),
+            tds_percentage=form.tds_percentage.data if form.tds_applicable.data == 'yes' else None,
+            tds_section=form.tds_section.data if form.tds_applicable.data == 'yes' else None,
             created_by=current_user.id,
             updated_by=current_user.id
         )
+        # Calculate TDS
+        payment.calculate_tds()
+        
         db.session.add(payment)
         db.session.commit()
         flash('Payment made added successfully!', 'success')
@@ -764,7 +787,13 @@ def payments_made_edit(id):
         payment.purchase_id = purchase_id
         payment.category = form.category.data
         payment.remarks = form.remarks.data
+        payment.tds_applicable = (form.tds_applicable.data == 'yes')
+        payment.tds_percentage = form.tds_percentage.data if form.tds_applicable.data == 'yes' else None
+        payment.tds_section = form.tds_section.data if form.tds_applicable.data == 'yes' else None
         payment.updated_by = current_user.id
+        
+        # Calculate TDS
+        payment.calculate_tds()
         
         db.session.commit()
         flash('Payment made updated successfully!', 'success')
@@ -773,6 +802,11 @@ def payments_made_edit(id):
     # Pre-populate form
     if not form.is_submitted():
         form.bill_number.data = payment.bill_number
+        form.tds_applicable.data = 'yes' if payment.tds_applicable else 'no'
+        form.tds_section.data = payment.tds_section
+        form.tds_percentage.data = payment.tds_percentage
+        form.tds_amount.data = payment.tds_amount
+        form.net_amount.data = payment.net_amount
     
     return render_template('finance/payments_made/edit.html', title='Edit Payment Made', form=form, payment=payment)
 

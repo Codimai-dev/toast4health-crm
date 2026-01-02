@@ -1138,12 +1138,28 @@ class PaymentReceived(db.Model, TimestampMixin, UserTrackingMixin):
     sale_id = db.Column(db.Integer, db.ForeignKey('sale.id'), nullable=True)
     remarks = db.Column(db.Text, nullable=True)
     
+    # TDS fields
+    tds_applicable = db.Column(db.Boolean, nullable=False, default=False)
+    tds_percentage = db.Column(db.Numeric(5, 2), nullable=True)  # e.g., 10.00 for 10%
+    tds_amount = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    tds_section = db.Column(db.String(50), nullable=True)  # e.g., "194C", "194J"
+    net_amount = db.Column(db.Numeric(12, 2), nullable=True)  # Amount after TDS deduction
+    
     # Relationships
     customer = db.relationship('Customer', backref='payments_received')
     sale = db.relationship('Sale', backref='payments_received')
     
+    def calculate_tds(self):
+        """Calculate TDS amount and net amount."""
+        if self.tds_applicable and self.tds_percentage:
+            self.tds_amount = self.amount * (self.tds_percentage / 100)
+            self.net_amount = self.amount - self.tds_amount
+        else:
+            self.tds_amount = 0
+            self.net_amount = self.amount
+    
     def __repr__(self):
-        return f'<PaymentReceived {self.reference_number}: Γé╣{self.amount}>'
+        return f'<PaymentReceived {self.reference_number}: ₹{self.amount}>'
 
     @staticmethod
     def generate_reference_number():
@@ -1189,11 +1205,27 @@ class PaymentMade(db.Model, TimestampMixin, UserTrackingMixin):
     category = db.Column(db.String(100), nullable=False)
     remarks = db.Column(db.Text, nullable=True)
     
+    # TDS fields
+    tds_applicable = db.Column(db.Boolean, nullable=False, default=False)
+    tds_percentage = db.Column(db.Numeric(5, 2), nullable=True)  # e.g., 10.00 for 10%
+    tds_amount = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    tds_section = db.Column(db.String(50), nullable=True)  # e.g., "194C", "194J"
+    net_amount = db.Column(db.Numeric(12, 2), nullable=True)  # Amount after TDS deduction
+    
     # Relationships
     purchase = db.relationship('Purchase', backref='payments_made')
     
+    def calculate_tds(self):
+        """Calculate TDS amount and net amount."""
+        if self.tds_applicable and self.tds_percentage:
+            self.tds_amount = self.amount * (self.tds_percentage / 100)
+            self.net_amount = self.amount - self.tds_amount
+        else:
+            self.tds_amount = 0
+            self.net_amount = self.amount
+    
     def __repr__(self):
-        return f'<PaymentMade {self.reference_number}: Γé╣{self.amount}>'
+        return f'<PaymentMade {self.reference_number}: ₹{self.amount}>'
 
     @staticmethod
     def generate_reference_number():

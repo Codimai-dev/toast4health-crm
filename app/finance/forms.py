@@ -142,8 +142,26 @@ class PaymentReceivedForm(FlaskForm):
                                render_kw={'class': 'form-control', 'autocomplete': 'off'})
     customer_name_new = StringField('Or Enter New Customer Name', validators=[Optional()],
                                    render_kw={'class': 'form-control', 'placeholder': 'Enter new customer name', 'autocomplete': 'off'})
-    amount = DecimalField('Amount (₹)', validators=[DataRequired(), NumberRange(min=0)],
-                         places=2, render_kw={'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'autocomplete': 'off'})
+    amount = DecimalField('Gross Amount (₹)', validators=[DataRequired(), NumberRange(min=0)],
+                         places=2, render_kw={'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'autocomplete': 'off', 'id': 'gross_amount'})
+    
+    # TDS fields
+    tds_applicable = SelectField('TDS Applicable', 
+                                choices=[('no', 'No'), ('yes', 'Yes')],
+                                validators=[DataRequired()], default='no',
+                                render_kw={'class': 'form-control', 'autocomplete': 'off', 'id': 'tds_applicable'})
+    tds_section = SelectField('TDS Section', 
+                             choices=[('', 'Select Section'), ('194C', '194C - Contractors'), ('194J', '194J - Professional Services'), 
+                                     ('194H', '194H - Commission'), ('194I', '194I - Rent'), ('194A', '194A - Interest'), ('Other', 'Other')],
+                             validators=[Optional()],
+                             render_kw={'class': 'form-control', 'autocomplete': 'off', 'id': 'tds_section'})
+    tds_percentage = DecimalField('TDS %', validators=[Optional(), NumberRange(min=0, max=100)],
+                                 places=2, render_kw={'class': 'form-control', 'placeholder': '0.00', 'autocomplete': 'off', 'id': 'tds_percentage'})
+    tds_amount = DecimalField('TDS Amount (₹)', validators=[Optional()],
+                             places=2, render_kw={'class': 'form-control', 'placeholder': '0.00', 'readonly': True, 'autocomplete': 'off', 'id': 'tds_amount'})
+    net_amount = DecimalField('Net Amount (₹)', validators=[Optional()],
+                             places=2, render_kw={'class': 'form-control', 'placeholder': '0.00', 'readonly': True, 'autocomplete': 'off', 'id': 'net_amount'})
+    
     payment_method = SelectField('Payment Method', 
                                 choices=[('Cash', 'Cash'), ('Bank Transfer', 'Bank Transfer'), 
                                         ('Cheque', 'Cheque'), ('UPI', 'UPI'), ('Card', 'Card'), ('Other', 'Other')],
@@ -194,8 +212,26 @@ class PaymentMadeForm(FlaskForm):
                     render_kw={'class': 'form-control', 'type': 'date', 'autocomplete': 'off'})
     payee_name = StringField('Payee Name', validators=[DataRequired()],
                             render_kw={'class': 'form-control', 'placeholder': 'Enter payee name', 'autocomplete': 'off'})
-    amount = DecimalField('Amount (₹)', validators=[DataRequired(), NumberRange(min=0)],
-                         places=2, render_kw={'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'autocomplete': 'off'})
+    amount = DecimalField('Gross Amount (₹)', validators=[DataRequired(), NumberRange(min=0)],
+                         places=2, render_kw={'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'autocomplete': 'off', 'id': 'gross_amount_made'})
+    
+    # TDS fields
+    tds_applicable = SelectField('TDS Applicable', 
+                                choices=[('no', 'No'), ('yes', 'Yes')],
+                                validators=[DataRequired()], default='no',
+                                render_kw={'class': 'form-control', 'autocomplete': 'off', 'id': 'tds_applicable_made'})
+    tds_section = SelectField('TDS Section', 
+                             choices=[('', 'Select Section'), ('194C', '194C - Contractors'), ('194J', '194J - Professional Services'), 
+                                     ('194H', '194H - Commission'), ('194I', '194I - Rent'), ('194A', '194A - Interest'), ('Other', 'Other')],
+                             validators=[Optional()],
+                             render_kw={'class': 'form-control', 'autocomplete': 'off', 'id': 'tds_section_made'})
+    tds_percentage = DecimalField('TDS %', validators=[Optional(), NumberRange(min=0, max=100)],
+                                 places=2, render_kw={'class': 'form-control', 'placeholder': '0.00', 'autocomplete': 'off', 'id': 'tds_percentage_made'})
+    tds_amount = DecimalField('TDS Amount (₹)', validators=[Optional()],
+                             places=2, render_kw={'class': 'form-control', 'placeholder': '0.00', 'readonly': True, 'autocomplete': 'off', 'id': 'tds_amount_made'})
+    net_amount = DecimalField('Net Amount Paid (₹)', validators=[Optional()],
+                             places=2, render_kw={'class': 'form-control', 'placeholder': '0.00', 'readonly': True, 'autocomplete': 'off', 'id': 'net_amount_made'})
+    
     payment_method = SelectField('Payment Method', 
                                 choices=[('Cash', 'Cash'), ('Bank Transfer', 'Bank Transfer'), 
                                         ('Cheque', 'Cheque'), ('UPI', 'UPI'), ('Card', 'Card'), ('Other', 'Other')],

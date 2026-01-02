@@ -6,7 +6,10 @@ from flask_wtf.csrf import validate_csrf, generate_csrf
 from app import db
 from app.models import (
     User, UserRole, B2CLead, B2BLead, FollowUp, Customer,
-    Employee, Expense, ChannelPartner, Setting, AuditLog, Service
+    Employee, Expense, ChannelPartner, Setting, AuditLog, Service,
+    Meeting, Booking, Attendance, Leave, Task, PerformanceMetric,
+    Payment, Camp, CampDefault, Sale, Purchase, PaymentReceived,
+    PaymentMade, ChartOfAccount
 )
 from app.settings import bp
 from flask_wtf import FlaskForm
@@ -741,16 +744,62 @@ def delete_all_data():
 
     try:
         # Delete in order to respect foreign key constraints
-        # Start with dependent records first
+        # Start with most dependent records first, then work up to parent tables
+        
+        # Audit logs (references everything)
         AuditLog.query.delete()
+        
+        # Employee-related dependent tables
+        Task.query.delete()
+        PerformanceMetric.query.delete()
+        Leave.query.delete()
+        Attendance.query.delete()
+        
+        # Follow-ups (references B2C and B2B leads)
         FollowUp.query.delete()
-        Expense.query.delete()
+        
+        # Meetings (references B2B leads)
+        Meeting.query.delete()
+        
+        # Financial dependent tables
+        PaymentReceived.query.delete()
+        PaymentMade.query.delete()
+        
+        # Booking-related
+        Payment.query.delete()  # References Booking
+        Expense.query.delete()  # Can reference Booking and Employee
+        
+        # Bookings (references Customer and Employee)
+        Booking.query.delete()
+        
+        # Sales and Purchases (reference Customer)
+        Sale.query.delete()
+        Purchase.query.delete()
+        
+        # Camps (references Employee)
+        Camp.query.delete()
+        CampDefault.query.delete()
+        
+        # Customer (referenced by many tables)
         Customer.query.delete()
+        
+        # Leads
         B2CLead.query.delete()
         B2BLead.query.delete()
+        
+        # Employee (referenced by many tables)
         Employee.query.delete()
+        
+        # Channel Partners (referenced by Customer)
         ChannelPartner.query.delete()
+        
+        # Chart of Accounts
+        ChartOfAccount.query.delete()
+        
+        # Services
         Service.query.delete()
+        
+        # Settings (dropdown data)
         Setting.query.delete()
 
         # Delete all users except admin users

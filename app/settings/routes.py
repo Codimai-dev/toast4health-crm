@@ -5,7 +5,7 @@ from flask_login import login_required, current_user
 from flask_wtf.csrf import validate_csrf, generate_csrf
 from app import db
 from app.models import (
-    User, UserRole, B2CLead, B2BLead, FollowUp, Customer, Booking,
+    User, UserRole, B2CLead, B2BLead, FollowUp, Customer,
     Employee, Expense, ChannelPartner, Setting, AuditLog, Service
 )
 from app.settings import bp
@@ -40,7 +40,6 @@ class UserForm(FlaskForm):
     leads_b2b_access = BooleanField('B2B Leads', render_kw={'class': 'form-check-input'})
     follow_ups_access = BooleanField('Follow-ups', render_kw={'class': 'form-check-input'})
     customers_access = BooleanField('Customers', render_kw={'class': 'form-check-input'})
-    bookings_access = BooleanField('Bookings', render_kw={'class': 'form-check-input'})
     employees_access = BooleanField('Employees', render_kw={'class': 'form-check-input'})
     expenses_access = BooleanField('Expenses', render_kw={'class': 'form-check-input'})
     channel_partners_access = BooleanField('Channel Partners', render_kw={'class': 'form-check-input'})
@@ -76,7 +75,6 @@ class EditUserForm(FlaskForm):
     leads_b2b_access = BooleanField('B2B Leads', render_kw={'class': 'form-check-input'})
     follow_ups_access = BooleanField('Follow-ups', render_kw={'class': 'form-check-input'})
     customers_access = BooleanField('Customers', render_kw={'class': 'form-check-input'})
-    bookings_access = BooleanField('Bookings', render_kw={'class': 'form-check-input'})
     employees_access = BooleanField('Employees', render_kw={'class': 'form-check-input'})
     expenses_access = BooleanField('Expenses', render_kw={'class': 'form-check-input'})
     channel_partners_access = BooleanField('Channel Partners', render_kw={'class': 'form-check-input'})
@@ -365,8 +363,6 @@ def create_user():
             allowed_modules.append('follow_ups')
         if form.customers_access.data:
             allowed_modules.append('customers')
-        if form.bookings_access.data:
-            allowed_modules.append('bookings')
         if form.employees_access.data:
             allowed_modules.append('employees')
         if form.expenses_access.data:
@@ -430,8 +426,6 @@ def edit_user(user_id):
             allowed_modules.append('follow_ups')
         if form.customers_access.data:
             allowed_modules.append('customers')
-        if form.bookings_access.data:
-            allowed_modules.append('bookings')
         if form.employees_access.data:
             allowed_modules.append('employees')
         if form.expenses_access.data:
@@ -465,7 +459,6 @@ def edit_user(user_id):
     form.leads_b2b_access.data = 'leads_b2b' in allowed
     form.follow_ups_access.data = 'follow_ups' in allowed
     form.customers_access.data = 'customers' in allowed
-    form.bookings_access.data = 'bookings' in allowed
     form.employees_access.data = 'employees' in allowed
     form.expenses_access.data = 'expenses' in allowed
     form.channel_partners_access.data = 'channel_partners' in allowed
@@ -553,7 +546,6 @@ def delete_all_data():
         AuditLog.query.delete()
         FollowUp.query.delete()
         Expense.query.delete()
-        Booking.query.delete()
         Customer.query.delete()
         B2CLead.query.delete()
         B2BLead.query.delete()

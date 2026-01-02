@@ -8,7 +8,7 @@ from sqlalchemy import func, and_, or_
 from app import db
 from app.dashboard import bp
 from app.models import (
-    B2CLead, B2BLead, FollowUp, Customer, Booking, Employee,
+    B2CLead, B2BLead, FollowUp, Customer, Employee,
     Expense, ChannelPartner, LeadStatus, LeadType
 )
 
@@ -64,22 +64,12 @@ def index():
         if 'customers' in allowed_modules:
             customer_stats = {
                 'total': Customer.query.count(),
-                'with_bookings': db.session.query(func.count(func.distinct(Customer.id))).filter(Customer.bookings.any()).scalar() or 0,
             }
 
-        if 'bookings' in allowed_modules:
-            booking_stats = {
-                'total': Booking.query.count(),
-                'next_7_days': Booking.query.filter(Booking.start_date.between(today, today + timedelta(days=7))).count(),
-                'pending_amount': db.session.query(func.sum(Booking.pending_amount)).scalar() or 0,
-                'total_amount': db.session.query(func.sum(Booking.total_amount)).scalar() or 0,
-                'paid_amount': db.session.query(func.sum(Booking.amount_paid)).scalar() or 0,
-            }
 
         if 'employees' in allowed_modules:
             employee_stats = {
                 'total': Employee.query.count(),
-                'with_bookings': db.session.query(func.count(func.distinct(Employee.id))).filter(Employee.bookings.any()).scalar() or 0,
             }
 
         if 'expenses' in allowed_modules:
@@ -166,18 +156,6 @@ def search():
     ).limit(10).all()
     if customer_results:
         results['Customers'] = customer_results
-
-    # Search Bookings
-    booking_results = Booking.query.filter(
-        or_(
-            Booking.customer_name.ilike(f'%{query}%'),
-            Booking.customer_mob.ilike(f'%{query}%'),
-            Booking.booking_code.ilike(f'%{query}%'),
-            Booking.services.ilike(f'%{query}%')
-        )
-    ).limit(10).all()
-    if booking_results:
-        results['Bookings'] = booking_results
 
     # Search Employees
     employee_results = Employee.query.filter(
@@ -266,39 +244,9 @@ def chart_data():
             }
             chart_data['lead_funnel'] = funnel_data
 
-        # Revenue trend data (last 30 days)
-        if 'bookings' in allowed_modules:
-            revenue_data = {
-                'labels': [],
-                'datasets': [{
-                    'label': 'Revenue',
-                    'data': [],
-                    'borderColor': 'rgba(25, 135, 84, 1)',
-                    'backgroundColor': 'rgba(25, 135, 84, 0.1)',
-                    'fill': True,
-                    'tension': 0.4
-                }]
-            }
-
-            for i in range(days):
-                current_date = start_date + timedelta(days=i)
-                # Convert to datetime for proper comparison
-                current_datetime = datetime.combine(current_date, datetime.min.time())
-                next_datetime = datetime.combine(current_date + timedelta(days=1), datetime.min.time())
-
-                daily_revenue = db.session.query(func.sum(Booking.total_amount)).filter(
-                    Booking.created_at >= current_datetime,
-                    Booking.created_at < next_datetime
-                ).scalar() or 0
-
-                revenue_data['labels'].append(current_date.strftime('%d-%m'))
-                revenue_data['datasets'][0]['data'].append(float(daily_revenue))
-
-            chart_data['revenue_trend'] = revenue_data
-
         # Performance metrics
         performance_data = {
-            'labels': ['Leads', 'Customers', 'Bookings', 'Revenue'],
+            'labels': ['Leads', 'Customers', 'Employees', 'Expenses'],
             'datasets': [{
                 'label': 'Current Month',
                 'data': [],
@@ -321,20 +269,23 @@ def chart_data():
         else:
             monthly_customers = 0
 
-        if 'bookings' in allowed_modules:
-            monthly_bookings = Booking.query.filter(Booking.created_at >= month_start).count()
-            monthly_revenue = db.session.query(func.sum(Booking.total_amount)).filter(
-                Booking.created_at >= month_start
+        if 'employees' in allowed_modules:
+            monthly_employees = Employee.query.filter(Employee.created_at >= month_start).count()
+        else:
+            monthly_employees = 0
+
+        if 'expenses' in allowed_modules:
+            monthly_expenses = db.session.query(func.sum(Expense.expense_amount)).filter(
+                Expense.created_at >= month_start
             ).scalar() or 0
         else:
-            monthly_bookings = 0
-            monthly_revenue = 0
+            monthly_expenses = 0
 
         performance_data['datasets'][0]['data'] = [
             monthly_leads,
             monthly_customers,
-            monthly_bookings,
-            float(monthly_revenue)
+            monthly_employees,
+            float(monthly_expenses)
         ]
 
         chart_data['performance'] = performance_data

@@ -170,7 +170,7 @@ class User(UserMixin, db.Model, TimestampMixin, UserTrackingMixin):
         if self.role == UserRole.ADMIN:
             # Admins have access to everything
             return ['dashboard', 'leads_b2c', 'leads_b2b', 'follow_ups', 'customers',
-                   'bookings', 'employees', 'expenses', 'channel_partners', 'services', 'camps', 'finance', 'settings']
+                   'employees', 'expenses', 'channel_partners', 'services', 'camps', 'finance', 'settings']
 
         if self.permissions:
             try:
@@ -181,8 +181,8 @@ class User(UserMixin, db.Model, TimestampMixin, UserTrackingMixin):
         # Default permissions based on role
         defaults = {
             UserRole.SALES: ['dashboard', 'leads_b2c', 'leads_b2b', 'follow_ups', 'camps'],
-            UserRole.OPS: ['dashboard', 'customers', 'bookings', 'employees', 'expenses', 'channel_partners', 'services', 'camps'],
-            UserRole.FINANCE: ['dashboard', 'bookings', 'expenses', 'finance'],
+            UserRole.OPS: ['dashboard', 'customers', 'employees', 'expenses', 'channel_partners', 'services', 'camps'],
+            UserRole.FINANCE: ['dashboard', 'expenses', 'finance'],
             UserRole.VIEWER: ['dashboard']  # Read-only access
         }
         return defaults.get(self.role, ['dashboard'])

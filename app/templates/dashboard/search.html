@@ -46,9 +46,6 @@
                             {% elif category == 'Customers' %}
                                 <strong>{{ item.customer_name }}</strong>
                                 <br><small class="text-muted">{{ item.customer_code }} • {{ item.contact_no }} • {{ item.email or 'No email' }}</small>
-                            {% elif category == 'Bookings' %}
-                                <strong>{{ item.customer_name }}</strong>
-                                <br><small class="text-muted">{{ item.booking_code }} • {{ item.services }} • {{ item.start_date.strftime('%d-%m-%Y') }}</small>
                             {% elif category == 'Employees' %}
                                 <strong>{{ item.name }}</strong>
                                 <br><small class="text-muted">{{ item.employee_code }} • {{ item.designation or 'No designation' }} • {{ item.contact_no }}</small>
@@ -71,10 +68,6 @@
                                 </a>
                             {% elif category == 'Customers' %}
                                 <a href="{{ url_for('customers.view', id=item.id) }}" class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-eye"></i> View
-                                </a>
-                            {% elif category == 'Bookings' %}
-                                <a href="{{ url_for('bookings.view', id=item.id) }}" class="btn btn-sm btn-outline-primary">
                                     <i class="bi bi-eye"></i> View
                                 </a>
                             {% elif category == 'Employees' %}
@@ -118,7 +111,7 @@
     <div class="col-12">
         <div class="alert alert-info">
             <i class="bi bi-info-circle"></i>
-            <strong>Search Tips:</strong> You can search by name, contact number, email, or code across all CRM entities including leads, customers, bookings, employees, and more.
+            <strong>Search Tips:</strong> You can search by name, contact number, email, or code across all CRM entities including leads, customers, employees, and more.
         </div>
     </div>
 </div>

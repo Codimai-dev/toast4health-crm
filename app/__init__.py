@@ -88,9 +88,6 @@ def create_app(config_name=None):
     from app.customers import bp as customers_bp
     app.register_blueprint(customers_bp, url_prefix='/customers')
     
-    from app.bookings import bp as bookings_bp
-    app.register_blueprint(bookings_bp, url_prefix='/bookings')
-    
     from app.employees import bp as employees_bp
     app.register_blueprint(employees_bp, url_prefix='/employees')
     

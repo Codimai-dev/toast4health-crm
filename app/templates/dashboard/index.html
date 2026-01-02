@@ -77,33 +77,6 @@
     </div>
     {% endif %}
 
-    {% if booking_stats %}
-    <!-- Revenue Stats -->
-    <div class="col-xl-3 col-md-6">
-        <div class="card stats-card success">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h6 class="card-subtitle mb-2 text-muted">Pending Revenue</h6>
-                        <h3 class="card-title mb-0">{{ booking_stats.pending_amount | currency }}</h3>
-                        <small class="text-success">
-                            <i class="bi bi-arrow-up"></i> {{ booking_stats.total_amount | currency }} total
-                        </small>
-                    </div>
-                    <div class="align-self-center">
-                        <i class="bi bi-currency-rupee fs-2 text-success opacity-75"></i>
-                    </div>
-                </div>
-                <div class="mt-2">
-                    <a href="{{ url_for('bookings.index') }}" class="btn btn-sm btn-outline-success">
-                        View Bookings <i class="bi bi-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
     {% if expense_stats %}
     <!-- Expenses Stats -->
     <div class="col-xl-3 col-md-6">
@@ -166,33 +139,11 @@
                         <h6 class="card-subtitle mb-2 text-muted">Customers</h6>
                         <h3 class="card-title mb-0">{{ customer_stats.total }}</h3>
                         <small class="text-primary">
-                            <i class="bi bi-check-circle"></i> {{ customer_stats.with_bookings }} active
+                            <i class="bi bi-check-circle"></i> Active customers
                         </small>
                     </div>
                     <div class="align-self-center">
                         <i class="bi bi-people fs-2 text-primary opacity-75"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    {% if booking_stats %}
-    <!-- Bookings -->
-    <div class="col-xl-3 col-md-6">
-        <div class="card stats-card success">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h6 class="card-subtitle mb-2 text-muted">Bookings</h6>
-                        <h3 class="card-title mb-0">{{ booking_stats.total }}</h3>
-                        <small class="text-success">
-                            <i class="bi bi-calendar-event"></i> {{ booking_stats.next_7_days }} next 7 days
-                        </small>
-                    </div>
-                    <div class="align-self-center">
-                        <i class="bi bi-calendar-check fs-2 text-success opacity-75"></i>
                     </div>
                 </div>
             </div>
@@ -210,7 +161,7 @@
                         <h6 class="card-subtitle mb-2 text-muted">Employees</h6>
                         <h3 class="card-title mb-0">{{ employee_stats.total }}</h3>
                         <small class="text-warning">
-                            <i class="bi bi-briefcase"></i> {{ employee_stats.with_bookings }} assigned
+                            <i class="bi bi-briefcase"></i> Active employees
                         </small>
                     </div>
                     <div class="align-self-center">
@@ -241,21 +192,6 @@
     </div>
     {% endif %}
 
-    {% if 'bookings' in allowed_modules %}
-    <!-- Revenue Trend -->
-    <div class="col-xl-4 col-lg-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="bi bi-graph-up"></i> Revenue Trend (30 Days)
-                </h5>
-            </div>
-            <div class="card-body">
-                <canvas id="revenueChart" width="400" height="300"></canvas>
-            </div>
-        </div>
-    </div>
-    {% endif %}
 
     <!-- Performance Metrics -->
     <div class="col-xl-4 col-lg-12">
@@ -301,13 +237,6 @@
                     <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
                         <a href="{{ url_for('customers.add') }}" class="btn btn-outline-success w-100">
                             <i class="bi bi-people"></i><br>Add Customer
-                        </a>
-                    </div>
-                    {% endif %}
-                    {% if 'bookings' in allowed_modules %}
-                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
-                        <a href="{{ url_for('bookings.add') }}" class="btn btn-outline-warning w-100">
-                            <i class="bi bi-calendar-plus"></i><br>New Booking
                         </a>
                     </div>
                     {% endif %}

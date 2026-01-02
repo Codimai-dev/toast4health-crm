@@ -12,7 +12,7 @@ from datetime import datetime
 
 # revision identifiers, used by Alembic.
 revision = 'add_unified_dropdown_groups'
-down_revision = None  # Update this with the latest migration ID
+down_revision = '97a834849ada'  # add_tds_fields_to_payments
 branch_labels = None
 depends_on = None
 

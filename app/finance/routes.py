@@ -188,13 +188,51 @@ def sales_add():
             updated_by=current_user.id
         )
         db.session.add(sale)
+        db.session.flush()  # Flush to get the sale.id
+        
+        # If payment status is Received or Partial, create a PaymentReceived entry
+        if form.payment_status.data in ['Received', 'Partial']:
+            # Validate payment fields
+            if not form.payment_amount.data or form.payment_amount.data <= 0:
+                flash('Payment amount is required when payment status is Received or Partial!', 'danger')
+                db.session.rollback()
+                return render_template('finance/sales/add.html', title='Add Sale', form=form)
+            
+            if not form.payment_date.data:
+                flash('Payment date is required when payment status is Received or Partial!', 'danger')
+                db.session.rollback()
+                return render_template('finance/sales/add.html', title='Add Sale', form=form)
+            
+            if not form.payment_method.data:
+                flash('Payment method is required when payment status is Received or Partial!', 'danger')
+                db.session.rollback()
+                return render_template('finance/sales/add.html', title='Add Sale', form=form)
+            
+            payment = PaymentReceived(
+                reference_number=PaymentReceived.generate_reference_number(),
+                date=form.payment_date.data,
+                customer_name=customer_name,
+                customer_id=customer_id,
+                amount=form.payment_amount.data,
+                payment_method=form.payment_method.data,
+                invoice_number=sale.invoice_number,
+                sale_id=sale.id,
+                remarks=form.payment_remarks.data or f"Payment for {sale.invoice_number}",
+                created_by=current_user.id,
+                updated_by=current_user.id
+            )
+            db.session.add(payment)
+        
         db.session.commit()
         flash('Sale added successfully!', 'success')
+        if form.payment_status.data in ['Received', 'Partial']:
+            flash('Payment received entry created automatically!', 'info')
         return redirect(url_for('finance.sales'))
     
     # Pre-populate invoice number
     form.invoice_number.data = Sale.generate_invoice_number()
     form.date.data = date.today()
+    form.payment_date.data = date.today()
     return render_template('finance/sales/add.html', title='Add Sale', form=form)
 
 
@@ -222,6 +260,9 @@ def sales_edit(id):
         # Find customer_id if customer exists
         customer = Customer.query.filter_by(customer_name=customer_name).first()
         
+        # Store old payment status to detect changes
+        old_payment_status = sale.payment_status
+        
         sale.date = form.date.data
         sale.customer_name = customer_name
         sale.customer_id = customer.id if customer else None
@@ -231,13 +272,75 @@ def sales_edit(id):
         sale.notes = form.notes.data
         sale.updated_by = current_user.id
         
+        # Handle payment received entry
+        if form.payment_status.data in ['Received', 'Partial']:
+            # Validate payment fields
+            if not form.payment_amount.data or form.payment_amount.data <= 0:
+                flash('Payment amount is required when payment status is Received or Partial!', 'danger')
+                db.session.rollback()
+                return render_template('finance/sales/edit.html', title='Edit Sale', form=form, sale=sale)
+            
+            if not form.payment_date.data:
+                flash('Payment date is required when payment status is Received or Partial!', 'danger')
+                db.session.rollback()
+                return render_template('finance/sales/edit.html', title='Edit Sale', form=form, sale=sale)
+            
+            if not form.payment_method.data:
+                flash('Payment method is required when payment status is Received or Partial!', 'danger')
+                db.session.rollback()
+                return render_template('finance/sales/edit.html', title='Edit Sale', form=form, sale=sale)
+            
+            # Check if there's already a payment for this sale
+            existing_payment = PaymentReceived.query.filter_by(sale_id=sale.id).first()
+            
+            if existing_payment:
+                # Update existing payment
+                existing_payment.date = form.payment_date.data
+                existing_payment.customer_name = customer_name
+                existing_payment.customer_id = customer.id if customer else None
+                existing_payment.amount = form.payment_amount.data
+                existing_payment.payment_method = form.payment_method.data
+                existing_payment.remarks = form.payment_remarks.data or f"Payment for {sale.invoice_number}"
+                existing_payment.updated_by = current_user.id
+                flash('Sale and payment received entry updated successfully!', 'success')
+            else:
+                # Create new payment entry
+                payment = PaymentReceived(
+                    reference_number=PaymentReceived.generate_reference_number(),
+                    date=form.payment_date.data,
+                    customer_name=customer_name,
+                    customer_id=customer.id if customer else None,
+                    amount=form.payment_amount.data,
+                    payment_method=form.payment_method.data,
+                    invoice_number=sale.invoice_number,
+                    sale_id=sale.id,
+                    remarks=form.payment_remarks.data or f"Payment for {sale.invoice_number}",
+                    created_by=current_user.id,
+                    updated_by=current_user.id
+                )
+                db.session.add(payment)
+                flash('Sale updated and payment received entry created successfully!', 'success')
+        elif old_payment_status in ['Received', 'Partial'] and form.payment_status.data == 'Pending':
+            # Payment status changed from Received/Partial to Pending
+            # Optionally delete the payment entry (or just update the sale)
+            flash('Sale updated successfully! Note: Existing payment entry was not deleted.', 'warning')
+        else:
+            flash('Sale updated successfully!', 'success')
+        
         db.session.commit()
-        flash('Sale updated successfully!', 'success')
         return redirect(url_for('finance.sales'))
     
     # Pre-populate form
     if not form.is_submitted():
         form.customer_name.data = sale.customer_name
+        
+        # Pre-populate payment fields if there's an existing payment
+        existing_payment = PaymentReceived.query.filter_by(sale_id=sale.id).first()
+        if existing_payment:
+            form.payment_amount.data = existing_payment.amount
+            form.payment_date.data = existing_payment.date
+            form.payment_method.data = existing_payment.payment_method
+            form.payment_remarks.data = existing_payment.remarks
     
     return render_template('finance/sales/edit.html', title='Edit Sale', form=form, sale=sale)
 

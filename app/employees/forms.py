@@ -19,10 +19,10 @@ class EmployeeForm(FlaskForm):
                             render_kw={'class': 'form-control', 'placeholder': 'Enter contact number', 'autocomplete': 'off'})
     email = StringField('Email', validators=[Optional(), Email(), Length(max=120)],
                        render_kw={'class': 'form-control', 'placeholder': 'Enter email (optional)', 'autocomplete': 'off'})
-    designation = StringField('Designation', validators=[Optional(), Length(max=100)],
-                             render_kw={'class': 'form-control', 'placeholder': 'Enter designation', 'autocomplete': 'off'})
-    employ_type = StringField('Employment Type', validators=[Optional(), Length(max=50)],
-                             render_kw={'class': 'form-control', 'placeholder': 'Enter employment type', 'autocomplete': 'off'})
+    designation = SelectField('Designation', validators=[Optional()],
+                             render_kw={'class': 'form-select', 'autocomplete': 'off'})
+    employ_type = SelectField('Employment Type', validators=[Optional()],
+                             render_kw={'class': 'form-select', 'autocomplete': 'off'})
     gender = SelectField('Gender', choices=[('', 'Select Gender'), ('MALE', 'Male'), ('FEMALE', 'Female'), ('OTHER', 'Other')],
                         validators=[Optional()], render_kw={'class': 'form-select', 'autocomplete': 'off'})
     dob = DateField('Date of Birth', validators=[Optional()],

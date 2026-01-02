@@ -73,7 +73,17 @@ def index():
 @require_module_access('employees')
 def add():
     """Add a new employee."""
+    from app.models import Setting
+    
     form = EmployeeForm()
+    
+    # Populate dropdown choices from database
+    designation_options = Setting.get_options('EmployeeDesignation')
+    form.designation.choices = [('', 'Select Designation')] + [(opt.value, opt.value) for opt in designation_options]
+    
+    employ_type_options = Setting.get_options('EmployeeType')
+    form.employ_type.choices = [('', 'Select Employment Type')] + [(opt.value, opt.value) for opt in employ_type_options]
+    
     form.employee_code.data = Employee.generate_employee_code()
     if form.validate_on_submit():
         try:
@@ -201,6 +211,7 @@ def edit(id):
     """Edit an employee."""
     # Use raw SQL to handle empty gender values
     from sqlalchemy import text
+    from app.models import Setting
 
     class SimpleEmployee:
         def __init__(self, **kwargs):
@@ -242,6 +253,13 @@ def edit(id):
 
     # Populate form with converted data
     form = EmployeeForm()
+    
+    # Populate dropdown choices from database
+    designation_options = Setting.get_options('EmployeeDesignation')
+    form.designation.choices = [('', 'Select Designation')] + [(opt.value, opt.value) for opt in designation_options]
+    
+    employ_type_options = Setting.get_options('EmployeeType')
+    form.employ_type.choices = [('', 'Select Employment Type')] + [(opt.value, opt.value) for opt in employ_type_options]
     if request.method == 'GET':
         form.employee_code.data = employee_dict['employee_code']
         form.name.data = employee_dict['name']

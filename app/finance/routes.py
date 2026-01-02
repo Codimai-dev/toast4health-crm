@@ -23,9 +23,18 @@ def dashboard():
     current_month = datetime.now().month
     
     # Calculate totals for current year
+    # Total Revenue = Sales invoices + Standalone payments received (not linked to sales)
     total_sales = db.session.query(func.sum(Sale.amount)).filter(
         extract('year', Sale.date) == current_year
     ).scalar() or 0
+    
+    # Add standalone payments (payments not linked to any sale invoice)
+    standalone_payments = db.session.query(func.sum(PaymentReceived.amount)).filter(
+        extract('year', PaymentReceived.date) == current_year,
+        PaymentReceived.sale_id.is_(None)
+    ).scalar() or 0
+    
+    total_revenue = total_sales + standalone_payments
     
     total_purchases = db.session.query(func.sum(Purchase.amount)).filter(
         extract('year', Purchase.date) == current_year
@@ -45,12 +54,19 @@ def dashboard():
     ).scalar() or 0
     
     # Calculate derived metrics
-    gross_profit = total_sales - total_purchases
+    gross_profit = total_revenue - total_purchases
     net_profit = gross_profit - total_expenses
     cash_position = total_payments_received - total_payments_made
     
     # Transaction counts
+    # For revenue count: sales invoices + standalone payments
     sales_count = Sale.query.filter(extract('year', Sale.date) == current_year).count()
+    standalone_payments_count = PaymentReceived.query.filter(
+        extract('year', PaymentReceived.date) == current_year,
+        PaymentReceived.sale_id.is_(None)
+    ).count()
+    revenue_count = sales_count + standalone_payments_count
+    
     purchases_count = Purchase.query.filter(extract('year', Purchase.date) == current_year).count()
     expenses_count = Expense.query.filter(extract('year', Expense.date) == current_year).count()
     payments_received_count = PaymentReceived.query.filter(extract('year', PaymentReceived.date) == current_year).count()
@@ -69,6 +85,15 @@ def dashboard():
             extract('year', Sale.date) == current_year,
             extract('month', Sale.date) == month
         ).scalar() or 0
+        
+        # Add standalone payments for the month
+        month_standalone_payments = db.session.query(func.sum(PaymentReceived.amount)).filter(
+            extract('year', PaymentReceived.date) == current_year,
+            extract('month', PaymentReceived.date) == month,
+            PaymentReceived.sale_id.is_(None)
+        ).scalar() or 0
+        
+        month_revenue = month_sales + month_standalone_payments
         
         month_purchases = db.session.query(func.sum(Purchase.amount)).filter(
             extract('year', Purchase.date) == current_year,
@@ -90,12 +115,12 @@ def dashboard():
             extract('month', PaymentMade.date) == month
         ).scalar() or 0
         
-        month_net_profit = month_sales - month_purchases - month_expenses
+        month_net_profit = month_revenue - month_purchases - month_expenses
         
         monthly_data.append({
             'month': month,
             'month_name': date(current_year, month, 1).strftime('%B'),
-            'sales': float(month_sales),
+            'sales': float(month_revenue),  # Changed to show total revenue in chart
             'purchases': float(month_purchases),
             'expenses': float(month_expenses),
             'payments_received': float(month_payments_received),
@@ -105,7 +130,7 @@ def dashboard():
     
     return render_template('finance/dashboard.html',
                          title='Financial Dashboard',
-                         total_sales=total_sales,
+                         total_revenue=total_revenue,
                          total_purchases=total_purchases,
                          total_expenses=total_expenses,
                          total_payments_received=total_payments_received,
@@ -113,7 +138,7 @@ def dashboard():
                          gross_profit=gross_profit,
                          net_profit=net_profit,
                          cash_position=cash_position,
-                         sales_count=sales_count,
+                         revenue_count=revenue_count,
                          purchases_count=purchases_count,
                          expenses_count=expenses_count,
                          payments_received_count=payments_received_count,

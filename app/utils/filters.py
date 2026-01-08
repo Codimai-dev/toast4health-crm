@@ -80,6 +80,39 @@ def role_badge_class(role):
     return role_classes.get(str(role).upper(), 'bg-secondary')
 
 
+def get_dropdown_value(key, group=None):
+    """
+    Get the display value for a dropdown key from the Setting table.
+    
+    Args:
+        key: The key to look up
+        group: Optional group name to narrow the search
+        
+    Returns:
+        The display value if found, otherwise the key itself with underscores replaced by spaces
+    """
+    if not key:
+        return '-'
+    
+    from app.models import Setting
+    
+    try:
+        if group:
+            setting = Setting.query.filter_by(group=group, key=str(key)).first()
+        else:
+            # Search across all groups if no group specified
+            setting = Setting.query.filter_by(key=str(key)).first()
+        
+        if setting:
+            return setting.value
+        else:
+            # Fallback: return key with underscores replaced by spaces
+            return str(key).replace('_', ' ')
+    except Exception:
+        # If any error occurs (like database not initialized), return the key
+        return str(key).replace('_', ' ')
+
+
 def register_filters(app):
     """Register custom filters and globals with Flask app."""
     app.jinja_env.filters['currency'] = format_currency
@@ -88,6 +121,7 @@ def register_filters(app):
     app.jinja_env.filters['truncate_text'] = truncate_text
     app.jinja_env.filters['status_badge'] = status_badge_class
     app.jinja_env.filters['role_badge'] = role_badge_class
+    app.jinja_env.filters['dropdown_value'] = get_dropdown_value
 
     # Add CSRF token global
     app.jinja_env.globals['csrf_token'] = generate_csrf

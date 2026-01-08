@@ -45,10 +45,10 @@
                             <dd class="col-sm-7">{{ expense.date.strftime('%d-%m-%Y') if expense.date else '-' }}</dd>
 
                             <dt class="col-sm-5">Category:</dt>
-                            <dd class="col-sm-7">{{ expense.category }}</dd>
+                            <dd class="col-sm-7">{{ expense.category|dropdown_value('ExpenseMainCategory') }}</dd>
 
                             <dt class="col-sm-5">Sub Category:</dt>
-                            <dd class="col-sm-7">{{ expense.sub_category or '-' }}</dd>
+                            <dd class="col-sm-7">{{ expense.sub_category|dropdown_value('ExpenseSubCategory') }}</dd>
                         </dl>
                     </div>
                     <div class="col-md-6">

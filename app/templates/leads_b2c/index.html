@@ -63,10 +63,10 @@
                                 <td>{{ lead.enquiry_date.strftime('%d-%m-%Y') if lead.enquiry_date else '-' }}</td>
                                 <td>
                                     <span class="badge bg-{{ 'primary' if lead.status == 'new' else 'warning' if lead.status == 'follow_up' else 'info' if lead.status == 'prospect' else 'success' if lead.status == 'converted' else 'secondary' if lead.status == 'lost' else 'danger' }}">
-                                        {{ lead.status.replace('_', ' ') }}
+                                        {{ lead.status|dropdown_value('LeadStatus') }}
                                     </span>
                                 </td>
-                                <td>{{ lead.source.replace('_', ' ') if lead.source else '-' }}</td>
+                                <td>{{ lead.source|dropdown_value('Source') }}</td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
                                         <a href="{{ url_for('leads_b2c.view', enquiry_id=lead.enquiry_id) }}" class="btn btn-outline-primary btn-sm" title="View">

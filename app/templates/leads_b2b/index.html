@@ -53,10 +53,10 @@
                                 <td>{{ lead.organization_name }}</td>
                                 <td>{{ lead.organization_email or '-' }}</td>
                                 <td>{{ lead.location or '-' }}</td>
-                                <td>{{ lead.type_of_leads or '-' }}</td>
+                                <td>{{ lead.type_of_leads|dropdown_value('B2BLeadType') if lead.type_of_leads else '-' }}</td>
                                 <td>{{ lead.org_poc_name_and_role or '-' }}</td>
                                 <td>
-                                    <span class="badge bg-primary">{{ lead.status or 'New' }}</span>
+                                    <span class="badge bg-primary">{{ lead.status|dropdown_value('B2BMeetingStatus') if lead.status else 'New' }}</span>
                                 </td>
                                 <td>{{ lead.date.strftime('%d-%m-%Y') if lead.date else '-' }}</td>
                                 <td>

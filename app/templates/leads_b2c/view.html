@@ -59,12 +59,12 @@
                             <dt class="col-sm-5">Status:</dt>
                             <dd class="col-sm-7">
                                 <span class="badge bg-{{ 'primary' if lead.status == 'new' else 'warning' if lead.status == 'follow_up' else 'info' if lead.status == 'prospect' else 'success' if lead.status == 'converted' else 'secondary' if lead.status == 'lost' else 'danger' }}">
-                                    {{ lead.status.replace('_', ' ') }}
+                                    {{ lead.status|dropdown_value('LeadStatus') }}
                                 </span>
                             </dd>
 
                             <dt class="col-sm-5">Source:</dt>
-                            <dd class="col-sm-7">{{ lead.source.replace('_', ' ') if lead.source else '-' }}</dd>
+                            <dd class="col-sm-7">{{ lead.source|dropdown_value('Source') }}</dd>
 
                             <dt class="col-sm-5">Services:</dt>
                             <dd class="col-sm-7">{{ lead.services or '-' }}</dd>

@@ -51,7 +51,7 @@
                             <dd class="col-sm-7">{{ lead.location or '-' }}</dd>
 
                             <dt class="col-sm-5">Type of Leads:</dt>
-                            <dd class="col-sm-7">{{ lead.type_of_leads or '-' }}</dd>
+                            <dd class="col-sm-7">{{ lead.type_of_leads|dropdown_value('B2BLeadType') if lead.type_of_leads else '-' }}</dd>
 
                             <dt class="col-sm-5">POC & Role:</dt>
                             <dd class="col-sm-7">{{ lead.org_poc_name_and_role or '-' }}</dd>
@@ -76,7 +76,7 @@
 
                             <dt class="col-sm-5">Status:</dt>
                             <dd class="col-sm-7">
-                                <span class="badge bg-primary">{{ lead.status or 'New' }}</span>
+                                <span class="badge bg-primary">{{ lead.status|dropdown_value('B2BMeetingStatus') if lead.status else 'New' }}</span>
                             </dd>
                         </dl>
                     </div>
@@ -165,7 +165,7 @@
                     <p class="mb-1"><strong>Tasks Done:</strong> {{ meeting.task_done }}</p>
                     {% endif %}
                     {% if meeting.status %}
-                    <small class="text-success">Status: {{ meeting.status }}</small>
+                    <small class="text-success">Status: {{ meeting.status|dropdown_value('B2BMeetingStatus') }}</small>
                     {% endif %}
                 </div>
                 {% endfor %}

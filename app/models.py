@@ -954,6 +954,7 @@ class CampDefault(db.Model, TimestampMixin, UserTrackingMixin):
     __tablename__ = 'camp_default'
 
     id = db.Column(db.Integer, primary_key=True)
+    camp_id = db.Column(db.String(20), nullable=True)
     staff_id = db.Column(db.Integer, db.ForeignKey('employee.id'), nullable=True)
     camp_date = db.Column(db.Date, nullable=True)
     camp_location = db.Column(db.String(200), nullable=True)

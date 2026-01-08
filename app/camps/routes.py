@@ -24,28 +24,36 @@ def index():
 def add():
     """Add a new camp entry."""
     form = CampForm()
-    generated_camp_id = Camp.generate_camp_id()
-    form.camp_id.data = generated_camp_id
     
     # Load predefined defaults if available
     camp_default = CampDefault.get_active_default()
-    if request.method == 'GET' and camp_default:
-        if camp_default.staff_id:
-            form.t4h_staff.data = str(camp_default.staff_id)
-        if camp_default.camp_date:
-            form.camp_date.data = camp_default.camp_date
-        if camp_default.camp_location:
-            form.camp_location.data = camp_default.camp_location
-        if camp_default.org_name:
-            form.org_name.data = camp_default.org_name
-        if camp_default.package:
-            form.package.data = camp_default.package
-        if camp_default.diagnostic_partner:
-            form.diagnostic_partner.data = camp_default.diagnostic_partner
+    
+    # Use predefined camp_id if available, otherwise generate new one
+    if request.method == 'GET':
+        if camp_default and camp_default.camp_id:
+            form.camp_id.data = camp_default.camp_id
+        else:
+            form.camp_id.data = Camp.generate_camp_id()
+            
+        # Load other predefined defaults
+        if camp_default:
+            if camp_default.staff_id:
+                form.t4h_staff.data = str(camp_default.staff_id)
+            if camp_default.camp_date:
+                form.camp_date.data = camp_default.camp_date
+            if camp_default.camp_location:
+                form.camp_location.data = camp_default.camp_location
+            if camp_default.org_name:
+                form.org_name.data = camp_default.org_name
+            if camp_default.package:
+                form.package.data = camp_default.package
+            if camp_default.diagnostic_partner:
+                form.diagnostic_partner.data = camp_default.diagnostic_partner
     
     if form.validate_on_submit():
+        # Use the camp_id from the form (which can be edited by user)
         camp = Camp(
-            camp_id=generated_camp_id,
+            camp_id=form.camp_id.data,
             staff_id=int(form.t4h_staff.data) if form.t4h_staff.data else None,
             camp_date=form.camp_date.data,
             camp_location=form.camp_location.data,
@@ -165,6 +173,7 @@ def predefine():
     
     # Create new default
     camp_default = CampDefault(
+        camp_id=request.form.get('camp_id') if request.form.get('camp_id') else None,
         staff_id=int(request.form.get('t4h_staff')) if request.form.get('t4h_staff') else None,
         camp_date=camp_date_obj,
         camp_location=request.form.get('camp_location') if request.form.get('camp_location') else None,

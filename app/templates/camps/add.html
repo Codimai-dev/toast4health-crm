@@ -187,8 +187,8 @@ function predefineValues() {
     csrfInput.value = csrfToken;
     form.appendChild(csrfInput);
     
-    // Get Camp Information field values
-    const fields = ['t4h_staff', 'camp_date', 'camp_location', 'org_name', 'package', 'diagnostic_partner'];
+    // Get Camp Information field values including camp_id
+    const fields = ['camp_id', 't4h_staff', 'camp_date', 'camp_location', 'org_name', 'package', 'diagnostic_partner'];
     fields.forEach(fieldName => {
         const field = document.querySelector(`[name="${fieldName}"]`);
         if (field && field.value) {

@@ -11,14 +11,14 @@ class CampForm(FlaskForm):
     """Form for adding/editing camp entries."""
 
     camp_id = StringField('Camp ID', validators=[DataRequired()],
-                         render_kw={'class': 'form-control', 'readonly': True, 'autocomplete': 'off'})
+                         render_kw={'class': 'form-control', 'autocomplete': 'off'})
     camp_date = DateField('Camp Date', validators=[DataRequired()],
                          render_kw={'class': 'form-control', 'autocomplete': 'off'})
     camp_location = StringField('Camp Location', validators=[DataRequired()],
                                render_kw={'class': 'form-control', 'placeholder': 'Enter camp location', 'autocomplete': 'off'})
     org_name = StringField('Org Name', validators=[Optional()],
                           render_kw={'class': 'form-control', 'placeholder': 'Enter organization name (optional)', 'autocomplete': 'off'})
-    t4h_staff = SelectField('T4H Staff', validators=[DataRequired()],
+    t4h_staff = SelectField('T4H Staff', validators=[Optional()],
                             render_kw={'class': 'form-select', 'autocomplete': 'off'})
     package = SelectField('Camp Package', choices=[], validators=[Optional()],
                          render_kw={'class': 'form-select', 'autocomplete': 'off'})

@@ -13,12 +13,20 @@ from app.models import FollowUp
 @require_module_access('follow_ups')
 def index():
     """Display all follow-ups categorized by B2C and B2B."""
+    from app.models import B2CLead
 
     # Get all follow-ups ordered by date
     all_follow_ups = FollowUp.query.order_by(FollowUp.follow_up_on.desc()).all()
 
-    # Separate into B2C and B2B
-    b2c_follow_ups = [fu for fu in all_follow_ups if fu.lead_type.value == 'B2C']
+    # Separate into B2C and B2B, excluding converted leads from B2C follow-ups
+    b2c_follow_ups = []
+    for fu in all_follow_ups:
+        if fu.lead_type.value == 'B2C':
+            # Check if the lead is not converted (case-insensitive)
+            lead = B2CLead.query.filter_by(enquiry_id=fu.b2c_lead_id).first()
+            if lead and lead.status.lower() != 'converted':
+                b2c_follow_ups.append(fu)
+    
     b2b_follow_ups = [fu for fu in all_follow_ups if fu.lead_type.value == 'B2B']
 
     return render_template('follow_ups/index.html', title='Follow-ups',

@@ -224,8 +224,8 @@ def add():
         db.session.add(lead)
         db.session.commit()
 
-        # Create automatic follow-up for the new B2C lead only if status is not 'converted'
-        if form.status.data != 'converted':
+        # Create automatic follow-up for the new B2C lead only if status is not 'converted' (case-insensitive)
+        if form.status.data.lower() != 'converted':
             followup = FollowUp(
                 lead_type=LeadType.B2C,
                 b2c_lead_id=lead.enquiry_id,

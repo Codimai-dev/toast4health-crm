@@ -60,12 +60,13 @@ class SaleForm(FlaskForm):
         super().__init__(*args, **kwargs)
         # Populate customer choices from both Customer table and converted B2C leads
         from app.models import Customer, B2CLead
+        from sqlalchemy import func
         
         # Get actual customers
         customers = Customer.query.order_by(Customer.customer_name).all()
         
-        # Get converted B2C leads that are not yet customers
-        converted_leads = B2CLead.query.filter_by(status='converted').order_by(B2CLead.customer_name).all()
+        # Get converted B2C leads that are not yet customers (case-insensitive)
+        converted_leads = B2CLead.query.filter(func.lower(B2CLead.status) == 'converted').order_by(B2CLead.customer_name).all()
         
         # Build choices list
         choices = [('', 'Select Customer or Enter New')]
@@ -177,12 +178,13 @@ class PaymentReceivedForm(FlaskForm):
         super().__init__(*args, **kwargs)
         # Populate customer choices from both Customer table and converted B2C leads
         from app.models import Customer, Sale, B2CLead
+        from sqlalchemy import func
         
         # Get actual customers
         customers = Customer.query.order_by(Customer.customer_name).all()
         
-        # Get converted B2C leads that are not yet customers
-        converted_leads = B2CLead.query.filter_by(status='converted').order_by(B2CLead.customer_name).all()
+        # Get converted B2C leads that are not yet customers (case-insensitive)
+        converted_leads = B2CLead.query.filter(func.lower(B2CLead.status) == 'converted').order_by(B2CLead.customer_name).all()
         
         # Build choices list
         choices = [('', 'Select Customer or Enter New')]

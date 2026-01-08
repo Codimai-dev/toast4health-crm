@@ -15,9 +15,11 @@ from app.models import Customer
 def index():
     """Display all customers and converted B2C leads."""
     from app.models import B2CLead
+    from sqlalchemy import func
 
     customers = Customer.query.order_by(Customer.created_at.desc()).all()
-    converted_leads = B2CLead.query.filter_by(status='converted').order_by(B2CLead.created_at.desc()).all()
+    # Query converted leads with case-insensitive comparison
+    converted_leads = B2CLead.query.filter(func.lower(B2CLead.status) == 'converted').order_by(B2CLead.created_at.desc()).all()
 
     # Combine customers and converted leads into a single list
     combined = []

@@ -32,7 +32,8 @@ class B2CLeadForm(FlaskForm):
         super(B2CLeadForm, self).__init__(*args, **kwargs)
         # Populate choices from settings
         self.source.choices = [('', 'Select Source')] + [(setting.key, setting.value) for setting in Setting.get_options('Source')]
-        self.status.choices = [(setting.key, setting.value) for setting in Setting.get_options('LeadStatus')]
+        # Use value as both key and display text for status to store actual status name
+        self.status.choices = [(setting.value, setting.value) for setting in Setting.get_options('LeadStatus')]
         # Populate services choices from database
         self.services.choices = [('', 'Select Service')] + [(str(service.id), service.name) for service in Service.query.order_by(Service.name).all()]
 

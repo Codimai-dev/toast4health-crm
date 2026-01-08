@@ -40,11 +40,11 @@ def index():
             b2c_stats = {
                 'total': B2CLead.query.count(),
                 'today': B2CLead.query.filter_by(enquiry_date=today).count(),
-                'new': B2CLead.query.filter_by(status='NEW').count(),
-                'follow_up': B2CLead.query.filter_by(status='FOLLOW_UP').count(),
-                'prospect': B2CLead.query.filter_by(status='PROSPECT').count(),
-                'converted': B2CLead.query.filter_by(status='CONVERTED').count(),
-                'lost': B2CLead.query.filter_by(status='LOST').count(),
+                'new': B2CLead.query.filter(func.upper(B2CLead.status) == 'NEW').count(),
+                'follow_up': B2CLead.query.filter(func.upper(B2CLead.status) == 'FOLLOW_UP').count(),
+                'prospect': B2CLead.query.filter(func.upper(B2CLead.status) == 'PROSPECT').count(),
+                'converted': B2CLead.query.filter(func.upper(B2CLead.status) == 'CONVERTED').count(),
+                'lost': B2CLead.query.filter(func.upper(B2CLead.status) == 'LOST').count(),
             }
 
         if 'leads_b2b' in allowed_modules:
@@ -219,11 +219,11 @@ def chart_data():
                 'datasets': [{
                     'label': 'B2C Leads',
                     'data': [
-                        B2CLead.query.filter_by(status='new').count(),
-                        B2CLead.query.filter_by(status='follow_up').count(),
-                        B2CLead.query.filter_by(status='prospect').count(),
-                        B2CLead.query.filter_by(status='converted').count(),
-                        B2CLead.query.filter_by(status='lost').count(),
+                        B2CLead.query.filter(func.upper(B2CLead.status) == 'NEW').count(),
+                        B2CLead.query.filter(func.upper(B2CLead.status) == 'FOLLOW_UP').count(),
+                        B2CLead.query.filter(func.upper(B2CLead.status) == 'PROSPECT').count(),
+                        B2CLead.query.filter(func.upper(B2CLead.status) == 'CONVERTED').count(),
+                        B2CLead.query.filter(func.upper(B2CLead.status) == 'LOST').count(),
                     ],
                     'backgroundColor': [
                         'rgba(13, 110, 253, 0.8)',   # Blue

@@ -9,7 +9,7 @@ class SaleForm(FlaskForm):
     """Form for adding/editing sales."""
 
     invoice_number = StringField('Invoice Number', validators=[DataRequired()],
-                                render_kw={'class': 'form-control', 'readonly': True, 'autocomplete': 'off'})
+                                render_kw={'class': 'form-control', 'autocomplete': 'off', 'placeholder': 'Enter invoice number after T4H/24-25/'})
     date = DateField('Date', validators=[DataRequired()],
                     render_kw={'class': 'form-control', 'type': 'date', 'autocomplete': 'off'})
     customer_name = SelectField('Customer Name', choices=[('', 'Select Customer or Enter New')], validators=[DataRequired()],

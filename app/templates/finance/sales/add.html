@@ -24,7 +24,11 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 {{ form.invoice_number.label(class="form-label") }}
-                                {{ form.invoice_number(class="form-control") }}
+                                <div class="input-group">
+                                    <span class="input-group-text">T4H/24-25/</span>
+                                    {{ form.invoice_number(class="form-control", id="invoice_number_input") }}
+                                </div>
+                                <small class="text-muted">Prefix is auto-filled. Enter the remaining invoice number</small>
                             </div>
                             <div class="col-md-6 mb-3">
                                 {{ form.date.label(class="form-label") }}
@@ -145,6 +149,23 @@
         const paymentStatusField = document.getElementById('payment_status');
         const paymentDetailsDiv = document.getElementById('payment_details');
         const paymentAmountField = document.getElementById('payment_amount');
+        const invoiceNumberInput = document.getElementById('invoice_number_input');
+
+        // Clear the invoice number field on load (remove auto-filled prefix, user will enter their number)
+        if (invoiceNumberInput && invoiceNumberInput.value === 'T4H/24-25/') {
+            invoiceNumberInput.value = '';
+        }
+
+        // Ensure the full invoice number is submitted with prefix
+        const form = invoiceNumberInput.closest('form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const userInput = invoiceNumberInput.value.trim();
+                if (userInput && !userInput.startsWith('T4H/24-25/')) {
+                    invoiceNumberInput.value = 'T4H/24-25/' + userInput;
+                }
+            });
+        }
 
         function calculateGST() {
             const baseAmount = parseFloat(baseAmountField.value) || 0;

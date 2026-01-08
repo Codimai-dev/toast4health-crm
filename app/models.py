@@ -1027,26 +1027,9 @@ class Sale(db.Model, TimestampMixin, UserTrackingMixin):
 
     @staticmethod
     def generate_invoice_number():
-        """Generate a unique invoice number in format INV-YYYY-XXX."""
-        from datetime import datetime
-        year = datetime.now().year
-        existing_invoices = db.session.query(Sale.invoice_number).filter(
-            Sale.invoice_number.like(f'INV-{year}-%')
-        ).all()
-
-        if existing_invoices:
-            numbers = []
-            for inv in existing_invoices:
-                try:
-                    num_part = inv[0].split('-')[-1]
-                    numbers.append(int(num_part))
-                except (IndexError, ValueError):
-                    continue
-            next_num = max(numbers) + 1 if numbers else 1
-        else:
-            next_num = 1
-
-        return f'INV-{year}-{next_num:04d}'
+        """Generate a unique invoice number prefix in format T4H/24-25/."""
+        # Return only the prefix, user will add the rest
+        return 'T4H/24-25/'
 
 
 # Indexes for Sale

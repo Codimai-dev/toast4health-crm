@@ -175,8 +175,13 @@ def sales_add():
         customer = Customer.query.filter_by(customer_name=customer_name).first()
         customer_id = customer.id if customer else None
         
+        # Ensure invoice number has the prefix
+        invoice_num = form.invoice_number.data
+        if not invoice_num.startswith('T4H/24-25/'):
+            invoice_num = 'T4H/24-25/' + invoice_num
+        
         sale = Sale(
-            invoice_number=Sale.generate_invoice_number(),
+            invoice_number=invoice_num,
             date=form.date.data,
             customer_name=customer_name,
             customer_id=customer_id,
@@ -234,8 +239,7 @@ def sales_add():
             flash('Payment received entry created automatically!', 'info')
         return redirect(url_for('finance.sales'))
     
-    # Pre-populate invoice number
-    form.invoice_number.data = Sale.generate_invoice_number()
+    # Don't pre-populate invoice number - user will enter after prefix
     form.date.data = date.today()
     form.payment_date.data = date.today()
     return render_template('finance/sales/add.html', title='Add Sale', form=form)
